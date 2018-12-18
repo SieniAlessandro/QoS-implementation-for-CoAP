@@ -1,0 +1,12 @@
+Aggiunte:
+- inserire un reverse proxy (raspberry 3), che si occupa di rifornire i dati agli observer, e di fare il polling verso i sensori del server
+
+Ricevuti:
+ 2xNodi sensori Zolertia
+ 1xBorder Router skyMote
+ 1xProxy Raspberry 
+
+Client si connette al rasp, rasp controlla se usare la propria informazione
+a seconda della priorità stabilità o se richiedere tramite border router dati
+più aggiornati e freschi
+note: installare ubuntu sul rasp e configurarlo come access point
