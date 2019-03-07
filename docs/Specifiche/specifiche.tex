@@ -1,0 +1,29 @@
+\chapter{Specifiche}
+L’estensione Observe del protocollo CoAP permette agli osservatori di registrarsi presso i soggetti per ottenere le risorse a cui essi sono interessati. Nel paper analizzato, è stato introdotta una funzionalità aggiuntiva che permette agli osservatori di specificare a quali eventi sono interessati, in particolare eventi critici o non critici, utilizzando dei livelli di priorità.
+	\section{Processo di registrazione}
+		\begin{itemize}
+			\item Per inviare una registrazione l’osservatore invia una richiesta GET indicando nel campo observe il valore 0 ed un token per identificare la richiesta
+			\item Nelle notifiche invece il campo observe sarà diverso da 0 ed indicherà il numero di sequenza della notifica, mantenendo invece sempre il campo token invariato
+			\item Il soggetto nel momento della registrazione può decidere se rifiutare la richiesta dell’osservatore inviando la risposta priva del campo observe
+			\item L’osservatore può in qualunque momento decidere di smettere di ricevere notifiche semplicemente rispondendo ad una notifica con un messaggio RST oppure inviando un messaggio GET per la stessa risorsa
+			\item Per garantire l’affidabilità si fa uso dei meccanismi definiti in CoAP: un nodo che riceve un messaggio CON deve notificare che ha ricevuto correttamente il messaggio e talora il mittente non riceva un ACK, esso ritrasmetterà la richiesta. Il processo di ritrasmissione segue il modello \underline{STOP-AND-WAIT} con un backoff esponenziale
+			\item Un nodo può anche scegliere di inviare messaggi in modo non affidabile usando dei messaggi NON. In questa estensione la scelta del tipo di messaggio (CON o NON) è a carico del soggetto
+			\item Per la tempestività dei messaggi invece è previsto l’uso della validità temporale, avvalendosi del meccanismo di cache presente in CoAP
+				\begin{itemize}
+					\item In CoAP è presente un parametro MaxAge che viene usato per indicare la validità temporale
+					\item Un osservatore può salvare in cache un messaggio e riutilizzarlo per future richieste finché la sua validità temporale sarà rispettata
+				\end{itemize}
+		\end{itemize}
+
+	\section{Ruoli}
+		\subsection{Subject}
+			Non gestisce le code a priorità. Effettua un sensing costante in modo da non perdersi gli eventi critici. I dati collezionati vengono inviati solamente al proxy e non direttamente agli osservatori.
+		\subsection{Proxy CoAP-CoAP}
+			Gestisce le code a varie priorità. Riceve le richieste di registrazione alle risorse da parte degli osservatori, quindi registra sé stesso presso i soggetti per ricevere le notifiche di quelle risorse. In questo modo, si maschera anche il numero di osservatori interessati alla risorsa e si riduce il numero di pacchetti inviati dai soggetti, in quanto questi manderanno solo al proxy, il quale appare come un unico osservatore. 
+		\subsection{Border Router}
+			Si occupa di fare da tramite tra la rete locale dei nodi sensori e il proxy.
+		\subsection{Observer}
+			Richiede al proxy la lista delle risorse disponibili sui vari soggetti ed effettua una registrazione per ogni risorsa a cui è interessato. Se la notifica della risorsa non viene ricevuta entro il MaxAge dell’ultimo pacchetto ricevuto, l’osservatore considera sé stesso eliminato dalla lista di osservatori da notificare. 
+
+	\section{Gestione della Frequenza di trasmissione}
+		Al fine di limitare il numero di trasmissioni effettuate dai nodi sensori, e quindi di ridurre il consumo della batteria degli stessi, la frequenza di trasmissione dei nodi sensori al proxy varia nel tempo in base ai valori che stanno rilevando. Nel caso in cui i valori si mantengono per un periodo di tempo all’interno di una certa fascia non critica, la frequenza di trasmissione può essere abbassata, fino a raggiungere un valore minimo prefissato. Viceversa, alla rilevazione di un evento critico, la frequenza di trasmissione è aumentata, quindi successivamente, quando i valori non sono considerati più critici si ripete l’algoritmo per trovare il numero minimo di trasmissioni necessarie. Per implementare questo meccanismo si sfrutta il campo MaxAge del protocollo CoAP, in modo tale da far sapere all’osservatore per quanto tempo deve essere considerato valido il valore ricevuto, in quanto se non riceve alcun nuovo valore entro il MaxAge dell’ultimo pacchetto ricevuto, l’osservatore si può considerare eliminato dalla lista degli osservatori gestiti da tale soggetto.
