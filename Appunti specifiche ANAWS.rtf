@@ -1,0 +1,104 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1671\cocoasubrtf200
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww23740\viewh14320\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs28 \cf0 Comunicazione: \
+\
+-La comunicazione tra i nodi sensori ed il proxy server avviene mediante protocollo CoAP con l\'92ausilio di un border router collegato al proxy server.\
+\
+-Gli observer si collegano invece al proxy server utilizzando una rete ad-hoc (o preesistente) creata dallo stesso proxy server.\
+\
+Ottenimento risorse:\
+\
+- All\'92avvio dell\'92osservatore verr\'e0 fatta una richiesta al proxy server per ottenere la lista delle risorse disponibili (ovvero i nodi sensori) e il proxy stesso risponder\'e0 fornendo tutti i nodi sensori collegati ad esso e le relative risorse in grado di offrire.\
+(AMEDEO SE HAI DELLE AGGIUNTE COMPLETALO TE) \
+\
+Registrazione:\
+\
+-Il nodo sensore sta in attesa fino a quando non arriva la prima registrazione.\
+\
+- Il processo di registrazione seguir\'e0 le specifiche indicate nel paper utilizzati i campi observe e token e il comando GET\
+\
+- Se il nodo sensore ha attiva una registrazione di livello i il proxy non invier\'e0 una richiesta di livello superiore in quanto ha gi\'e0 i dati necessari a servire il nuovo osservatore.\
+\
+- La registrazione tra nodo sensore e proxy server avviene in modo leggermente diverso rispetto a quanto indicato nel paper, dato rispettivamente i livello 1-2 e 3-4 servono solo a differenziare l\'92ordine con qui devono essere inviati i dati (solo critici o tutti), ma dato che nel nostro schema \'e8 presente solo un osservatore dal punto di vista del sensore questa differenziazione non \'e8 pi\'f9 necessaria, riducendo quindi i livelli di priorit\'e0 a 2, il livello 1 solo per i valori critici ed il livello 2 per tutti i valori ottenuti dal sensore.Il livello 3 sar\'e0 utilizzato dal proxy server per disiscriversi dal nodo sensore relativamente a quella risorsa.\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 - Per disiscriversi da un soggetto l\'92osservatore comunicher\'e0 al proxy tale richiesta secondo le specifiche indicate dal paper, e qualora nessun osservatore sar\'e0 pi\'f9 interessato ad essere notificato da tale soggetto, il proxy invier\'e0  al nodo sensore un messaggio GET indicando il livello massimo usato per la disiscrizione.\
+\
+\
+Gestione dei soggetti nel proxy Server:\
+\
+- Al fine di garantire le migliori performance e la maggiore scalabilit\'e0 possibile si intende realizzare un meccanismo di caching sul proxy server che sia in grado di memorizzare gli ultimi valori ottenuti da ciascun soggetto, in modo da poterli ottenere nel momento in cui devono essere inviati a tutti gli osservatori in ascolto.\
+\
+- Per ottenere questo meccanismo sar\'e0 realizzata una struttura dati associata ad ogni nodo sensore, e ogni qual volta che un nuovo dato arriver\'e0 da un soggetto, la sua struttura dati sar\'e0 aggiornata e sar\'e0 notificata il modulo del proxy server che si occuper\'e0 di inviare questo nuovo valore a tutti gli osservatori registrati.\
+\
+- Se un valore rimarr\'e0 nella struttura dati per un tempo maggiore rispetto al max-age indicato nel pacchetto associata, allora significa che il nodo sensore non \'e8 pi\'f9 in grado di produrre nuovi valori e quindi il proxy si considera disiscritto, rimuovendo anche la lista degli osservatori registrati a quella risorsa.\
+\
+\
+Gestione degli osservatori nel proxy Server:\
+\
+- Durante la fase iniziale, dopo aver inviato la lista delle risorse disponibili, il proxy server memorizza anche le informazioni dell\'92osservatore a cui ha inviato tale lista.\
+\
+- Questo modulo del proxy server si occuper\'e0 di inviare i valori ottenuti dai soggetti qualora ne arrivi uno nuovo oppure appena dopo aver completato il protocollo di registrazione con un osservatore, nel caso in cui sia disponibile il valore relativo a quella risorsa.\
+\
+- La gestione della priorit\'e0 dal lato proxy-osservatore reintrodurr\'e0 quattro livelli, seguendo le specifiche del paper, in modo da rendere il proxy trasparente dal punto di vista dell\'92osservatore. Lo stesso discorso si pu\'f2 applicare per il processo di disiscrizione che dal punto di vista dell\'92osservatore sar\'e0 identico a quello proposto nel paper.\
+\
+- Qualora arrivasse una richiesta di disiscrizione da parte di un osservatore verso un soggetto, il proxy server non far\'e0 altro che rimuovere il soggetto in questione dalla lista di quelli iscritti a tale risorsa.\
+\
+- Negoziazione priorit\'e0 di invio da parte del soggetto in base al livello di batteria presente\
+\
+\
+Ottenimento risorse nel nodo sensore:\
+\
+- Un nodo sensore avvia un timer costante per effettuare il sensing qualora sia presente almeno un osservatore interessato a tale risorsa.\
+\
+- Allo scadere del timer si salver\'e0 il valore ottenuto confrontandolo con il valore precedentemente inviato per vedere se \'e8 rimasto all\'92interno di uno specifico range, oppure se completamente un altro valore.\
+\
+- Il nodo sensore stoppa il timer della risorsa nel momento nessun osservatore \'e8 pi\'f9 interessato a tale risorsa, risparmando cosi energia.\
+\
+Gestione priorit\'e0 dei valori:\
+\
+- Il nodo sensore non avendo al suo interno una lista di osservatori, in quanto parler\'e0 solo con il proxy, avr\'e0 per ciascuna risorsa un livello di priorit\'e0 associato, che in questo caso sono due:\
+	- Critico : manda solo i valori considerati critici\
+	- Non critico: manda tutti i valori ottenuti.\
+\
+- Questo meccanismo permette quindi di ridurre allo stretto necessario il numero di invii necessari, in quanto se ad una risorsa sono richiesti solo i valori critici, allora risulta inutile inviarli tutti.\
+\
+- Per una corretta gestione di tutte le informazioni il soggetto assocer\'e0 alla risorsa il valore di priorit\'e0 pi\'f9 basso tra quelli ottenuti : ovvero se al tempo 1 avr\'e0 associato solo valori critici ed al tempo 10 arriver\'e0 una registrazione per tutti i valori, da quel momento in poi il soggetto mander\'e0 tutti i valori, in quanto facendo l\'92opposto sarebbe certa la perdita di informazioni.\
+\
+Gestione della batteria:\
+\
+- Se il livello di energia \'e8 superiore al 30%, il nodo sensore invier\'e0 tutti i valori ottenuti, sia critici che non critici, mentre se il livello \'e8 sotto a tale soglia saranno inviati solo i valori critici, in modo da risparmiare energia.\
+\
+- Per gli osservatori interessati a tutti i valori, avverr\'e0 un disiscrizione e qualora volessero riscriversi dovranno rieseguire il protocollo di registrazione.\
+\
+- Qualora debba essere eseguita una registrazione, se siamo sopra a tale soglia tutte potranno essere accettate, altrimenti solo la registrazione che richiede i valori critici potr\'e0 andare a buon fine, mentre quella che richiede tutti i valori no.\
+\
+Invio del valore dal sensore sensore:\
+\
+- Se il valore appena ottenuto \'e8 considerato critico non saranno fatti calcoli o controlli su di esso, ma bens\'ec sar\'e0 immediatamente inviato al proxy server, dato che in questa situazione la componente cruciale risulta essere il tempo.\
+\
+- Se invece il valore ottenuto non \'e8 critico, allora sar\'e0 eseguito un confronto con il precedente per vedere se \'e8 necessario inviare il valore\
+\
+- Se siamo vicini alla scadenza del max-age allora obbligatoriamente l\'92ultimo valore registrato registrato sar\'e0 inviato, in quanto altrimenti dal punto dell\'92osservatore risulter\'e0 che dal punto rivista dell\'92osservatore, il nodo sensore l\'92abbia disiscritto dalla sua lista.\
+\
+Gestione del max-age nel nodo sensore: \
+\
+- Al fine di ottimizzare il numero di trasmissione da parte del soggetto, \'e8 stato scelto di introdurre un max-age variabile nel tempo, in modo da diminuire, quando possibile la trasmissione di valori simili o uguale tra loro.\
+\
+- All\'92ottenimento di un nuovo valore verr\'e0 controllato che sia critico o meno:\
+	- Nel caso in cui sia critico il max-age sar\'e0 messo ad un preciso valore che deve essere basso, in quanto si presume che anche il prossimo sia critico\
+	- Nel caso in cui non sia critico verr\'e0 eseguito un confronto con il precedente valore:\
+		- Nel caso in cui il nuovo sia vicino al precedente di un certo intervallo:\
+			- Se caso in cui siamo prossimi alla scadenza del precedente max-age, allora il nuovo valore sar\'e0 inviato con un 			  max-age superiore\
+			- Altrimenti il valore misurato sar\'e0 scartato in quanto il confronto deve essere sempre fatto tra il 		  	  valore misurato e l\'92ultimo inviato.\
+		- Altrimenti il valore sar\'e0 inviato ed il max age sar\'e0 impostato al minimo.\
+\
+- I valori che potranno essere assunti dal max-age sono i seguenti:\
+	- Per un valore critico max-age = 2*sensingTime+soglia\
+	- Per un valore non critico il max-age sar\'e0 all\'92interno della finestra [2*sensingTime+soglia; 5*sensingTime+soglia] ed incrementer\'e0 a step di sensingTime\
+	- La soglia \'e8 stata introdotta per non far coincidere il max-age con il sensingTime, in quanto ci\'f2 potrebbe causare problemi di sovrapposizione.}
