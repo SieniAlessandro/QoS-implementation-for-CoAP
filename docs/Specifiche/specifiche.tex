@@ -1,29 +1,189 @@
 \chapter{Specifiche}
-L’estensione Observe del protocollo CoAP permette agli osservatori di registrarsi presso i soggetti per ottenere le risorse a cui essi sono interessati. Nel paper analizzato, è stato introdotta una funzionalità aggiuntiva che permette agli osservatori di specificare a quali eventi sono interessati, in particolare eventi critici o non critici, utilizzando dei livelli di priorità.
-	\section{Processo di registrazione}
-		\begin{itemize}
-			\item Per inviare una registrazione l’osservatore invia una richiesta GET indicando nel campo observe il valore 0 ed un token per identificare la richiesta
-			\item Nelle notifiche invece il campo observe sarà diverso da 0 ed indicherà il numero di sequenza della notifica, mantenendo invece sempre il campo token invariato
-			\item Il soggetto nel momento della registrazione può decidere se rifiutare la richiesta dell’osservatore inviando la risposta priva del campo observe
-			\item L’osservatore può in qualunque momento decidere di smettere di ricevere notifiche semplicemente rispondendo ad una notifica con un messaggio RST oppure inviando un messaggio GET per la stessa risorsa
-			\item Per garantire l’affidabilità si fa uso dei meccanismi definiti in CoAP: un nodo che riceve un messaggio CON deve notificare che ha ricevuto correttamente il messaggio e talora il mittente non riceva un ACK, esso ritrasmetterà la richiesta. Il processo di ritrasmissione segue il modello \underline{STOP-AND-WAIT} con un backoff esponenziale
-			\item Un nodo può anche scegliere di inviare messaggi in modo non affidabile usando dei messaggi NON. In questa estensione la scelta del tipo di messaggio (CON o NON) è a carico del soggetto
-			\item Per la tempestività dei messaggi invece è previsto l’uso della validità temporale, avvalendosi del meccanismo di cache presente in CoAP
-				\begin{itemize}
-					\item In CoAP è presente un parametro MaxAge che viene usato per indicare la validità temporale
-					\item Un osservatore può salvare in cache un messaggio e riutilizzarlo per future richieste finché la sua validità temporale sarà rispettata
-				\end{itemize}
-		\end{itemize}
+	\section{Comunicazione}
 
-	\section{Ruoli}
-		\subsection{Subject}
-			Non gestisce le code a priorità. Effettua un sensing costante in modo da non perdersi gli eventi critici. I dati collezionati vengono inviati solamente al proxy e non direttamente agli osservatori.
-		\subsection{Proxy CoAP-CoAP}
-			Gestisce le code a varie priorità. Riceve le richieste di registrazione alle risorse da parte degli osservatori, quindi registra sé stesso presso i soggetti per ricevere le notifiche di quelle risorse. In questo modo, si maschera anche il numero di osservatori interessati alla risorsa e si riduce il numero di pacchetti inviati dai soggetti, in quanto questi manderanno solo al proxy, il quale appare come un unico osservatore. 
-		\subsection{Border Router}
-			Si occupa di fare da tramite tra la rete locale dei nodi sensori e il proxy.
-		\subsection{Observer}
-			Richiede al proxy la lista delle risorse disponibili sui vari soggetti ed effettua una registrazione per ogni risorsa a cui è interessato. Se la notifica della risorsa non viene ricevuta entro il MaxAge dell’ultimo pacchetto ricevuto, l’osservatore considera sé stesso eliminato dalla lista di osservatori da notificare. 
+    \begin{itemize}
+      \item La comunicazione tra i nodi sensori ed il proxy server avviene mediante protocollo CoAP con l’ausilio di un border router collegato al proxy server.
+      \item Gli observer si collegano invece al proxy server utilizzando una rete ad-hoc (o preesistente) creata dallo stesso proxy server.
+    \end{itemize}
 
-	\section{Gestione della Frequenza di trasmissione}
-		Al fine di limitare il numero di trasmissioni effettuate dai nodi sensori, e quindi di ridurre il consumo della batteria degli stessi, la frequenza di trasmissione dei nodi sensori al proxy varia nel tempo in base ai valori che stanno rilevando. Nel caso in cui i valori si mantengono per un periodo di tempo all’interno di una certa fascia non critica, la frequenza di trasmissione può essere abbassata, fino a raggiungere un valore minimo prefissato. Viceversa, alla rilevazione di un evento critico, la frequenza di trasmissione è aumentata, quindi successivamente, quando i valori non sono considerati più critici si ripete l’algoritmo per trovare il numero minimo di trasmissioni necessarie. Per implementare questo meccanismo si sfrutta il campo MaxAge del protocollo CoAP, in modo tale da far sapere all’osservatore per quanto tempo deve essere considerato valido il valore ricevuto, in quanto se non riceve alcun nuovo valore entro il MaxAge dell’ultimo pacchetto ricevuto, l’osservatore si può considerare eliminato dalla lista degli osservatori gestiti da tale soggetto.
+  \section{Ottenimento Lista Risorse da parte degli Observer}
+
+    \begin{itemize}
+      \item All’avvio dell’osservatore verrà fatta una richiesta al proxy server per ottenere la lista delle risorse disponibili (nei nodi sensori) e il proxy stesso risponderà fornendo tutti i nodi sensori collegati ad esso e le relative risorse in grado di offrire.
+    \end{itemize}
+
+  \section{Registrazione}
+
+    \begin{itemize}
+      \item Il nodo sensore sta in attesa fino a quando non arriva la prima registrazione.
+      \item Il processo di registrazione seguirà le specifiche indicate nel paper utilizzati i campi observe e token e il comando GET.
+      \item Se il nodo sensore ha attiva una registrazione di livello i il proxy non invierà una richiesta di livello superiore in quanto ha già i dati necessari a servire il nuovo osservatore.
+      \item La registrazione tra nodo sensore e proxy server avviene in modo leggermente diverso rispetto a quanto indicato nel paper, dato rispettivamente i livello 1-2 e 3-4 servono solo a differenziare l’ordine con qui devono essere inviati i dati (solo critici o tutti), ma dato che nel nostro schema è presente solo un osservatore dal punto di vista del sensore questa differenziazione non è più necessaria, riducendo quindi i livelli di priorità a 2, il livello 1 solo per i valori critici ed il livello 2 per tutti i valori ottenuti dal sensore.Il livello 3 dello steso campo sarà utilizzato dal proxy server per disiscriversi dal nodo sensore relativamente a quella risorsa.
+      \item Per disiscriversi da un soggetto l’osservatore comunicherà al proxy tale richiesta secondo le specifiche indicate dal paper, e qualora nessun osservatore sarà più interessato ad essere notificato da tale soggetto, il proxy invierà  al nodo sensore un messaggio GET indicando il livello 3 che viene usato per la disiscrizione.
+    \end{itemize}
+
+  \section{Gestione dei Soggetti nel Proxy Server}
+
+    \begin{itemize}
+      \item Al fine di garantire le migliori performance e la maggiore scalabilità possibile si intende realizzare un meccanismo di caching sul proxy server che sia in grado di memorizzare gli ultimi valori ottenuti da ciascun soggetto, in modo da poterli ottenere nel momento in cui devono essere inviati a tutti gli osservatori in ascolto.
+      \item Per ottenere questo meccanismo sarà realizzata una struttura dati associata ad ogni nodo sensore, e ogni qual volta che un nuovo dato arriverà da un soggetto, la sua struttura dati sarà aggiornata e sarà notificata il modulo del proxy server che si occuperà di inviare questo nuovo valore a tutti gli osservatori registrati.
+      \item Se un valore rimane nella struttura dati per un tempo maggiore rispetto al max-age indicato nel pacchetto associato, allora significa che il nodo sensore non è più in grado di produrre nuovi valori e quindi il proxy si considera disiscritto, rimuovendo anche la lista degli osservatori registrati a quella risorsa.
+    \end{itemize}
+
+  \section{Gestione degli Osservatori nel Proxy Server}
+
+    \begin{itemize}
+      \item Durante la fase iniziale, dopo aver inviato la lista delle risorse disponibili, il proxy server memorizza anche le informazioni dell’osservatore a cui ha inviato tale lista.
+      \item Questo modulo del proxy server si occuperà di inviare i valori ottenuti dai soggetti qualora ne arrivi uno nuovo oppure appena dopo aver completato il protocollo di registrazione con un osservatore, nel caso in cui sia disponibile il valore relativo a quella risorsa.
+      \item La gestione della priorità dal lato proxy-osservatore reintrodurrà quattro livelli, seguendo le specifiche del paper, in modo da rendere il proxy trasparente dal punto di vista dell’osservatore. Lo stesso discorso si può applicare per il processo di disiscrizione che dal punto di vista dell’osservatore sarà identico a quello proposto nel paper.
+      \item Qualora arrivasse una richiesta di disiscrizione da parte di un osservatore verso un soggetto, il proxy server non farà altro che rimuovere il soggetto in questione dalla lista di quelli iscritti a tale risorsa.
+      \item Negoziazione della priorità di invio da parte del soggetto in base al livello di batteria presente nel nodo sensore a cui appartiene la risorsa interessata.
+    \end{itemize}
+
+  \section{Ottenimento Risorse nel Nodo Sensore}
+
+    \begin{itemize}
+      \item Un nodo sensore avvia un timer costante per effettuare il sensing qualora sia presente almeno un osservatore interessato ad almeno una risorsa.
+      \item Allo scadere del timer si salverà il valore ottenuto confrontandolo con il valore precedentemente inviato per vedere se è rimasto all’interno di uno specifico range, oppure se completamente un altro valore.
+      \item Il nodo sensore ferma il timer della risorsa nel momento in cui nessun osservatore è più interessato a qualche risorsa, risparmiando cosi energia.
+    \end{itemize}
+
+  \section{Gestione Priorità dei Valori}
+
+    \begin{itemize}
+      \item Il nodo sensore non avendo al suo interno una lista di osservatori, in quanto parlerà solo con il proxy, avrà per ciascuna risorsa un livello di priorità associato, che in questo caso sono due:
+
+        \begin{itemize}
+          \item Critico : manda solo i valori considerati critici.
+          \item Non critico: manda tutti i valori ottenuti.
+        \end{itemize}
+
+      \item Questo meccanismo permette quindi di ridurre allo stretto necessario il numero di invii, in quanto se ad una risorsa sono richiesti solo i valori critici, allora risulta inutile inviarli tutti.
+      \item Per una corretta gestione di tutte le informazioni il soggetto assocerà alla risorsa il valore di priorità più basso tra quelli ottenuti : ovvero se al tempo 1 avrà associato solo valori critici ed al tempo 10 arriverà una registrazione per tutti i valori, da quel momento in poi il soggetto manderà tutti i valori, in quanto facendo l’opposto sarebbe certa la perdita di informazioni.
+    \end{itemize}
+
+  \section{Gestione della Batteria}
+
+    \begin{itemize}
+      \item Se il livello di energia è superiore al 30%, il nodo sensore invierà tutti i valori ottenuti, sia critici che non critici, mentre se il livello è sotto a tale soglia saranno inviati solo i valori critici, in modo da risparmiare energia.
+      \item Per gli osservatori interessati a tutti i valori, avverrà un disiscrizione e qualora volessero riscriversi dovranno rieseguire il protocollo di registrazione.
+      \item Qualora debba essere eseguita una registrazione, se siamo sopra a tale soglia tutte potranno essere accettate, altrimenti solo la registrazione che richiede i valori critici potrà andare a buon fine, mentre quella che richiede tutti i valori no.
+    \end{itemize}
+
+  \section{Trasmissione dei Valori dal Nodo Sensore}
+
+    \begin{itemize}
+      \item Se il valore appena ottenuto è considerato critico non saranno fatti calcoli o controlli su di esso, ma bensì sarà immediatamente inviato al proxy server, dato che in questa situazione la componente cruciale risulta essere il tempo.
+      \item Se invece il valore ottenuto non è critico, allora sarà eseguito un confronto con il precedente per vedere se è necessario inviare il valore.
+      \item Se siamo vicini alla scadenza del max-age allora obbligatoriamente l’ultimo valore registrato sarà inviato, in quanto altrimenti dal punto dell’osservatore risulterà che il nodo sensore l’abbia disiscritto dalla sua lista.
+    \end{itemize}
+
+  \section{Gestione del max-age nel Nodo Sensore}
+
+    \begin{itemize}
+      \item Al fine di ottimizzare il numero di trasmissione da parte del soggetto, è stato scelto di introdurre un max-age variabile nel tempo, in modo da diminuire, quanto possibile la trasmissione di valori simili o uguali tra loro.
+      \item All’ottenimento di un nuovo valore verrà controllato che sia critico o meno:
+
+        \begin{itemize}
+          \item Nel caso in cui sia critico il max-age sarà messo ad un preciso valore che deve essere basso, in quanto si presume che anche il prossimo sia critico
+          \item Nel caso in cui non sia critico verrà eseguito un confronto con il precedente valore:
+
+              \begin{itemize}
+                \item Nel caso in cui il nuovo sia vicino al precedente di un certo intervallo:
+
+                  \begin{itemize}
+                    \item Se caso in cui siamo prossimi alla scadenza del precedente max-age, allora il nuovo valore sarà inviato con un max-age superiore.
+                    \item Altrimenti il valore misurato sarà scartato in quanto il confronto deve essere sempre fatto tra il valore misurato e l’ultimo inviato.
+                  \end{itemize}
+
+                \item Altrimenti il valore sarà inviato ed il max age sarà impostato al minimo.
+              \end{itemize}
+
+        \end{itemize}
+
+      \item I valori che potranno essere assunti dal max-age sono i seguenti:
+
+        \begin{itemize}
+          \item Per un valore critico max-age = 2*sensingTime+soglia.
+          \item Per un valore non critico il max-age sarà all’interno della finestra [2*sensingTime+soglia; 5*sensingTime+soglia] ed incrementerà a step di sensingTime.
+          \item La soglia è stata introdotta per non far coincidere il max-age con il sensingTime, in quanto ciò potrebbe causare problemi di sovrapposizione.
+        \end{itemize}
+
+    \end{itemize}
+
+  \section{Implementazione}
+    L’architettura del nostro sistema si dividerà nei seguenti moduli:
+
+      \begin{itemize}
+        \item Il modulo osservatore che riceverà i dati.
+        \item Il proxy che al suo al interno avrà due sottomoduli:
+
+          \begin{itemize}
+            \item Il sottomodulo ProxyObserver responsabile della gestione e della comunicazione con gli osservatori, inoltrando al modulo ProxySubject le eventuali richieste di registrazione e di disiscrizione.
+            \item Il sottomodulo ProxySubject che invece si occupa di gestire e comunicare con i soggetti, fornendo al sottomodulo ProxyObserver le strutture dati necessari per poter trasmettere i valori agli osservatori.
+          \end{itemize}
+
+        \item Il modulo che si occupa di gestire il soggetto, con le relative misure e trasmissioni.
+
+      \end{itemize}
+    \subsection{Modulo Osservatore}
+      Questo modulo risulterà essere un semplice client di prova senza interfaccia grafica realizzato in java che si occuperà solo di richiedere la lista delle risorse e di effettuare registrazione/disiscrizione, stampando a video i valori ricevuti dai soggetti.
+
+    \subsection{Modulo Proxy}
+      Il modulo che sarà eseguito sul proxy sarà sviluppato interamente in java, anch’esso senza interfaccia grafica, e si occuperà di far comunicare gli osservatori con i soggetti, cercando di massimizzare le performance ed il consumo di energia per i soggetti stessi.
+
+      \paragraph{Sottomodulo ProxyObserver}
+
+        \begin{itemize}
+          \item Sarà un thread apposito per gestire le richieste di registrazione e disiscrizione, creando un sottothread per ciascuna di esse occupandosi anche di inoltrare (richiamando funzioni specifiche offerte dal sottomodulo ProxySubject) tali richieste al ProxySubject solo se la negoziazione ha avuto esito positivo.
+          \item Sarà presente un altro thread per l’invio delle notifiche agli osservatori seguendo le priorità specificate durante il processo di negoziazione.
+          \item Per quanto riguarda le strutture dati o classi saranno le seguenti:
+
+            \begin{itemize}
+              \item Una classe che si occupa di gestire gli osservatori mantenendo le informazioni necessarie per la connessione.
+              \item Per ogni risorsa ci saranno quattro code in cui verrano inseriti le istanze degli osservatori registrati e inseriti nella relativa coda in base alla priorità negoziata.
+            \end{itemize}
+
+        \end{itemize}
+
+      \paragraph{Sottomodulo ProxySubject}
+
+        \begin{itemize}
+          \item Sarà presente una lista di strutture dati che serviranno a virtualizzare i soggetti fornendo le seguenti informazioni:
+
+            \begin{itemize}
+              \item L’indirizzo ip del nodo sensore.
+              \item Il livello di batteria del nodo sensore
+              \item Una lista delle risorse disponibili, virtualizzate tramite una struttura dati che mi fornisce i seguenti valori:
+
+                \begin{itemize}
+                  \item Il tipo della risorsa (temperatura, umidità,…).
+                  \item L’ultimo valore ricevuto ed il max-age relativo per ciascuna risorsa ottenibile da tale nodo sensore.
+                  \item Il livello dell’attuale registrazione con quel nodo sensore per ogni risorsa ottenibile da tale nodo sensore.
+                \end{itemize}
+
+            \end{itemize}
+
+          \item Questo sottomodulo fornirà anche dei metodi per poter accedere ai valori della precedente struttura dati, in modo da poter completamente virtualizzate il nodo sensore dal punto di vista del ProxyObserver, come ad esempio:
+
+            \begin{itemize}
+              \item Il metodo che restituisce il livello di batteria dello specifico nodo sensore.
+              \item Un metodo per ottenere l’ultimo valore registrato dal nodo sensore per una specifica risorsa.
+              \item Un metodo per potersi registrare allo specifico nodo sensore.
+              \item Un metodo per potersi disiscriversi dal nodo sensore.
+            \end{itemize}
+
+        \end{itemize}
+
+    \subsection{Modulo Soggetto}
+
+      \begin{itemize}
+        \item Implementato in C.
+        \item Sarà presente una struttura dati con le informazioni necessarie per comunicare con il proxy
+        \item Avrà delle soglie per determinare se un valore è critico o meno
+        \item Avrà un livello di priorità per ogni risorsa alla quale è stata la registrazione.
+        \item Avrà un timer, comune a tutte le risorse, per decidere quando effettuare il sensing del nuovo valore.
+        \item Deciderà se effettuare il sensing di una risorsa se è presente una registrazione su quella risorsa.
+        \item Avrà un timer per gestire la scadenza del max-age, come da algoritmo precedentemente riportato.
+        \item Avrà un valore che virtualizzerà il livello di batteria, in particolare verrà aggiornato ad ogni sensing e ad ogni trasmissione di un valore costante, differente per i due casi.
+      \end{itemize}

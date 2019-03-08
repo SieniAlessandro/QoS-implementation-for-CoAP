@@ -1,4 +1,4 @@
-Comunicazione: 
+Comunicazione:
 
 -La comunicazione tra i nodi sensori ed il proxy server avviene mediante protocollo CoAP con l’ausilio di un border router collegato al proxy server.
 
@@ -12,7 +12,7 @@ Registrazione:
 
 -Il nodo sensore sta in attesa fino a quando non arriva la prima registrazione.
 
-- Il processo di registrazione seguirà le specifiche indicate nel paper utilizzati i campi observe e token e il comando GET
+- Il processo di registrazione seguirà le specifiche indicate nel paper utilizzati i campi observe e token e il comando GET.
 
 - Se il nodo sensore ha attiva una registrazione di livello i il proxy non invierà una richiesta di livello superiore in quanto ha già i dati necessari a servire il nuovo osservatore.
 
@@ -69,15 +69,15 @@ Gestione della batteria:
 
 - Qualora debba essere eseguita una registrazione, se siamo sopra a tale soglia tutte potranno essere accettate, altrimenti solo la registrazione che richiede i valori critici potrà andare a buon fine, mentre quella che richiede tutti i valori no.
 
-Invio del valore dal nodo sensore:
+Trasmissione del valore dal nodo sensore:
 
 - Se il valore appena ottenuto è considerato critico non saranno fatti calcoli o controlli su di esso, ma bensì sarà immediatamente inviato al proxy server, dato che in questa situazione la componente cruciale risulta essere il tempo.
 
-- Se invece il valore ottenuto non è critico, allora sarà eseguito un confronto con il precedente per vedere se è necessario inviare il valore
+- Se invece il valore ottenuto non è critico, allora sarà eseguito un confronto con il precedente per vedere se è necessario inviare il valore.
 
 - Se siamo vicini alla scadenza del max-age allora obbligatoriamente l’ultimo valore registrato sarà inviato, in quanto altrimenti dal punto dell’osservatore risulterà che il nodo sensore l’abbia disiscritto dalla sua lista.
 
-Gestione del max-age nel nodo sensore: 
+Gestione del max-age nel nodo sensore:
 
 - Al fine di ottimizzare il numero di trasmissione da parte del soggetto, è stato scelto di introdurre un max-age variabile nel tempo, in modo da diminuire, quanto possibile la trasmissione di valori simili o uguali tra loro.
 
@@ -85,8 +85,8 @@ Gestione del max-age nel nodo sensore:
 	- Nel caso in cui sia critico il max-age sarà messo ad un preciso valore che deve essere basso, in quanto si presume che anche il prossimo sia critico
 	- Nel caso in cui non sia critico verrà eseguito un confronto con il precedente valore:
 		- Nel caso in cui il nuovo sia vicino al precedente di un certo intervallo:
-			- Se caso in cui siamo prossimi alla scadenza del precedente max-age, allora il nuovo valore sarà inviato con un 			  max-age superiore
-			- Altrimenti il valore misurato sarà scartato in quanto il confronto deve essere sempre fatto tra il 		  	  valore misurato e l’ultimo inviato.
+			- Se caso in cui siamo prossimi alla scadenza del precedente max-age, allora il nuovo valore sarà inviato con un max-age superiore.
+			- Altrimenti il valore misurato sarà scartato in quanto il confronto deve essere sempre fatto tra il valore misurato e l’ultimo inviato.
 		- Altrimenti il valore sarà inviato ed il max age sarà impostato al minimo.
 
 - I valori che potranno essere assunti dal max-age sono i seguenti:
@@ -99,10 +99,10 @@ Gestione del max-age nel nodo sensore:
 Implementazione:
 
 - L’architettura del nostro sistema si dividerà nei seguenti moduli:
-	- Il modulo osservatore che riceverà i dati
+	- Il modulo osservatore che riceverà i dati.
 	- Il proxy che al suo al interno avrà due sottomoduli:
-		- Il sottomodulo ProxyObserver responsabile della gestione e della comunicazione con gli osservatori, inoltrando al modulo ProxySubject le eventuali richieste di registrazione e di 		  disiscrizione.
-		- Il sottomodulo ProxySubject che invece si occupa di gestire e comunicare con i soggetti, fornendo al sottomodulo ProxyObserver le strutture dati necessari per poter trasmettere i 		  valori agli osservatori.
+		- Il sottomodulo ProxyObserver responsabile della gestione e della comunicazione con gli osservatori, inoltrando al modulo ProxySubject le eventuali richieste di registrazione e di disiscrizione.
+		- Il sottomodulo ProxySubject che invece si occupa di gestire e comunicare con i soggetti, fornendo al sottomodulo ProxyObserver le strutture dati necessari per poter trasmettere i valori agli osservatori.
 	- Il modulo che si occupa di gestire il soggetto, con le relative misure e trasmissioni.
 
 Modulo Osservatore:
@@ -115,15 +115,15 @@ Modulo Proxy:
 
 	Sottomodulo ProxyObserver:
 
-	- Sarà un thread apposito per gestire le richieste di registrazione e disiscrizione, creando un sottothread per ciascuna di esse occupandosi anche di inoltrare (richiamando funzioni 	  specifiche offerte dal sottomodulo ProxySubject) tali richieste al ProxySubject solo se la negoziazione ha avuto esito positivo.
+	- Sarà un thread apposito per gestire le richieste di registrazione e disiscrizione, creando un sottothread per ciascuna di esse occupandosi anche di inoltrare (richiamando funzioni specifiche offerte dal sottomodulo ProxySubject) tali richieste al ProxySubject solo se la negoziazione ha avuto esito positivo.
 	- Sarà presente un altro thread per l’invio delle notifiche agli osservatori seguendo le priorità specificate durante il processo di  negoziazione.
 	- Per quanto riguarda le strutture dati o classi saranno le seguenti:
 		- Una classe che si occupa di gestire gli osservatori mantenendo le informazioni necessarie per la connessione.
 		- Per ogni risorsa ci saranno quattro code in cui verrano inseriti le istanze degli osservatori registrati e inseriti nella relativa coda in base alla priorità negoziata.
-	
+
 	Sottomodulo ProxySubject:
 
-	- Sarà presente una liste di strutture dati che serviranno a virtualizzare i soggetti fornendo le seguenti informazioni:
+	- Sarà presente una lista di strutture dati che serviranno a virtualizzare i soggetti fornendo le seguenti informazioni:
 		- L’indirizzo ip del nodo sensore
 		- Il livello di batteria del nodo sensore
 		- Una lista delle risorse disponibili, virtualizzate tramite una struttura dati che mi fornisce i seguenti valori:
@@ -146,5 +146,3 @@ Modulo Soggetto:
 - Avrà un valore che virtualizzerà il livello di batteria:
 	- Ad ogni sensing e ad invio il livello scenderà di un valore costante.
 - Sarà presente una struttura dati con le informazioni necessarie per comunicare con il proxy
-
-
