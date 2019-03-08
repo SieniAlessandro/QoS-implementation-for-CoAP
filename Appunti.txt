@@ -1,0 +1,150 @@
+Comunicazione: 
+
+-La comunicazione tra i nodi sensori ed il proxy server avviene mediante protocollo CoAP con l’ausilio di un border router collegato al proxy server.
+
+-Gli observer si collegano invece al proxy server utilizzando una rete ad-hoc (o preesistente) creata dallo stesso proxy server.
+
+Ottenimento risorse:
+
+- All’avvio dell’osservatore verrà fatta una richiesta al proxy server per ottenere la lista delle risorse disponibili (ovvero i nodi sensori) e il proxy stesso risponderà fornendo tutti i nodi sensori collegati ad esso e le relative risorse in grado di offrire.
+
+Registrazione:
+
+-Il nodo sensore sta in attesa fino a quando non arriva la prima registrazione.
+
+- Il processo di registrazione seguirà le specifiche indicate nel paper utilizzati i campi observe e token e il comando GET
+
+- Se il nodo sensore ha attiva una registrazione di livello i il proxy non invierà una richiesta di livello superiore in quanto ha già i dati necessari a servire il nuovo osservatore.
+
+- La registrazione tra nodo sensore e proxy server avviene in modo leggermente diverso rispetto a quanto indicato nel paper, dato rispettivamente i livello 1-2 e 3-4 servono solo a differenziare l’ordine con qui devono essere inviati i dati (solo critici o tutti), ma dato che nel nostro schema è presente solo un osservatore dal punto di vista del sensore questa differenziazione non è più necessaria, riducendo quindi i livelli di priorità a 2, il livello 1 solo per i valori critici ed il livello 2 per tutti i valori ottenuti dal sensore.Il livello 3 dello steso campo sarà utilizzato dal proxy server per disiscriversi dal nodo sensore relativamente a quella risorsa.
+
+- Per disiscriversi da un soggetto l’osservatore comunicherà al proxy tale richiesta secondo le specifiche indicate dal paper, e qualora nessun osservatore sarà più interessato ad essere notificato da tale soggetto, il proxy invierà  al nodo sensore un messaggio GET indicando il livello 3 che viene usato per la disiscrizione.
+
+
+Gestione dei soggetti nel proxy Server:
+
+- Al fine di garantire le migliori performance e la maggiore scalabilità possibile si intende realizzare un meccanismo di caching sul proxy server che sia in grado di memorizzare gli ultimi valori ottenuti da ciascun soggetto, in modo da poterli ottenere nel momento in cui devono essere inviati a tutti gli osservatori in ascolto.
+
+- Per ottenere questo meccanismo sarà realizzata una struttura dati associata ad ogni nodo sensore, e ogni qual volta che un nuovo dato arriverà da un soggetto, la sua struttura dati sarà aggiornata e sarà notificata il modulo del proxy server che si occuperà di inviare questo nuovo valore a tutti gli osservatori registrati.
+
+- Se un valore rimarrà nella struttura dati per un tempo maggiore rispetto al max-age indicato nel pacchetto associato, allora significa che il nodo sensore non è più in grado di produrre nuovi valori e quindi il proxy si considera disiscritto, rimuovendo anche la lista degli osservatori registrati a quella risorsa.
+
+
+Gestione degli osservatori nel proxy Server:
+
+- Durante la fase iniziale, dopo aver inviato la lista delle risorse disponibili, il proxy server memorizza anche le informazioni dell’osservatore a cui ha inviato tale lista.
+
+- Questo modulo del proxy server si occuperà di inviare i valori ottenuti dai soggetti qualora ne arrivi uno nuovo oppure appena dopo aver completato il protocollo di registrazione con un osservatore, nel caso in cui sia disponibile il valore relativo a quella risorsa.
+
+- La gestione della priorità dal lato proxy-osservatore reintrodurrà quattro livelli, seguendo le specifiche del paper, in modo da rendere il proxy trasparente dal punto di vista dell’osservatore. Lo stesso discorso si può applicare per il processo di disiscrizione che dal punto di vista dell’osservatore sarà identico a quello proposto nel paper.
+
+- Qualora arrivasse una richiesta di disiscrizione da parte di un osservatore verso un soggetto, il proxy server non farà altro che rimuovere il soggetto in questione dalla lista di quelli iscritti a tale risorsa.
+
+- Negoziazione della priorità di invio da parte del soggetto in base al livello di batteria presente
+
+
+Ottenimento risorse nel nodo sensore:
+
+- Un nodo sensore avvia un timer costante per effettuare il sensing qualora sia presente almeno un osservatore interessato a tale risorsa.
+
+- Allo scadere del timer si salverà il valore ottenuto confrontandolo con il valore precedentemente inviato per vedere se è rimasto all’interno di uno specifico range, oppure se completamente un altro valore.
+
+- Il nodo sensore stoppa il timer della risorsa nel momento in cui nessun osservatore è più interessato a tale risorsa, risparmiando cosi energia.
+
+Gestione priorità dei valori:
+
+- Il nodo sensore non avendo al suo interno una lista di osservatori, in quanto parlerà solo con il proxy, avrà per ciascuna risorsa un livello di priorità associato, che in questo caso sono due:
+	- Critico : manda solo i valori considerati critici
+	- Non critico: manda tutti i valori ottenuti.
+
+- Questo meccanismo permette quindi di ridurre allo stretto necessario il numero di invii, in quanto se ad una risorsa sono richiesti solo i valori critici, allora risulta inutile inviarli tutti.
+
+- Per una corretta gestione di tutte le informazioni il soggetto assocerà alla risorsa il valore di priorità più basso tra quelli ottenuti : ovvero se al tempo 1 avrà associato solo valori critici ed al tempo 10 arriverà una registrazione per tutti i valori, da quel momento in poi il soggetto manderà tutti i valori, in quanto facendo l’opposto sarebbe certa la perdita di informazioni.
+
+Gestione della batteria:
+
+- Se il livello di energia è superiore al 30%, il nodo sensore invierà tutti i valori ottenuti, sia critici che non critici, mentre se il livello è sotto a tale soglia saranno inviati solo i valori critici, in modo da risparmiare energia.
+
+- Per gli osservatori interessati a tutti i valori, avverrà un disiscrizione e qualora volessero riscriversi dovranno rieseguire il protocollo di registrazione.
+
+- Qualora debba essere eseguita una registrazione, se siamo sopra a tale soglia tutte potranno essere accettate, altrimenti solo la registrazione che richiede i valori critici potrà andare a buon fine, mentre quella che richiede tutti i valori no.
+
+Invio del valore dal nodo sensore:
+
+- Se il valore appena ottenuto è considerato critico non saranno fatti calcoli o controlli su di esso, ma bensì sarà immediatamente inviato al proxy server, dato che in questa situazione la componente cruciale risulta essere il tempo.
+
+- Se invece il valore ottenuto non è critico, allora sarà eseguito un confronto con il precedente per vedere se è necessario inviare il valore
+
+- Se siamo vicini alla scadenza del max-age allora obbligatoriamente l’ultimo valore registrato sarà inviato, in quanto altrimenti dal punto dell’osservatore risulterà che il nodo sensore l’abbia disiscritto dalla sua lista.
+
+Gestione del max-age nel nodo sensore: 
+
+- Al fine di ottimizzare il numero di trasmissione da parte del soggetto, è stato scelto di introdurre un max-age variabile nel tempo, in modo da diminuire, quanto possibile la trasmissione di valori simili o uguali tra loro.
+
+- All’ottenimento di un nuovo valore verrà controllato che sia critico o meno:
+	- Nel caso in cui sia critico il max-age sarà messo ad un preciso valore che deve essere basso, in quanto si presume che anche il prossimo sia critico
+	- Nel caso in cui non sia critico verrà eseguito un confronto con il precedente valore:
+		- Nel caso in cui il nuovo sia vicino al precedente di un certo intervallo:
+			- Se caso in cui siamo prossimi alla scadenza del precedente max-age, allora il nuovo valore sarà inviato con un 			  max-age superiore
+			- Altrimenti il valore misurato sarà scartato in quanto il confronto deve essere sempre fatto tra il 		  	  valore misurato e l’ultimo inviato.
+		- Altrimenti il valore sarà inviato ed il max age sarà impostato al minimo.
+
+- I valori che potranno essere assunti dal max-age sono i seguenti:
+	- Per un valore critico max-age = 2*sensingTime+soglia
+	- Per un valore non critico il max-age sarà all’interno della finestra [2*sensingTime+soglia; 5*sensingTime+soglia] ed incrementerà a step di sensingTime
+	- La soglia è stata introdotta per non far coincidere il max-age con il sensingTime, in quanto ciò potrebbe causare problemi di sovrapposizione.
+
+
+
+Implementazione:
+
+- L’architettura del nostro sistema si dividerà nei seguenti moduli:
+	- Il modulo osservatore che riceverà i dati
+	- Il proxy che al suo al interno avrà due sottomoduli:
+		- Il sottomodulo ProxyObserver responsabile della gestione e della comunicazione con gli osservatori, inoltrando al modulo ProxySubject le eventuali richieste di registrazione e di 		  disiscrizione.
+		- Il sottomodulo ProxySubject che invece si occupa di gestire e comunicare con i soggetti, fornendo al sottomodulo ProxyObserver le strutture dati necessari per poter trasmettere i 		  valori agli osservatori.
+	- Il modulo che si occupa di gestire il soggetto, con le relative misure e trasmissioni.
+
+Modulo Osservatore:
+
+- Questo modulo risulterà essere un semplice client di prova senza interfaccia grafica realizzato in java che si occuperà solo di richiedere la lista delle risorse e di effettuare registrazione/disiscrizione, stampando a video i valori ricevuti dai soggetti.
+
+Modulo Proxy:
+
+- Il modulo che sarà eseguito sul proxy sarà sviluppato interamente in java, anch’esso senza interfaccia grafica, e si occuperà di far comunicare gli osservatori con i soggetti, cercando di massimizzare le performance ed il consumo di energia per i soggetti stessi.
+
+	Sottomodulo ProxyObserver:
+
+	- Sarà un thread apposito per gestire le richieste di registrazione e disiscrizione, creando un sottothread per ciascuna di esse occupandosi anche di inoltrare (richiamando funzioni 	  specifiche offerte dal sottomodulo ProxySubject) tali richieste al ProxySubject solo se la negoziazione ha avuto esito positivo.
+	- Sarà presente un altro thread per l’invio delle notifiche agli osservatori seguendo le priorità specificate durante il processo di  negoziazione.
+	- Per quanto riguarda le strutture dati o classi saranno le seguenti:
+		- Una classe che si occupa di gestire gli osservatori mantenendo le informazioni necessarie per la connessione.
+		- Per ogni risorsa ci saranno quattro code in cui verrano inseriti le istanze degli osservatori registrati e inseriti nella relativa coda in base alla priorità negoziata.
+	
+	Sottomodulo ProxySubject:
+
+	- Sarà presente una liste di strutture dati che serviranno a virtualizzare i soggetti fornendo le seguenti informazioni:
+		- L’indirizzo ip del nodo sensore
+		- Il livello di batteria del nodo sensore
+		- Una lista delle risorse disponibili, virtualizzate tramite una struttura dati che mi fornisce i seguenti valori:
+			- Il tipo della risorsa (temperatura, umidità,…)
+			- L’ultimo valore ricevuto ed il max-age relativo per ciascuna risorsa ottenibile da tale nodo sensore.
+			- Il livello dell’attuale registrazione con quel nodo sensore per ogni risorsa ottenibile da tale nodo sensore
+	- Questo sottomodulo fornirà anche dei metodi per poter accedere ai valori della precedente struttura dati, in modo da poter completamente virtualizzate il nodo sensore dal punto di vista del ProxyObserver, come ad esempio:
+		- Il metodo che restituisce il livello di batteria dello specifico nodo sensore.
+		- Un metodo per ottenere l’ultimo valore registrato dal nodo sensore per una specifica risorsa.
+		- Un metodo per potersi registrare allo specifico nodo sensore.
+		- Un metodo per potersi disiscriversi dal nodo sensore .
+
+Modulo Soggetto:
+
+- Implementato in C
+- Avrà un livello di priorità per ogni risorsa alla quale è stata la registrazione
+- Avrà un timer sensing del nuovo valore, comune a tutte le risorse.
+- Deciderà se effettuare il sensing di una risorsa se è presente una registrazione
+- Avrà un timer per gestire la scadenza del max-age, come da algoritmo precedentemente riportato
+- Avrà un valore che virtualizzerà il livello di batteria:
+	- Ad ogni sensing e ad invio il livello scenderà di un valore costante.
+- Sarà presente una struttura dati con le informazioni necessarie per comunicare con il proxy
+
+
