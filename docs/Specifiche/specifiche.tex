@@ -187,3 +187,10 @@
         \item Avrà un timer per gestire la scadenza del max-age, come da algoritmo precedentemente riportato.
         \item Avrà un valore che virtualizzerà il livello di batteria, in particolare verrà aggiornato ad ogni sensing e ad ogni trasmissione di un valore costante, differente per i due casi.
       \end{itemize}
+
+	\section{Testing}
+		Al termine dell'implementazione il sistema sarà testato con lo scopo di andare a valutare le performance del sistema, in particolare andremo ad analizzare:
+			\begin{itemize}
+				\item Delay: analisi del tempo necessario per la trasmissione del pacchetto dal soggetto all’osservatore differenziando il numero di osservatori collegati al proxy e le priorità da loro richieste.
+				\item Energy Consumption: Analisi del consumo energetico sui nodi sensori distinguendo il caso in cui l'invio avviene sempre subito dopo il sensing oppure utilizzando l'algoritmo illustrato nelle specifiche.
+			\end{itemize}
