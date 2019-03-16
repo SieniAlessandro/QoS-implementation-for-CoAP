@@ -79,6 +79,8 @@ public class ObservableResource extends CoapResource {
 			exchange.respond(response);
 
 			ObserveRelation relation = new ObserveRelation(observingEndpoint, this, exchange.advanced());
+		} else {
+			// NEGOTIATION 
 		}
 	}
 

@@ -15,6 +15,7 @@ import org.eclipse.californium.core.coap.OptionNumberRegistry;
 import org.eclipse.californium.core.coap.OptionSet;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.network.Endpoint;
+import org.eclipse.californium.core.network.config.NetworkConfig;
 
 public class Observer {
 
@@ -31,6 +32,7 @@ public class Observer {
 		this.observerCoap = new CoapClient();
 		this.resourceList = new HashSet<WebLink>();
 		this.relations = new HashMap<String, CoapObserveRelation>();
+		this.observerCoap.setURI("coap://[" + this.ipv6Proxy + "]:" + this.portProxy);
 		resourceDiscovery();
 	}
 
@@ -38,6 +40,7 @@ public class Observer {
 		System.out.print("Discovery...\n");
 		resourceList.clear();
 		resourceList.addAll(observerCoap.discover());
+		System.out.println(resourceList.toString());
 	}
 
 	public int getQoSBits(int priority) throws IllegalArgumentException {
@@ -136,7 +139,7 @@ public class Observer {
 
 	public static void main(String[] args) {
 		scanner = new Scanner(System.in);
-		Observer observerClient = new Observer("::1", 6666);
+		Observer observerClient = new Observer("::1", 5683);
 
 		System.out.println("Welcome to the Observer's Command Line Interface");
 		observerClient.printHelpMenu();
