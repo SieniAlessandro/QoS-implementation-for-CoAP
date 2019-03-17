@@ -25,6 +25,7 @@ public class Observer {
 	private HashSet<WebLink> resourceList;
 	private static Scanner scanner;
 	private HashMap<String, CoapObserveRelation> relations;
+	final private boolean DEBUG = true;
 
 	public Observer(String ipv6Proxy, int portProxy) {
 		this.ipv6Proxy = ipv6Proxy;
@@ -63,6 +64,14 @@ public class Observer {
 		}
 		return hex;
 	}
+	
+	public HashMap<String, CoapObserveRelation> getRelations() {
+		return relations;
+	}
+	
+	public CoapClient getCoapClient() {
+		return observerCoap;
+	}
 
 	public void resourceRegistration() {
 		if (resourceList.isEmpty()) {
@@ -85,36 +94,8 @@ public class Observer {
 		}
 
 		observeRequest.setURI("coap://[" + this.ipv6Proxy + "]:" + this.portProxy + "/" + resourceName);
-		CoapResponse response = observerCoap.advanced(observeRequest);
-
-		// Registration failed
-		if (!response.getOptions().hasObserve()) {
-			System.out.println("Subject rejected the observe request to the resource " + resourceName);
-			return;
-		}
-		// Observation accepted then create a relation
-		if (response.getOptions().getObserve() == priority) {
-			System.out.println("Observe Relation accepted");
-			System.out.println(response.getResponseText());
-		} else {
-			// Request not accepted but Subject wants to negotiate
-			observeRequest.setOptions(new OptionSet()
-					.addOption(new Option(OptionNumberRegistry.OBSERVE, response.getOptions().getObserve())));
-			CoapObserveRelation observeRelation = observerCoap.observe(observeRequest, new CoapHandler() {
-
-				public void onLoad(CoapResponse response) {
-					System.out.println("Negotiation terminated, starting listen to notifications");
-				}
-
-				public void onError() {
-					System.out.println("Negotiation failed!");
-				}
-
-			});
-
-			observeRelation.setNotificationListener(new NotificationHandler());
-			relations.put(resourceName, observeRelation);
-		}
+		CoapObserveRelation observeRelation = observerCoap.observe(observeRequest, new NegotiationHandler( this, priority, resourceName) );
+		relations.put(resourceName, observeRelation);
 	}
 
 	public void resourceCancellation() {
