@@ -92,9 +92,10 @@ public class Observer {
 		} catch (IllegalArgumentException ex) {
 			System.out.println("Invalid Priority Level");
 		}
-
-		observeRequest.setURI("coap://[" + this.ipv6Proxy + "]:" + this.portProxy + "/" + resourceName);
-		CoapObserveRelation observeRelation = observerCoap.observe(observeRequest, new NegotiationHandler( this, priority, resourceName) );
+		
+		String URI = "coap://[" + this.ipv6Proxy + "]:" + this.portProxy + "/" + resourceName;
+		observeRequest.setURI(URI);
+		CoapObserveRelation observeRelation = observerCoap.observe(observeRequest, new ResponseHandler( this, priority, resourceName, URI) );
 		relations.put(resourceName, observeRelation);
 	}
 

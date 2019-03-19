@@ -34,14 +34,15 @@ import com.thoughtworks.xstream.XStream;
 public class ProxyObserver {
 
 	private CoapServer proxyObserver;
-	private DiscoveryResource resourceList;
-	private Map<String, Entry<CoapEndpoint, ObservingEndpoint>> observers;
+	private ArrayList<ObservableResource> resourceList;
+	private Map<String, Entry<ObservingEndpoint, Boolean>> observers;
 	private static Scanner scanner;
 
 	public ProxyObserver() {
 
 		proxyObserver = new CoapServer();
-		observers = new HashMap<String, Entry<CoapEndpoint, ObservingEndpoint>>();
+		observers = new HashMap<String, Entry<ObservingEndpoint, Boolean>>();
+		resourceList = new ArrayList<ObservableResource>();
 	}
 
 	public void init() {
@@ -54,16 +55,20 @@ public class ProxyObserver {
 		proxyObserver.start();
 	}
 
-	public void addObserver(String key, Endpoint e, ObservingEndpoint oe) {
-		observers.put(key, new SimpleEntry((CoapEndpoint) e, oe));
+	public void addObserver(String key,ObservingEndpoint oe) {
+		observers.put(key, new SimpleEntry(oe, false));
 	}
 
 	public ObservingEndpoint getObservingEndpoint(String key) {
-		return observers.get(key).getValue();
+		return observers.get(key).getKey();
 	}
 
-	public CoapEndpoint getCoapEndpoint(String key) {
-		return observers.get(key).getKey();
+	public boolean getNegotationState(String key) {
+		return observers.get(key).getValue();
+	}
+	
+	public void setNegotation(String key, boolean state) {
+		observers.get(key).setValue(state);
 	}
 
 	public boolean isEndpointPresent(String key) {
@@ -72,8 +77,9 @@ public class ProxyObserver {
 
 	public void addResource(ObservableResource resource) {
 		proxyObserver.add(resource);
-		resourceList = new DiscoveryResource(proxyObserver.getRoot());
-		proxyObserver.add(resourceList);
+		resourceList.add(resource);
+//		resourceList = new DiscoveryResource(proxyObserver.getRoot());
+//		proxyObserver.add(resourceList);
 //		updateResourcesFile(resource);
 	}
 
@@ -81,8 +87,6 @@ public class ProxyObserver {
 		for (Resource resource : resources) {
 			proxyObserver.add(resource);
 		}
-		resourceList = new DiscoveryResource(proxyObserver.getRoot());
-		proxyObserver.add(resourceList);
 	}
 
 	public void updateResourcesFile(ObservableResource resource) {
@@ -138,6 +142,10 @@ public class ProxyObserver {
 	public void deleteResourceCLI() {
 		System.out.println("work in progress...");
 	}
+	
+	public void triggerChange() {
+		resourceList.get(0).changed();
+	}
 
 	public static void main(String[] args) {
 		ProxyObserver server = new ProxyObserver();
@@ -164,6 +172,8 @@ public class ProxyObserver {
 				System.out.println("Exiting... Good bye!");
 				System.exit(0);
 				break;
+			case 6: 
+				server.triggerChange();
 			default:
 				continue;
 			}

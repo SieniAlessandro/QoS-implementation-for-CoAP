@@ -24,14 +24,15 @@ public class ObservableResource extends CoapResource implements Serializable {
 	final private boolean DEBUG = true;
 	private ProxyObserver server;
 	private SubjectState state;
-	private boolean noNegotiation;
+	private boolean negotiation;
+	static private int seqnum = 0;
 
 	public ObservableResource() {
 		super("defaultName");
 		this.setObservable(true);
 		this.setVisible(true);
-		this.state = SubjectState.AVAILABLE;
-		this.noNegotiation = true;
+		this.state = SubjectState.ONLY_CRITICAL;
+		this.negotiation = false;
 	}
 
 	public void setName(String name) {
@@ -71,62 +72,72 @@ public class ObservableResource extends CoapResource implements Serializable {
 
 	@Override
 	public void handleGET(CoapExchange exchange) {
-		int priority = getPriority(exchange.getRequestOptions().getObserve());
-
-		if (DEBUG) 
-			System.out.println("\n[DEBUG] HandleGET> " + priority);
 		if (state.equals(SubjectState.UNVAVAILABLE)) {
 			System.out.println("Subject is unavailable");
 			return;
 		}
 
+		int priority = getPriority(exchange.getRequestOptions().getObserve());
 		// store observer information if the endpoint is not already present
-		Endpoint observer = exchange.advanced().getEndpoint();
 		String observerID = exchange.getSourceAddress() + ":" + exchange.getSourcePort();
 		ObservingEndpoint observingEndpoint = null;
-		if (!server.isEndpointPresent(observerID)) {
-			if (DEBUG) 
-				System.out.println("\n[DEBUG] Observer not present, add it to the list ");
-			server.addObserver(observerID, observer, observingEndpoint);
+		// if there is a running negotation or a new endpoint
+		if ( !server.isEndpointPresent(observerID) ) {
+			// REGISTRATION PHASE
+			if (DEBUG)
+				System.out.println("\t[DEBUG] Observer " + observerID + " not present, added to the list ");
 			observingEndpoint = new ObservingEndpoint(
 					new InetSocketAddress(exchange.getSourceAddress(), exchange.getSourcePort()));
-		} else 
-			observingEndpoint = server.getObservingEndpoint(observerID);
-
-		if (priority > 2 && state == SubjectState.ONLY_CRITICAL) {
-			// NEGOTIATION
-			Response response = new Response(CoAP.ResponseCode.NOT_ACCEPTABLE);
-			response.setOptions(new OptionSet().addOption(new Option(OptionNumberRegistry.OBSERVE, 0x400000)));
-			response.setPayload(fetchResource(this.getName()));
-			if (DEBUG) {
-				System.out.println("\n[DEBUG] Negotiation Started ");
-				System.out.println("\n[DEBUG] " + response.toString());
-			}
-			exchange.respond(response);
-			noNegotiation = false;
-		} else {
-			if (!noNegotiation) {
-				// Request accepted without negotiation
-				Response response = new Response(CoAP.ResponseCode.CONTENT);
+			server.addObserver(observerID, observingEndpoint);
+			if (priority > 2 && state.equals(SubjectState.ONLY_CRITICAL)) {
+				// NEGOTIATION
+				Response response = new Response(CoAP.ResponseCode.NOT_ACCEPTABLE);
 				response.setOptions(new OptionSet().addOption(new Option(OptionNumberRegistry.OBSERVE, 0x400000)));
-				response.setPayload(fetchResource(this.getName()));
 				if (DEBUG) {
-					System.out.println("\n[DEBUG] Accepting the request ");
-					System.out.println("\n[DEBUG] " + response.toString());
+					System.out.println("\t[DEBUG] Negotiation Started " + response.toString());
 				}
+				server.setNegotation(observerID, true);
 				exchange.respond(response);
+			} else {
+				if (DEBUG) {
+					System.out.println("\t[DEBUG] Accepting the request from " + exchange.getSourcePort() + " request: " + exchange.getRequestOptions().toString());
+				}
+				// Request accepted without negotiation
+				finalizeObservation(exchange, observingEndpoint, observerID);
 			}
+		} else if ( server.getNegotationState(observerID) ) {
 			// this was a negotiation so there is no need to respond
-			ObserveRelation relation = new ObserveRelation(observingEndpoint, this, exchange.advanced());
-			if (DEBUG) 
-				System.out.println("\n[DEBUG] Building observe relation ");
-			relation.setEstablished();
-			relation.notifyObservers();
+			if (DEBUG)
+				System.out.println("\t[DEBUG] Negotiation ended ");
+//			TODO controllo sulla conferma della proposta
+			finalizeObservation(exchange, server.getObservingEndpoint(observerID), observerID);
+		} else {
+			Response response = new Response(CoAP.ResponseCode.CONTENT);
+			response.setOptions( new OptionSet().setObserve(seqnum++));
+			response.setPayload(fetchResource(this.getName()));
+			exchange.respond(response);
+			if (DEBUG)
+				System.out.println("\t[DEBUG] Notification sent to : " + exchange.getSourcePort() + " notification: "+ response.getPayloadString());
 		}
+
+	}
+	
+	private void finalizeObservation(CoapExchange exchange, ObservingEndpoint observingEndpoint, String observerID) {
+		Response response = new Response(CoAP.ResponseCode.CONTENT);
+		response.setOptions(new OptionSet().addOption(
+				new Option(OptionNumberRegistry.OBSERVE, exchange.getRequestOptions().getObserve())));
+		response.setPayload(fetchResource(this.getName()));
+		exchange.respond(response);
+		ObserveRelation relation = new ObserveRelation(observingEndpoint, this, exchange.advanced());
+		relation.setEstablished();
+		server.setNegotation(observerID, false);
+		this.addObserveRelation(relation);
 	}
 
 	private String fetchResource(String name) {
-		return "RESOURCE VALUE";
+		return "RESOURCE VALUE #" + seqnum;
 	}
 
+//	TODO 
+	
 }
