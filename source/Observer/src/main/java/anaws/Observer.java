@@ -84,7 +84,7 @@ public class Observer {
 //		System.out.print("Resource Name: ");
 		String resourceName = "prova"; //scanner.next();
 //		System.out.print("Priority: ");
-		int priority = getQoSBits(4); // getQoSBits(scanner.nextInt());
+		int priority = getQoSBits(1); // getQoSBits(scanner.nextInt());
 
 		Request observeRequest = new Request(Code.GET);
 		try {
@@ -97,7 +97,7 @@ public class Observer {
 		
 		String URI = "coap://[" + this.ipv6Proxy + "]:" + this.portProxy + "/" + resourceName;
 		observeRequest.setURI(URI);
-		observerCoap.advanced(new ResponseHandler( this, priority, resourceName, URI), observeRequest );
+		observerCoap.observe( observeRequest, new ResponseHandler( this, priority, resourceName, URI) );
 //		relations.put(resourceName, observeRelation);
 	}
 

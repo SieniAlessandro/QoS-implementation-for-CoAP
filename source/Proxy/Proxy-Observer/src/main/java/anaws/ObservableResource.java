@@ -10,6 +10,7 @@ import org.eclipse.californium.core.coap.OptionNumberRegistry;
 import org.eclipse.californium.core.coap.OptionSet;
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.californium.core.coap.Token;
+import org.eclipse.californium.core.coap.CoAP.Type;
 import org.eclipse.californium.core.network.Endpoint;
 import org.eclipse.californium.core.observe.ObserveRelation;
 import org.eclipse.californium.core.observe.ObservingEndpoint;
@@ -31,6 +32,7 @@ public class ObservableResource extends CoapResource implements Serializable {
 	public ObservableResource() {
 		super("defaultName");
 		this.setObservable(true);
+		this.setObserveType(Type.CON);
 		this.setVisible(true);
 		this.state = SubjectState.ONLY_CRITICAL;
 		this.negotiation = false;
@@ -93,13 +95,11 @@ public class ObservableResource extends CoapResource implements Serializable {
 					new InetSocketAddress(exchange.getSourceAddress(), exchange.getSourcePort()));
 			server.addObserver(observerID, observingEndpoint);
 			if (priority > 2 && state.equals(SubjectState.ONLY_CRITICAL)) {
-				exchange.accept();
 				// NEGOTIATION
 				response = new Response(CoAP.ResponseCode.NOT_ACCEPTABLE);
 				response.setOptions(new OptionSet().addOption(new Option(OptionNumberRegistry.OBSERVE, 0x400000)));
 				server.setNegotation(observerID, true);
 				exchange.respond(response);
-				exchange.advanced().getEndpoint().cancelObservation(null);
 				if (DEBUG) {
 					System.out.println("\t[DEBUG] Negotiation Started: " + response.toString());
 				}
@@ -109,37 +109,34 @@ public class ObservableResource extends CoapResource implements Serializable {
 							+ exchange.getRequestOptions().toString());
 				}
 				// Request accepted without negotiation
-				finalizeObservation(exchange, observingEndpoint, observerID);
+//				finalizeObservation(exchange.advanced().getRelation(), observingEndpoint, observerID);
+
+				sendNotification(exchange);
 			}
 		} else if (server.getNegotationState(observerID)) {
 			// this was a negotiation so there is no need to respond
-			if (DEBUG)
-				System.out.println("\t[DEBUG] Negotiation ended ");
 //			TODO controllo sulla conferma della proposta
 //			System.out.println(server.getObservingEndpoint(observerID).getObserveRelation(null));
 //			this.removeObserveRelation();
-			finalizeObservation(exchange, server.getObservingEndpoint(observerID), observerID);
-		} else {
-			exchange.accept();
-			// NOTIFICATION
+
+//			exchange.advanced().getEndpoint().cancelObservation(null);
+
+			finalizeObservation(exchange.advanced().getRelation(), server.getObservingEndpoint(observerID), observerID);
 			response = new Response(CoAP.ResponseCode.CONTENT);
-			Token token = exchange.advanced().getRequest().getToken();
-			if ( exchange.advanced().getResponse() != null ) 
-				response.setMID(exchange.advanced().getResponse().getMID() + 1);
-			response.setToken( token );
-			response.setConfirmable(true);
+			response.setOptions(new OptionSet()
+					.addOption(new Option(OptionNumberRegistry.OBSERVE, exchange.getRequestOptions().getObserve())));
 			response.setPayload(fetchResource(this.getName()));
-			response.setOptions(new OptionSet().setObserve(seqnum+5));
-			exchange.setMaxAge(10);
+			response.setConfirmable(true);
+			exchange.setMaxAge(60);
 			exchange.respond(response);
-			if (DEBUG) 
-				System.out.println("\t[DEBUG] Notification sent to : " + exchange.getSourcePort() + " notification: "
-						+ response.toString());
-		}
+			if (DEBUG)
+				System.out.println("\t[DEBUG] Negotiation ended " + response.toString());
+		} else // NOTIFICATION
+			sendNotification(exchange);
 	}
 
-	private void finalizeObservation(CoapExchange exchange, ObservingEndpoint observingEndpoint, String observerID) {
-		
+	private void finalizeObservation(ObserveRelation relation, ObservingEndpoint observingEndpoint, String observerID) {
+
 //		Response response = new Response(CoAP.ResponseCode.CONTENT);
 //		response.setOptions(new OptionSet()
 //				.addOption(new Option(OptionNumberRegistry.OBSERVE, exchange.getRequestOptions().getObserve())));
@@ -148,12 +145,29 @@ public class ObservableResource extends CoapResource implements Serializable {
 //		exchange.respond(response);
 //		if (DEBUG)
 //			System.out.println("\t[DEBUG] Building observe relation " + response.toString());
-		ObserveRelation relation = new ObserveRelation(observingEndpoint, this, exchange.advanced());
-		relation.setEstablished();
-		this.addObserveRelation(relation);
-		observingEndpoint.addObserveRelation(relation);
+//		ObserveRelation relation = new ObserveRelation(observingEndpoint, this, exchange.advanced());
+//		relation.setEstablished();
+//		exchange.advanced().setRelation(relation);
+//		this.addObserveRelation(relation);
+//		observingEndpoint.addObserveRelation(relation);
 		server.setNegotation(observerID, false);
-		this.changed();
+	}
+
+	private void sendNotification(CoapExchange exchange) {
+//		Response response = exchange.
+//		Token token = exchange.advanced().getRequest().getToken();
+////		if ( exchange.advanced().getResponse() != null ) 
+//		response.setMID(exchange.advanced().getResponse().getMID() + 1);
+//		response.setToken( token );
+//		response.setConfirmable(true);
+//		response.setPayload(fetchResource(this.getName()));
+//		response.setOptions(new OptionSet().setObserve(seqnum+5));
+		String value = fetchResource("");
+		exchange.setMaxAge(10);
+		exchange.respond(value);
+		if (DEBUG)
+			System.out.println(
+					"\t[DEBUG] Notification sent to : " + exchange.getSourcePort() + " notification: " + value);
 	}
 
 	private String fetchResource(String name) {

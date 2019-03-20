@@ -35,7 +35,7 @@ public class ResponseHandler implements CoapHandler {
 		if (response == null || !response.getOptions().hasObserve()) {
 			if (DEBUG) {
 				System.out.println("\t[DEBUG] Request rejected ");
-				System.out.println("\t[DEBUG] " + response.toString());
+				System.out.println("\t[DEBUG] " + response.advanced().toString());
 			}
 //			System.out.println("Subject rejected the observe request to the resource ");
 			onError();
@@ -53,7 +53,7 @@ public class ResponseHandler implements CoapHandler {
 		} else if (response.getCode().equals(CoAP.ResponseCode.NOT_ACCEPTABLE)) {
 			if (DEBUG)
 				System.out.println("\t[DEBUG] Nogotiation started, subject proposes " + response.getOptions());
-			// Subject started the negotation, observer need to accept it
+			// Subject started the negotiation, observer need to accept it
 //			System.out.println("Subject can't handle level " + priority + " request, it proposes level "
 //					+ responsePriority + ". Do you accept? (y/n, default yes)");
 //			switch (scanner.nextLine()) {
