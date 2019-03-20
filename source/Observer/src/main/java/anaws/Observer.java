@@ -1,5 +1,6 @@
 package anaws;
 
+import java.net.InetSocketAddress;
 import java.util.*;
 
 import javax.naming.directory.InvalidAttributesException;
@@ -79,15 +80,16 @@ public class Observer {
 			return;
 		}
 
-		System.out.print("Resource Registration\n");
-		System.out.print("Resource Name: ");
-		String resourceName = scanner.next();
-		System.out.print("Priority: ");
-		int priority = getQoSBits(scanner.nextInt());
+//		System.out.print("Resource Registration\n");
+//		System.out.print("Resource Name: ");
+		String resourceName = "prova"; //scanner.next();
+//		System.out.print("Priority: ");
+		int priority = getQoSBits(4); // getQoSBits(scanner.nextInt());
 
 		Request observeRequest = new Request(Code.GET);
 		try {
 			// Set the priority level using the first 2 bits of the observe option value
+			observeRequest.setObserve();
 			observeRequest.setOptions(new OptionSet().addOption(new Option(OptionNumberRegistry.OBSERVE, priority)));
 		} catch (IllegalArgumentException ex) {
 			System.out.println("Invalid Priority Level");
@@ -95,8 +97,8 @@ public class Observer {
 		
 		String URI = "coap://[" + this.ipv6Proxy + "]:" + this.portProxy + "/" + resourceName;
 		observeRequest.setURI(URI);
-		CoapObserveRelation observeRelation = observerCoap.observe(observeRequest, new ResponseHandler( this, priority, resourceName, URI) );
-		relations.put(resourceName, observeRelation);
+		observerCoap.advanced(new ResponseHandler( this, priority, resourceName, URI), observeRequest );
+//		relations.put(resourceName, observeRelation);
 	}
 
 	public void resourceCancellation() {
@@ -118,6 +120,14 @@ public class Observer {
 				+ "3) Resource cancellation\n" + "4) Print Help Menu\n" + "5) Exit\n";
 		System.out.println("List of commands:\n" + commandList);
 	}
+	
+	public InetSocketAddress getObserverAddress() {
+		return observerCoap.getEndpoint().getAddress();
+	}
+	
+	public void getObserverPort() {
+		System.out.println(observerCoap.getEndpoint().toString() );
+	}
 
 	public static void main(String[] args) {
 		scanner = new Scanner(System.in);
@@ -125,28 +135,29 @@ public class Observer {
 
 		System.out.println("Welcome to the Observer's Command Line Interface");
 		observerClient.printHelpMenu();
+		observerClient.resourceRegistration();
 		while (true) {
-			System.out.print("Observer> ");
-			switch (scanner.nextInt()) {
-			case 1:
-				observerClient.resourceDiscovery();
-				break;
-			case 2:
-				observerClient.resourceRegistration();
-				break;
-			case 3:
-				observerClient.resourceCancellation();
-				break;
-			case 4:
-				observerClient.printHelpMenu();
-				break;
-			case 5:
-				System.out.println("Exiting... Good bye!");
-				System.exit(0);
-				break;
-			default:
-				continue;
-			}
+//			System.out.print("Observer> ");
+//			switch (scanner.nextInt()) {
+//			case 1:
+//				observerClient.resourceDiscovery();
+//				break;
+//			case 2:
+//				observerClient.resourceRegistration();
+//				break;
+//			case 3:
+//				observerClient.resourceCancellation();
+//				break;
+//			case 4:
+//				observerClient.printHelpMenu();
+//				break;
+//			case 5:
+//				System.out.println("Exiting... Good bye!");
+//				System.exit(0);
+//				break;
+//			default:
+//				continue;
+//			}
 		}
 	}
 }

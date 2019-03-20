@@ -1,12 +1,19 @@
 package anaws;
 
 import java.util.HashMap;
-
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.Map.Entry;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -22,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.eclipse.californium.core.CoapServer;
+import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.network.CoapEndpoint;
 import org.eclipse.californium.core.network.Endpoint;
 import org.eclipse.californium.core.observe.ObserveRelation;
@@ -43,16 +51,16 @@ public class ProxyObserver {
 		proxyObserver = new CoapServer();
 		observers = new HashMap<String, Entry<ObservingEndpoint, Boolean>>();
 		resourceList = new ArrayList<ObservableResource>();
+		System.out.println("Starting listening...");
+		proxyObserver.start();
 	}
 
 	public void init() {
-		System.out.println("Starting listening...");
 //		Collection<Resource> resources = readResourcesFile();
 //		if (resources == null)
 //			return;
 //		System.out.println(resources.toString());
 //		addAllResources(resources);
-		proxyObserver.start();
 	}
 
 	public void addObserver(String key,ObservingEndpoint oe) {
@@ -78,6 +86,8 @@ public class ProxyObserver {
 	public void addResource(ObservableResource resource) {
 		proxyObserver.add(resource);
 		resourceList.add(resource);
+		System.out.println("Resource \"" + resource.getName() + "\" added to the resource list\n");
+
 //		resourceList = new DiscoveryResource(proxyObserver.getRoot());
 //		proxyObserver.add(resourceList);
 //		updateResourcesFile(resource);
@@ -130,11 +140,11 @@ public class ProxyObserver {
 	}
 
 	public void addResourceCLI() {
-		System.out.print("Add Resourse\n");
-		System.out.print("Resource Name: ");
-		String resourceName = scanner.next();
+//		System.out.print("Add Resourse\n");
+//		System.out.print("Resource Name: ");
+//		String resourceName = scanner.next();
 		ObservableResource or = new ObservableResource();
-		or.setName(resourceName);
+		or.setName("prova");
 		or.setServer(this);
 		addResource(or);
 	}
@@ -146,6 +156,10 @@ public class ProxyObserver {
 	public void triggerChange() {
 		resourceList.get(0).changed();
 	}
+	
+	public void clearObservation() {
+		resourceList.get(0).clearObserveRelations();
+	}
 
 	public static void main(String[] args) {
 		ProxyObserver server = new ProxyObserver();
@@ -153,6 +167,7 @@ public class ProxyObserver {
 
 		System.out.println("Welcome to the ProxyObserver Command Line Interface");
 		server.printHelpMenu();
+		server.addResourceCLI();
 		while (true) {
 			System.out.print("ProxyObserver> ");
 			switch (scanner.nextInt()) {
@@ -173,11 +188,12 @@ public class ProxyObserver {
 				System.exit(0);
 				break;
 			case 6: 
-				server.triggerChange();
+				server.triggerChange(); break;
+			case 7:
+				server.clearObservation(); break;
 			default:
 				continue;
 			}
 		}
-
 	}
 }

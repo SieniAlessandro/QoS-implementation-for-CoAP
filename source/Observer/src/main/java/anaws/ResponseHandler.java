@@ -4,8 +4,10 @@ import java.sql.Timestamp;
 import java.util.Scanner;
 
 import org.eclipse.californium.core.CoapHandler;
+import org.eclipse.californium.core.CoapObserveRelation;
 import org.eclipse.californium.core.CoapResponse;
 import org.eclipse.californium.core.coap.Request;
+import org.eclipse.californium.core.coap.Response;
 import org.eclipse.californium.core.coap.CoAP.Code;
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.Option;
@@ -19,6 +21,7 @@ public class ResponseHandler implements CoapHandler {
 	private Observer observer;
 	private String resourceName;
 	private String URI;
+	static private int count = 0;
 
 	public ResponseHandler(Observer observer, int priority, String resourceName, String URI) {
 		this.observer = observer;
@@ -45,10 +48,10 @@ public class ResponseHandler implements CoapHandler {
 		if (response.getCode().equals(CoAP.ResponseCode.CONTENT)) {
 			// Observe relation accepted without negotiation or a notification arrived
 			System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")] Notification Arrived: "
-					+ response.getResponseText());
+					+ response.advanced().toString());
 			return;
 		} else if (response.getCode().equals(CoAP.ResponseCode.NOT_ACCEPTABLE)) {
-			if (DEBUG) 
+			if (DEBUG)
 				System.out.println("\t[DEBUG] Nogotiation started, subject proposes " + response.getOptions());
 			// Subject started the negotation, observer need to accept it
 //			System.out.println("Subject can't handle level " + priority + " request, it proposes level "
@@ -59,17 +62,18 @@ public class ResponseHandler implements CoapHandler {
 //				break;
 //			default:
 			Request observeRequest = new Request(Code.GET);
+			observeRequest.setObserve();
 			observeRequest
 					.setOptions(new OptionSet().addOption(new Option(OptionNumberRegistry.OBSERVE, responsePriority)));
 			observeRequest.setURI(URI);
-			if (DEBUG) 
+			if (DEBUG)
 				System.out.println("\t[DEBUG] Accepting the subject's proposal " + URI);
-			observer.getCoapClient().advanced(observeRequest);
+			CoapObserveRelation relation = observer.getCoapClient().observe(observeRequest, this);
 //				break;
 //			}
 		}
 	}
-
+	
 	public void onError() {
 		observer.getRelations().remove(resourceName);
 	}
