@@ -27,6 +27,7 @@ public class Observer {
 	private static Scanner scanner;
 	private HashMap<String, CoapObserveRelation> relations;
 	final private boolean DEBUG = true;
+	final private int PRIORITY = 2;
 
 	public Observer(String ipv6Proxy, int portProxy) {
 		this.ipv6Proxy = ipv6Proxy;
@@ -80,11 +81,11 @@ public class Observer {
 			return;
 		}
 
-//		System.out.print("Resource Registration\n");
-//		System.out.print("Resource Name: ");
-		String resourceName = "prova"; //scanner.next();
-//		System.out.print("Priority: ");
-		int priority = getQoSBits(1); // getQoSBits(scanner.nextInt());
+		System.out.print("Resource Registration\n");
+		System.out.print("Resource Name: ");
+		String resourceName = scanner.next();
+		System.out.print("Priority: ");
+		int priority = getQoSBits(scanner.nextInt());
 
 		Request observeRequest = new Request(Code.GET);
 		try {
@@ -97,8 +98,16 @@ public class Observer {
 		
 		String URI = "coap://[" + this.ipv6Proxy + "]:" + this.portProxy + "/" + resourceName;
 		observeRequest.setURI(URI);
-		observerCoap.observe( observeRequest, new ResponseHandler( this, priority, resourceName, URI) );
-//		relations.put(resourceName, observeRelation);
+		if (DEBUG)
+			System.out.println("\t[DEBUG] Send Observe request: " + observeRequest.toString());
+		CoapObserveRelation relation = observerCoap.observeAndWait( observeRequest, new ResponseHandler( this, priority, resourceName, URI, true) );
+
+		if ( relation.isCanceled() ) {
+			if (DEBUG)
+				System.out.println("\t[DEBUG] Relation is canceled");
+		} else 
+			relations.put(resourceName, relation);
+		
 	}
 
 	public void resourceCancellation() {
@@ -112,7 +121,7 @@ public class Observer {
 			return;
 		}
 
-		relation.reactiveCancel();
+		relation.proactiveCancel();
 	}
 
 	public void printHelpMenu() {
@@ -132,32 +141,32 @@ public class Observer {
 	public static void main(String[] args) {
 		scanner = new Scanner(System.in);
 		Observer observerClient = new Observer("::1", 5683);
-
+			
 		System.out.println("Welcome to the Observer's Command Line Interface");
 		observerClient.printHelpMenu();
-		observerClient.resourceRegistration();
+//		observerClient.resourceRegistration();
 		while (true) {
-//			System.out.print("Observer> ");
-//			switch (scanner.nextInt()) {
-//			case 1:
-//				observerClient.resourceDiscovery();
-//				break;
-//			case 2:
-//				observerClient.resourceRegistration();
-//				break;
-//			case 3:
-//				observerClient.resourceCancellation();
-//				break;
-//			case 4:
-//				observerClient.printHelpMenu();
-//				break;
-//			case 5:
-//				System.out.println("Exiting... Good bye!");
-//				System.exit(0);
-//				break;
-//			default:
-//				continue;
-//			}
+			System.out.print("Observer> ");
+			switch (scanner.nextInt()) {
+			case 1:
+				observerClient.resourceDiscovery();
+				break;
+			case 2:
+				observerClient.resourceRegistration();
+				break;
+			case 3:
+				observerClient.resourceCancellation();
+				break;
+			case 4:
+				observerClient.printHelpMenu();
+				break;
+			case 5:
+				System.out.println("Exiting... Good bye!");
+				System.exit(0);
+				break;
+			default:
+				continue;
+			}
 		}
 	}
 }

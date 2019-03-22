@@ -1,55 +1,38 @@
 package anaws;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.Map.Entry;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import org.eclipse.californium.core.CoapServer;
-import org.eclipse.californium.core.coap.CoAP;
-import org.eclipse.californium.core.network.CoapEndpoint;
-import org.eclipse.californium.core.network.Endpoint;
-import org.eclipse.californium.core.observe.ObserveRelation;
-import org.eclipse.californium.core.observe.ObservingEndpoint;
-import org.eclipse.californium.core.server.resources.DiscoveryResource;
 import org.eclipse.californium.core.server.resources.Resource;
-
-import com.thoughtworks.xstream.XStream;
+import org.eclipse.californium.core.server.ServerState;
 
 public class ProxyObserver {
 
 	private CoapServer proxyObserver;
 	private ArrayList<ObservableResource> resourceList;
-	private Map<String, Entry<ObservingEndpoint, Boolean>> observers;
+	private Map<String, ObserverState> observers;
 	private static Scanner scanner;
+	private ServerState state;
 
 	public ProxyObserver() {
-
 		proxyObserver = new CoapServer();
-		observers = new HashMap<String, Entry<ObservingEndpoint, Boolean>>();
+		observers = new HashMap<String, ObserverState>();
 		resourceList = new ArrayList<ObservableResource>();
 		System.out.println("Starting listening...");
 		proxyObserver.start();
@@ -63,23 +46,20 @@ public class ProxyObserver {
 //		addAllResources(resources);
 	}
 
-	public void addObserver(String key,ObservingEndpoint oe) {
-		observers.put(key, new SimpleEntry(oe, false));
+	public void setState(ServerState state) {
+		this.state = state;
+		resourceList.forEach(r -> r.setServerState(state));
 	}
 
-	public ObservingEndpoint getObservingEndpoint(String key) {
-		return observers.get(key).getKey();
+	public void addObserver(String key, ObserverState state) {
+		observers.put(key, state);
 	}
 
-	public boolean getNegotationState(String key) {
-		return observers.get(key).getValue();
-	}
-	
-	public void setNegotation(String key, boolean state) {
-		observers.get(key).setValue(state);
+	public ObserverState getObserverState(String key) {
+		return observers.get(key);
 	}
 
-	public boolean isEndpointPresent(String key) {
+	public boolean isObserverPresent(String key) {
 		return observers.containsKey(key);
 	}
 
@@ -118,12 +98,12 @@ public class ProxyObserver {
 			System.out.println(result);
 
 			result.forEach(fileName -> {
-				try ( FileInputStream fin = new FileInputStream( new File(fileName));
-			              ObjectInputStream bin = new ObjectInputStream(fin)) {
-			            resources.add( (ObservableResource) bin.readObject() );
-			        } catch (IOException | ClassNotFoundException ex) {
-						ex.printStackTrace();
-			        }
+				try (FileInputStream fin = new FileInputStream(new File(fileName));
+						ObjectInputStream bin = new ObjectInputStream(fin)) {
+					resources.add((ObservableResource) bin.readObject());
+				} catch (IOException | ClassNotFoundException ex) {
+					ex.printStackTrace();
+				}
 			});
 
 		} catch (IOException e) {
@@ -135,8 +115,28 @@ public class ProxyObserver {
 
 	public void printHelpMenu() {
 		String commandList = "1) Start the server\n" + "2) Add a resource\n" + "3) Delete a resource\n"
-				+ "4) Print Help Menu\n" + "5) Exit\n";
+				+ "4) Print Help Menu\n" + "5) Exit\n" + "6) Simulate a Resource Change \n"
+				+ "7) Change Server State \n";
 		System.out.println("List of commands:\n" + commandList);
+	}
+
+	public void changeStateCLI() {
+		System.out.print("Change Server State: ( 1 - AVAILABLE, 2 - ONLY_CRITICAL, 3 - UNAVAILABLE )\n");
+		int cmd = scanner.nextInt();
+		switch (cmd) {
+		case 1:
+			setState(ServerState.AVAILABLE);
+			break;
+		case 2:
+			setState(ServerState.ONLY_CRITICAL);
+			break;
+		case 3:
+			setState(ServerState.UNVAVAILABLE);
+			break;
+		default:
+			System.out.print("Invalid State\n");
+			break;
+		}
 	}
 
 	public void addResourceCLI() {
@@ -152,11 +152,12 @@ public class ProxyObserver {
 	public void deleteResourceCLI() {
 		System.out.println("work in progress...");
 	}
-	
+
 	public void triggerChange() {
+		System.out.println(resourceList.get(0).getObserverCount());
 		resourceList.get(0).changed();
 	}
-	
+
 	public void clearObservation() {
 		resourceList.get(0).clearObserveRelations();
 	}
@@ -187,10 +188,12 @@ public class ProxyObserver {
 				System.out.println("Exiting... Good bye!");
 				System.exit(0);
 				break;
-			case 6: 
-				server.triggerChange(); break;
+			case 6:
+				server.triggerChange();
+				break;
 			case 7:
-				server.clearObservation(); break;
+				server.changeStateCLI();
+				break;
 			default:
 				continue;
 			}
