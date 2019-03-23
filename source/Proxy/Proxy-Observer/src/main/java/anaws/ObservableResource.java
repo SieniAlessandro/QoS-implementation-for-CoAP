@@ -8,20 +8,30 @@ import org.eclipse.californium.core.coap.OptionSet;
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.californium.core.coap.CoAP.Type;
 import org.eclipse.californium.core.server.resources.CoapExchange;
+import org.eclipse.californium.core.server.resources.ConcurrentCoapResource;
 import org.eclipse.californium.core.server.ServerState;
 
 import com.thoughtworks.xstream.XStream;
 
-public class ObservableResource extends CoapResource {
+public class ObservableResource extends ConcurrentCoapResource {
 
 	final private boolean DEBUG = true;
-	final private int PROPOSAL = 0x800000;
-	private int maxAge = 30;
+	final private int PROPOSAL = CoAP.QoSLevel.CRITICAL_HIGH_PRIORITY;
+	private int maxAge = 60;
 	private ProxyObserver server;
-	static private int seqnum = 0;
+	private double resourceValue;
+	
+	public double getResourceValue() {
+		return resourceValue;
+	}
+
+	public void setResourceValue(double resourceValue) {
+		this.resourceValue = resourceValue;
+	}
+
 
 	public ObservableResource() {
-		super("defaultName");
+		super("default_name", 3);
 		super.serverState = ServerState.AVAILABLE;
 		this.setObservable(true);
 		this.setObserveType(Type.CON);
@@ -45,16 +55,16 @@ public class ObservableResource extends CoapResource {
 	public int getPriority(int priority) throws IllegalArgumentException {
 		int dec;
 		switch (priority) {
-		case 0x000000:
+		case CoAP.QoSLevel.NON_CRITICAL_LOW_PRIORITY:
 			dec = 1;
 			break;
-		case 0x400000:
+		case CoAP.QoSLevel.NON_CRITICAL_MEDIUM_PRIORITY:
 			dec = 2;
 			break;
-		case 0x800000:
+		case CoAP.QoSLevel.CRITICAL_HIGH_PRIORITY:
 			dec = 3;
 			break;
-		case 0xc00000:
+		case CoAP.QoSLevel.CRITICAL_HIGHEST_PRIORITY:
 			dec = 4;
 			break;
 		default:
@@ -67,7 +77,7 @@ public class ObservableResource extends CoapResource {
 	public void handleGET(CoapExchange exchange) {
 		System.out.println("---------------------------------------");
 		if (DEBUG)
-			System.out.println("\t[DEBUG] handleGET request: " + exchange.advanced().getCurrentRequest().toString());
+			System.out.println("\t[DEBUG] handleGET request with priority: " + getPriority(exchange.advanced().getCurrentRequest().getOptions().getObserve()));
 		if (super.serverState.equals(ServerState.UNVAVAILABLE)) {
 			System.out.println("Subject is unavailable");
 			return;
@@ -129,15 +139,11 @@ public class ObservableResource extends CoapResource {
 	}
 
 	private void sendNotification(CoapExchange exchange) {
-		String value = fetchResource("");
+		String value = "Value: " + resourceValue;
 		exchange.setMaxAge(maxAge);
 		exchange.respond(value);
 		if (DEBUG)
 			System.out.println(
 					"\t[DEBUG] Notification sent to : " + exchange.getSourcePort() + " notification: " + value);
-	}
-
-	private String fetchResource(String name) {
-		return "RESOURCE VALUE #" + seqnum++;
 	}
 }

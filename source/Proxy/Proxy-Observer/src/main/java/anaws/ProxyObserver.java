@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.server.resources.Resource;
 import org.eclipse.californium.core.server.ServerState;
@@ -25,15 +26,17 @@ import org.eclipse.californium.core.server.ServerState;
 public class ProxyObserver {
 
 	private CoapServer proxyObserver;
-	private ArrayList<ObservableResource> resourceList;
+	private Map<String, ObservableResource> resourceList;
 	private Map<String, ObserverState> observers;
 	private static Scanner scanner;
 	private ServerState state;
+	private ArrayList<String> subjects;
 
 	public ProxyObserver() {
 		proxyObserver = new CoapServer();
 		observers = new HashMap<String, ObserverState>();
-		resourceList = new ArrayList<ObservableResource>();
+		resourceList = new HashMap<String, ObservableResource>();
+		subjects = new ArrayList<String>();
 		System.out.println("Starting listening...");
 		proxyObserver.start();
 	}
@@ -48,7 +51,7 @@ public class ProxyObserver {
 
 	public void setState(ServerState state) {
 		this.state = state;
-		resourceList.forEach(r -> r.setServerState(state));
+		resourceList.values().forEach(r -> r.setServerState(state));
 	}
 
 	public void addObserver(String key, ObserverState state) {
@@ -63,10 +66,29 @@ public class ProxyObserver {
 		return observers.containsKey(key);
 	}
 
-	public void addResource(ObservableResource resource) {
-		proxyObserver.add(resource);
-		resourceList.add(resource);
-		System.out.println("Resource \"" + resource.getName() + "\" added to the resource list\n");
+	public void clearObservation(String resourceName) {
+		resourceList.get(resourceName).clearAndNotifyObserveRelations(null);
+	}
+
+	public void addResource(String subjectAddress, ObservableResource resource) {
+
+		if (subjects.contains(subjectAddress)) {
+			// subject already present
+			for (Resource r : proxyObserver.getRoot().getChildren()) {
+				if (r.getName().equals(subjectAddress))
+					r.add(resource);
+			}
+		} else {
+			subjects.add(subjectAddress);
+			CoapResource subject = new CoapResource(subjectAddress);
+			subject.setVisible(false);
+			subject.add(resource);
+			proxyObserver.add(subject);
+		}
+
+		resourceList.put(resource.getURI(), resource);
+		System.out.println("Resource \"" + resource.getName() + "\" of sensor \"" + resource.getPath()
+				+ "\" added to the resource list\n");
 
 //		resourceList = new DiscoveryResource(proxyObserver.getRoot());
 //		proxyObserver.add(resourceList);
@@ -77,6 +99,16 @@ public class ProxyObserver {
 		for (Resource resource : resources) {
 			proxyObserver.add(resource);
 		}
+	}
+
+	public void triggerChange(String resourceName) {
+		if (resourceList.get(resourceName).getObserverCount() == 0) {
+			System.out.println("No Observe Relations on this resource");
+			return;
+		}
+		resourceList.get(resourceName).setResourceValue(Math.random() * 10 + 20);
+//		resourceList.get(resourceName).setResourceValue(proxySubject.fetchResource(resourceName));
+		resourceList.get(resourceName).changed();
 	}
 
 	public void updateResourcesFile(ObservableResource resource) {
@@ -113,14 +145,18 @@ public class ProxyObserver {
 		return resources;
 	}
 
-	public void printHelpMenu() {
+	/*******************************
+	 * COMMAND LINE TESTING FUNCTIONS
+	 *******************************/
+
+	private void printHelpMenuCLI() {
 		String commandList = "1) Start the server\n" + "2) Add a resource\n" + "3) Delete a resource\n"
-				+ "4) Print Help Menu\n" + "5) Exit\n" + "6) Simulate a Resource Change \n"
-				+ "7) Change Server State \n";
+				+ "4) Print Help Menu\n" + "5) Clear Observe Relations of a resource\n"
+				+ "6) Simulate a Resource Change \n" + "7) Change Server State \n";
 		System.out.println("List of commands:\n" + commandList);
 	}
 
-	public void changeStateCLI() {
+	private void changeStateCLI() {
 		System.out.print("Change Server State: ( 1 - AVAILABLE, 2 - ONLY_CRITICAL, 3 - UNAVAILABLE )\n");
 		int cmd = scanner.nextInt();
 		switch (cmd) {
@@ -139,27 +175,40 @@ public class ProxyObserver {
 		}
 	}
 
-	public void addResourceCLI() {
+	private void addResourceCLI() {
 //		System.out.print("Add Resourse\n");
+//		System.out.print("Subject IPv6:port\n");
+		String subjectAddress = "::1:5683";// scanner.next();
 //		System.out.print("Resource Name: ");
-//		String resourceName = scanner.next();
+		String resourceName = "temperature"; // scanner.next();
 		ObservableResource or = new ObservableResource();
-		or.setName("prova");
+		or.setName(resourceName);
 		or.setServer(this);
-		addResource(or);
+		addResource(subjectAddress, or);
 	}
 
-	public void deleteResourceCLI() {
+	private void deleteResourceCLI() {
 		System.out.println("work in progress...");
 	}
 
-	public void triggerChange() {
-		System.out.println(resourceList.get(0).getObserverCount());
-		resourceList.get(0).changed();
+	private void triggerChangeCLI() {
+//		System.out.print("Add Resourse\n");
+//		System.out.print("Subject IPv6:port\n");
+		String subjectAddress = "::1:5683";// scanner.next();
+//		System.out.print("Add Resourse\n");
+//		System.out.print("Resource Name: ");
+		String resourceName = "temperature"; // scanner.next();
+		triggerChange("/" + subjectAddress + "/" + resourceName);
 	}
 
-	public void clearObservation() {
-		resourceList.get(0).clearObserveRelations();
+	private void clearObservationCLI() {
+//		System.out.print("Add Resourse\n");
+//		System.out.print("Subject IPv6:port\n");
+		String subjectAddress = "::1:5683";// scanner.next();
+//		System.out.print("Add Resourse\n");
+//		System.out.print("Resource Name: ");
+		String resourceName = "temperature"; // scanner.next();
+		clearObservation("/" + subjectAddress + "/" + resourceName);
 	}
 
 	public static void main(String[] args) {
@@ -167,7 +216,7 @@ public class ProxyObserver {
 		scanner = new Scanner(System.in);
 
 		System.out.println("Welcome to the ProxyObserver Command Line Interface");
-		server.printHelpMenu();
+		server.printHelpMenuCLI();
 		server.addResourceCLI();
 		while (true) {
 			System.out.print("ProxyObserver> ");
@@ -182,21 +231,25 @@ public class ProxyObserver {
 				server.deleteResourceCLI();
 				break;
 			case 4:
-				server.printHelpMenu();
+				server.printHelpMenuCLI();
 				break;
 			case 5:
-				System.out.println("Exiting... Good bye!");
-				System.exit(0);
-				break;
+				server.clearObservationCLI();
 			case 6:
-				server.triggerChange();
+				server.triggerChangeCLI();
 				break;
 			case 7:
 				server.changeStateCLI();
+				break;
+			case 8:
+				System.out.println("Exiting... Good bye!");
+				server.clearObservationCLI();
+				System.exit(0);
 				break;
 			default:
 				continue;
 			}
 		}
 	}
+
 }

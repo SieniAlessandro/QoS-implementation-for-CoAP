@@ -22,7 +22,6 @@ public class ResponseHandler implements CoapHandler {
 	private String resourceName;
 	private String URI;
 	private boolean acceptProposal;
-	static private int count = 0;
 
 	public ResponseHandler(Observer observer, int priority, String resourceName, String URI, boolean acceptProposal) {
 		this.observer = observer;
@@ -33,13 +32,14 @@ public class ResponseHandler implements CoapHandler {
 	}
 
 	public void onLoad(CoapResponse response) {
-		System.out.println("---------------------------------------");
+		if (DEBUG) 
+			System.out.println("---------------------------------------");
 
 		// Registration failed because response doesn't have the observe option
 		if (response == null || !response.getOptions().hasObserve()) {
 			if (DEBUG) {
-				System.out.println("\t[DEBUG] Request rejected ");
-				System.out.println("\t[DEBUG] " + response.advanced().toString());
+				System.out.println("Observer #" + observer.getId() + ">\t[DEBUG] Request rejected ");
+				System.out.println("Observer #" + observer.getId() + ">\t[DEBUG] " + response.advanced().toString());
 			}
 //			System.out.println("Subject rejected the observe request to the resource ");
 			onError();
@@ -51,28 +51,29 @@ public class ResponseHandler implements CoapHandler {
 		// notification
 		if (response.getCode().equals(CoAP.ResponseCode.CONTENT)) {
 			// Observe relation accepted without negotiation or a notification arrived
-			System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")] Notification Arrived: "
+			System.out.println("Observer #" + observer.getId() + " Priority {"+observer.getRequestedPriority()+"}>[" + new Timestamp(System.currentTimeMillis()) + ")] Notification Arrived: "
 					+ response.advanced().toString());
 			return;
 		} else if (response.getCode().equals(CoAP.ResponseCode.NOT_ACCEPTABLE) && acceptProposal) {
 			if (DEBUG)
-				System.out.println("\t[DEBUG] Nogotiation started, subject proposes " + response.getOptions());
+				System.out.println("Observer #" + observer.getId() + ">\t[DEBUG] Nogotiation started, subject proposes " + response.getOptions());
 			// Subject started the negotiation, observer need to accept it
 			Request observeRequest = new Request(Code.GET);
 			observeRequest.setObserve();
 			observeRequest
 					.setOptions(new OptionSet().addOption(new Option(OptionNumberRegistry.OBSERVE, responsePriority)));
 			observeRequest.setURI(URI);
+			observer.setRequestedPriority(responsePriority);
 			if (DEBUG)
-				System.out.println("\t[DEBUG] Accepting the subject's proposal " + observeRequest.toString());
-			CoapObserveRelation relation = observer.getCoapClient().observe(observeRequest, new ResponseHandler( observer, priority, resourceName, URI, acceptProposal));
-
-			//				break;
-			
-//			}
+				System.out.println("Observer #" + observer.getId() + ">\t[DEBUG] Accepting the subject's proposal " + observeRequest.toString());
+			CoapObserveRelation relation = observer.getCoapClient().observe(observeRequest,
+					new ResponseHandler(observer, priority, resourceName, URI, acceptProposal));
+			if ( relation != null && !relation.isCanceled() ) {
+				observer.getRelations().put(resourceName, relation);
+			}
 		}
 	}
-	
+
 	public void onError() {
 		observer.getRelations().remove(resourceName);
 	}
