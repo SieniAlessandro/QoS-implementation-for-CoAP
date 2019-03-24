@@ -29,7 +29,6 @@ public class ProxyObserver {
 	private Map<String, ObservableResource> resourceList;
 	private Map<String, ObserverState> observers;
 	private static Scanner scanner;
-	private ServerState state;
 	private ArrayList<String> subjects;
 
 	public ProxyObserver() {
@@ -49,9 +48,13 @@ public class ProxyObserver {
 //		addAllResources(resources);
 	}
 
-	public void setState(ServerState state) {
-		this.state = state;
-		resourceList.values().forEach(r -> r.setServerState(state));
+	public void setState(String subjectAddress, ServerState state) {
+		for ( ObservableResource o : resourceList.values() ) {
+			if ( o.getPath().equals(subjectAddress)) {
+				System.out.println("State of " + o.getURI() +" changed from " + o.getServerState() + " to " + state);
+				o.setServerState(state);
+			}
+		}
 	}
 
 	public void addObserver(String key, ObserverState state) {
@@ -157,17 +160,19 @@ public class ProxyObserver {
 	}
 
 	private void changeStateCLI() {
+//		System.out.print("Subject IPv6:port\n");
+		String subjectAddress = "::1:5683";// scanner.next();
 		System.out.print("Change Server State: ( 1 - AVAILABLE, 2 - ONLY_CRITICAL, 3 - UNAVAILABLE )\n");
 		int cmd = scanner.nextInt();
 		switch (cmd) {
 		case 1:
-			setState(ServerState.AVAILABLE);
+			setState("/" + subjectAddress + "/", ServerState.AVAILABLE);
 			break;
 		case 2:
-			setState(ServerState.ONLY_CRITICAL);
+			setState("/" + subjectAddress + "/", ServerState.ONLY_CRITICAL);
 			break;
 		case 3:
-			setState(ServerState.UNVAVAILABLE);
+			setState("/" + subjectAddress + "/", ServerState.UNVAVAILABLE);
 			break;
 		default:
 			System.out.print("Invalid State\n");

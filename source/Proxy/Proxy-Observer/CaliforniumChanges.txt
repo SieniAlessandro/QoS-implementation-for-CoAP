@@ -1,6 +1,7 @@
 CoapClient: 
 	original line: https://github.com/eclipse/californium/blob/f3769602ae52217deead0e92ee95868cd0d35b85/californium-core/src/main/java/org/eclipse/californium/core/CoapClient.java#L1139
-	change line 1140: if (response == null || !response.advanced().getOptions().hasObserve() || response.getCode().equals(CoAP.ResponseCode.NOT_ACCEPTABLE)) {
+	change line 1140: if (response == null || !response.advanced().getOptions().hasObserve() 
+				|| response.getCode().equals(CoAP.ResponseCode.NOT_ACCEPTABLE)) {
 	motivation: the first CoapObserveRelation must be cancelled if the subject started the negotiation
 	
 Request:

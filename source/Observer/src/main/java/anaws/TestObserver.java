@@ -16,7 +16,7 @@ public class TestObserver {
 					Observer o = new Observer("::1", 5683);
 
 					try {
-						Thread.sleep((int)Math.floor(Math.random()*100));
+						Thread.sleep((int)Math.floor(Math.random()*2000));
 					} catch (InterruptedException e) {
 						o.clearRelations();
 					}
