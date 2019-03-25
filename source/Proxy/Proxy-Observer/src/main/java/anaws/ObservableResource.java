@@ -15,8 +15,11 @@ import com.thoughtworks.xstream.XStream;
 
 public class ObservableResource extends ConcurrentCoapResource {
 
+	final private static int THREAD_POOL_SIZE = 2;
+	
 	final private boolean DEBUG = true;
 	final private int PROPOSAL = CoAP.QoSLevel.CRITICAL_HIGH_PRIORITY;
+	
 	private int maxAge = 60;
 	private ProxyObserver server;
 	private double resourceValue;
@@ -30,8 +33,8 @@ public class ObservableResource extends ConcurrentCoapResource {
 	}
 
 
-	public ObservableResource() {
-		super("default_name", 3);
+	public ObservableResource(String name) {
+		super(name, THREAD_POOL_SIZE);
 		super.serverState = ServerState.AVAILABLE;
 		this.setObservable(true);
 		this.setObserveType(Type.CON);
@@ -116,7 +119,7 @@ public class ObservableResource extends ConcurrentCoapResource {
 				response.setOptions(new OptionSet().addOption(new Option(OptionNumberRegistry.OBSERVE, PROPOSAL)));
 				server.getObserverState(observerID).setNegotiationState(true);
 				exchange.respond(response);
-				exchange.advanced().getRelation().cancel();
+//				exchange.advanced().getRelation().cancel();
 				if (DEBUG) {
 					System.out.println("\t[DEBUG] Negotiation Started: " + response.toString());
 				}

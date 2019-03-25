@@ -12,45 +12,77 @@ import org.eclipse.californium.core.coap.Option;
 import org.eclipse.californium.core.coap.OptionNumberRegistry;
 import org.eclipse.californium.core.coap.OptionSet;
 import org.eclipse.californium.core.coap.Request;
-
+import org.eclipse.californium.core.network.CoapEndpoint;
+import org.eclipse.californium.core.network.config.NetworkConfig;
 
 public class Observer {
 
-	private String ipv6Proxy;
-	private int portProxy;
-	private static int instanceCount = 0;
-	private int id;
-	private int requestedPriority;
-	private CoapClient observerCoap;
-	private HashSet<WebLink> resourceList;
-	private static Scanner scanner;
-	private HashMap<String, CoapObserveRelation> relations;
 	final private boolean DEBUG = true;
 
+	private static int instanceCount = 0;
+	private static Scanner scanner;
+
+	private int portProxy;
+	private int id;
+	private int requestedPriority;
+	private boolean CLI;
+
+	private String ipv6Proxy;
+
+	private CoapClient observerCoap;
+	private HashSet<WebLink> resourceList;
+	private HashMap<String, CoapObserveRelation> relations;
+
 	public Observer(String ipv6Proxy, int portProxy) {
+		this(ipv6Proxy, portProxy, false);
+	}
+
+	public Observer(String ipv6Proxy, int portProxy, boolean CLI) {
+		this.observerCoap = new CoapClient();
 		this.ipv6Proxy = ipv6Proxy;
 		this.portProxy = portProxy;
-		this.observerCoap = new CoapClient();
-		this.instanceCount++;
-		this.id = instanceCount;
+		this.CLI = CLI;
+
 		this.resourceList = new HashSet<WebLink>();
 		this.relations = new HashMap<String, CoapObserveRelation>();
 		this.observerCoap.setURI("coap://[" + this.ipv6Proxy + "]:" + this.portProxy);
+
+		this.instanceCount++;
+		this.id = instanceCount;
+
+		CoapEndpoint.Builder builder = new CoapEndpoint.Builder();
+		builder.setPort(6000 + id);
+		builder.setNetworkConfig(NetworkConfig.getStandard());
+		observerCoap.setEndpoint(builder.build());
+
 		resourceDiscovery();
 	}
-	
+
 	public int getId() {
 		return id;
 	}
 
-	public void resourceDiscovery() {
-		System.out.print("Discovery...\n");
-		resourceList.clear();
-		resourceList.addAll(observerCoap.discover());
-		System.out.println(resourceList.toString());
+	public boolean isCLI() {
+		return CLI;
 	}
 
-	public int getQoSBits(int priority) throws IllegalArgumentException {
+	public int getRequestedPriority() {
+		return requestedPriority;
+	}
+
+	public void setRequestedPriority(int requestedPriority) {
+		this.requestedPriority = getPriority(requestedPriority);
+	}
+
+	public HashMap<String, CoapObserveRelation> getRelations() {
+		return relations;
+	}
+
+	public CoapClient getCoapClient() {
+		return observerCoap;
+	}
+
+	private int getQoSBits(int priority) throws IllegalArgumentException {
 		int hex;
 		switch (priority) {
 		case 1:
@@ -70,8 +102,8 @@ public class Observer {
 		}
 		return hex;
 	}
-	
-	public int getPriority(int priority) throws IllegalArgumentException {
+
+	private int getPriority(int priority) throws IllegalArgumentException {
 		int dec;
 		switch (priority) {
 		case CoAP.QoSLevel.NON_CRITICAL_LOW_PRIORITY:
@@ -91,39 +123,8 @@ public class Observer {
 		}
 		return dec;
 	}
-	
-	public HashMap<String, CoapObserveRelation> getRelations() {
-		return relations;
-	}
-	
-	public CoapClient getCoapClient() {
-		return observerCoap;
-	}
-	
 
-	public void resourceRegistration() {
-		if (resourceList.isEmpty()) {
-			System.out.println("No resource available, please run discovery first");
-			return;
-		}
-
-		System.out.print("Requesting an Observe Relations\n");
-//		System.out.print("Subject IPv6:port\n");
-		String subjectAddress = "::1:5683";//scanner.next();
-//		System.out.print("Resource Name: ");
-		String resourceName = "temperature" ;//scanner.next();
-		String path = "/" + subjectAddress + "/" + resourceName;
-		
-		if ( !resourceList.toString().contains(path) ) {
-			System.out.println("Resource not found: " + path);
-			return;
-		}
-		if (DEBUG)
-			System.out.println("Resource found: " + path + " is present into " + resourceList.toString());
-		
-		System.out.print("Priority: ");
-		requestedPriority = (int)Math.floor(Math.random()*4+1);
-		int priority = 	getQoSBits(requestedPriority);	// getQoSBits(scanner.nextInt());
+	private void resourceRegistration(String resourceName, int priority, String path) {
 		Request observeRequest = new Request(Code.GET);
 		try {
 			// Set the priority level using the first 2 bits of the observe option value
@@ -132,33 +133,29 @@ public class Observer {
 		} catch (IllegalArgumentException ex) {
 			System.out.println("Invalid Priority Level");
 		}
-		
+
 		String URI = "coap://[" + this.ipv6Proxy + "]:" + this.portProxy + path;
 		observeRequest.setURI(URI);
 		if (DEBUG)
 			System.out.println("Observer #" + id + ">\t[DEBUG] Send Observe request: " + observeRequest.toString());
-		CoapObserveRelation relation = observerCoap.observeAndWait( observeRequest, new ResponseHandler( this, priority, resourceName, URI, true) );
+		CoapObserveRelation relation = observerCoap.observeAndWait(observeRequest,
+				new ResponseHandler(this, priority, resourceName, URI, true));
 
-		if ( relation.isCanceled() ) {
+		if (relation.isCanceled()) {
 			if (DEBUG)
 				System.out.println("Observer #" + id + ">\t[DEBUG] Relation is canceled");
-		} else 
+		} else
 			relations.put(resourceName, relation);
-		
 	}
 
-	public int getRequestedPriority() {
-		return requestedPriority;
+	private void resourceDiscovery() {
+		System.out.print("Discovery...\n");
+		resourceList.clear();
+		resourceList.addAll(observerCoap.discover());
+		System.out.println(resourceList.toString());
 	}
 
-	public void setRequestedPriority(int requestedPriority) {
-		this.requestedPriority = getPriority(requestedPriority);
-	}
-
-	public void resourceCancellation() {
-		System.out.print("Resource Cancellation\n");
-		System.out.print("Resource Name: ");
-		String resourceName = scanner.next();
+	private void resourceCancellation(String resourceName) {
 
 		CoapObserveRelation relation = relations.get(resourceName);
 		if (relation == null) {
@@ -169,55 +166,122 @@ public class Observer {
 		relation.proactiveCancel();
 	}
 
+	/*******************************
+	 * COMMAND LINE TESTING FUNCTIONS
+	 *******************************/
+
+	public void resourceRegistrationCLI() {
+		if (resourceList.isEmpty()) {
+			System.out.println("No resource available, please run discovery first");
+			return;
+		}
+
+		requestedPriority = (int) Math.floor(Math.random() * 4 + 1);
+		String subjectAddress = "";
+		String resourceName = "";
+		int priority = 1;
+
+		if (CLI) {
+			try {
+				System.out.print("Requesting an Observe Relations\n");
+				System.out.print("Subject IPv6:port\n");
+				subjectAddress = scanner.next();
+				System.out.print("Resource Name: ");
+				resourceName = scanner.next();
+				System.out.print("Priority: ");
+				priority = getQoSBits(scanner.nextInt());
+			} catch (InputMismatchException e) {
+				System.out.println("Invalid Input");
+				scanner.nextLine();
+			}
+		} else {
+			subjectAddress = "::1:5683";
+			resourceName = "temperature";
+			priority = getQoSBits(requestedPriority);
+		}
+		String path = "/" + subjectAddress + "/" + resourceName;
+
+		if (!resourceList.toString().contains(path)) {
+			System.out.println("Resource not found: " + path);
+			return;
+		}
+		if (DEBUG)
+			System.out.println("Resource found: " + path + " is present into " + resourceList.toString());
+
+		resourceRegistration(resourceName, priority, path);
+	}
+
+	public void resourceCancellationCLI() {
+		String resourceName = "";
+
+		if (CLI) {
+			try {
+				System.out.print("Resource Cancellation\n");
+				System.out.print("Resource Name: ");
+				resourceName = scanner.next();
+			} catch (InputMismatchException e) {
+				System.out.println("Invalid input");
+				scanner.nextLine();		
+			}
+		} else
+			resourceName = "temperature";
+
+		resourceCancellation(resourceName);
+	}
+
 	public void printHelpMenu() {
 		String commandList = "1) Request the list of resources\n" + "2) Resource registration\n"
 				+ "3) Resource cancellation\n" + "4) Print Help Menu\n" + "5) Exit\n";
 		System.out.println("List of commands:\n" + commandList);
 	}
-	
-	public InetSocketAddress getObserverAddress() {
-		return observerCoap.getEndpoint().getAddress();
-	}
-	
-	public void getObserverPort() {
-		System.out.println(observerCoap.getEndpoint().toString() );
-	}
 
-	
 	public void clearRelations() {
+		System.out.println("Clearing observation...");
 		relations.values().forEach(r -> r.proactiveCancel());
 	}
-	
+
+	public void exit() {
+		clearRelations();
+		System.out.println("Exiting... Good bye!");
+		System.exit(0);
+	}
+
 	public static void main(String[] args) {
 		scanner = new Scanner(System.in);
-		Observer observerClient = new Observer("::1", 5683);
-			
+		Observer observerClient = new Observer("::1", 5683, true);
+
 		System.out.println("Welcome to the Observer's Command Line Interface");
 		observerClient.printHelpMenu();
-		observerClient.resourceRegistration();
-		while (true) {
-//			System.out.print("Observer> ");
-//			switch (scanner.nextInt()) {
-//			case 1:
-//				observerClient.resourceDiscovery();
-//				break;
-//			case 2:
-//				observerClient.resourceRegistration();
-//				break;
-//			case 3:
-//				observerClient.resourceCancellation();
-//				break;
-//			case 4:
-//				observerClient.printHelpMenu();
-//				break;
-//			case 5:
-//				System.out.println("Exiting... Good bye!");
-//				System.exit(0);
-//				break;
-//			default:
-//				continue;
-//			}
-		}
+		if (observerClient.isCLI()) {
+			while (true) {
+				try {
+					System.out.print("Observer> ");
+					switch (scanner.nextInt()) {
+					case 1:
+						observerClient.resourceDiscovery();
+						break;
+					case 2:
+						observerClient.resourceRegistrationCLI();
+						break;
+					case 3:
+						observerClient.resourceCancellationCLI();
+						break;
+					case 4:
+						observerClient.printHelpMenu();
+						break;
+					case 5:
+						observerClient.exit();
+						break;
+					default:
+						continue;
+					}
+				} catch (InputMismatchException e) {
+					System.out.println("Invalid command");
+					scanner.nextLine();
+				}
+			}
+		} else
+			observerClient.resourceRegistrationCLI();
 	}
 
 }

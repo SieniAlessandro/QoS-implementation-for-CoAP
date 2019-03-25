@@ -5,7 +5,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class TestObserver {
 
-	final static private int POOL_SIZE = 2;
+	final static private int POOL_SIZE = 10;
 
 	public static void main(String[] args) {
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(POOL_SIZE);
@@ -13,14 +13,14 @@ public class TestObserver {
 			executor.execute(new Runnable() {
 				@Override
 				public void run() {
-					Observer o = new Observer("::1", 5683);
-
+					Observer o = null;
 					try {
-						Thread.sleep((int)Math.floor(Math.random()*2000));
+						Thread.sleep((int)Math.floor(Math.random()*5000));
+						o = new Observer("::1", 5683);
 					} catch (InterruptedException e) {
 						o.clearRelations();
 					}
-					o.resourceRegistration();
+					o.resourceRegistrationCLI();
 					while (true) {
 						try {
 							Thread.sleep(500);
@@ -31,6 +31,5 @@ public class TestObserver {
 				}
 			});
 		}
-		executor.shutdown();
 	}
 }

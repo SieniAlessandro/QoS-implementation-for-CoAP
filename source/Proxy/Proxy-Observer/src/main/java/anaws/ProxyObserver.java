@@ -1,6 +1,7 @@
 package anaws;
 
 import java.util.HashMap;
+import java.util.InputMismatchException;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -24,6 +25,8 @@ import org.eclipse.californium.core.server.resources.Resource;
 import org.eclipse.californium.core.server.ServerState;
 
 public class ProxyObserver {
+
+	final private static boolean CLI = false;
 
 	private CoapServer proxyObserver;
 	private Map<String, ObservableResource> resourceList;
@@ -49,9 +52,9 @@ public class ProxyObserver {
 	}
 
 	public void setState(String subjectAddress, ServerState state) {
-		for ( ObservableResource o : resourceList.values() ) {
-			if ( o.getPath().equals(subjectAddress)) {
-				System.out.println("State of " + o.getURI() +" changed from " + o.getServerState() + " to " + state);
+		for (ObservableResource o : resourceList.values()) {
+			if (o.getPath().equals(subjectAddress)) {
+				System.out.println("State of " + o.getURI() + " changed from " + o.getServerState() + " to " + state);
 				o.setServerState(state);
 			}
 		}
@@ -104,14 +107,20 @@ public class ProxyObserver {
 		}
 	}
 
-	public void triggerChange(String resourceName) {
+	public void triggerChange(String resourceName, boolean critical) {
 		if (resourceList.get(resourceName).getObserverCount() == 0) {
 			System.out.println("No Observe Relations on this resource");
 			return;
 		}
-		resourceList.get(resourceName).setResourceValue(Math.random() * 10 + 20);
+		if (!critical) {
+			resourceList.get(resourceName).setResourceValue(Math.random() * 10 + 20);
 //		resourceList.get(resourceName).setResourceValue(proxySubject.fetchResource(resourceName));
-		resourceList.get(resourceName).changed();
+			resourceList.get(resourceName).changed();
+		} else {
+			resourceList.get(resourceName).setResourceValue(Math.random() * 10 + 30);
+			resourceList.get(resourceName).changed(new CriticalRelationFilter());
+		}
+		System.out.println("Current observers on this resource :" + resourceList.get(resourceName).getObserverCount());
 	}
 
 	public void updateResourcesFile(ObservableResource resource) {
@@ -155,39 +164,69 @@ public class ProxyObserver {
 	private void printHelpMenuCLI() {
 		String commandList = "1) Start the server\n" + "2) Add a resource\n" + "3) Delete a resource\n"
 				+ "4) Print Help Menu\n" + "5) Clear Observe Relations of a resource\n"
-				+ "6) Simulate a Resource Change \n" + "7) Change Server State \n";
+				+ "6) Simulate a Resource Change \n" + "7) Simulate a Critical Resource Change \n"
+				+ "8) Change Server State \n" + "9) Exit \n";
 		System.out.println("List of commands:\n" + commandList);
 	}
 
 	private void changeStateCLI() {
-//		System.out.print("Subject IPv6:port\n");
-		String subjectAddress = "::1:5683";// scanner.next();
+		String subjectAddress = "";
+		if (CLI) {
+			System.out.print("Subject IPv6:port\n");
+			try {
+				subjectAddress = scanner.next();
+			} catch (InputMismatchException e) {
+				System.out.println("Invalid input");
+				scanner.nextLine();
+			}
+		} else {
+			subjectAddress = "::1:5683";
+
+		}
+
 		System.out.print("Change Server State: ( 1 - AVAILABLE, 2 - ONLY_CRITICAL, 3 - UNAVAILABLE )\n");
 		int cmd = scanner.nextInt();
-		switch (cmd) {
-		case 1:
-			setState("/" + subjectAddress + "/", ServerState.AVAILABLE);
-			break;
-		case 2:
-			setState("/" + subjectAddress + "/", ServerState.ONLY_CRITICAL);
-			break;
-		case 3:
-			setState("/" + subjectAddress + "/", ServerState.UNVAVAILABLE);
-			break;
-		default:
-			System.out.print("Invalid State\n");
-			break;
+		try {
+			switch (cmd) {
+			case 1:
+				setState("/" + subjectAddress + "/", ServerState.AVAILABLE);
+				break;
+			case 2:
+				setState("/" + subjectAddress + "/", ServerState.ONLY_CRITICAL);
+				break;
+			case 3:
+				setState("/" + subjectAddress + "/", ServerState.UNVAVAILABLE);
+				break;
+			default:
+				System.out.print("Invalid State\n");
+				break;
+			}
+		} catch (InputMismatchException e) {
+			System.out.println("Invalid input");
+			scanner.nextLine();
 		}
 	}
 
 	private void addResourceCLI() {
-//		System.out.print("Add Resourse\n");
-//		System.out.print("Subject IPv6:port\n");
-		String subjectAddress = "::1:5683";// scanner.next();
-//		System.out.print("Resource Name: ");
-		String resourceName = "temperature"; // scanner.next();
-		ObservableResource or = new ObservableResource();
-		or.setName(resourceName);
+		String subjectAddress = "";
+		String resourceName = "";
+		if (CLI) {
+			try {
+				System.out.print("Add Resourse\n");
+				System.out.print("Subject IPv6:port\n");
+				subjectAddress = scanner.next();
+				System.out.print("Resource Name: ");
+				resourceName = scanner.next();
+			} catch (InputMismatchException e) {
+				System.out.println("Invalid input");
+				scanner.nextLine();
+			}
+		} else {
+			subjectAddress = "::1:5683";
+			resourceName = "temperature";
+		}
+
+		ObservableResource or = new ObservableResource(resourceName);
 		or.setServer(this);
 		addResource(subjectAddress, or);
 	}
@@ -197,22 +236,65 @@ public class ProxyObserver {
 	}
 
 	private void triggerChangeCLI() {
-//		System.out.print("Add Resourse\n");
-//		System.out.print("Subject IPv6:port\n");
-		String subjectAddress = "::1:5683";// scanner.next();
-//		System.out.print("Add Resourse\n");
-//		System.out.print("Resource Name: ");
-		String resourceName = "temperature"; // scanner.next();
-		triggerChange("/" + subjectAddress + "/" + resourceName);
+		String subjectAddress = "";
+		String resourceName = "";
+		if (CLI) {
+			try {
+				System.out.print("Add Resource\n");
+				System.out.print("Subject Address <IPv6:port>\n");
+				subjectAddress = scanner.next();
+				System.out.print("Resource Name: ");
+				resourceName = scanner.next();
+			} catch (InputMismatchException e) {
+				System.out.println("Invalid input");
+				scanner.nextLine();
+			}
+		} else {
+			subjectAddress = "::1:5683";
+			resourceName = "temperature";
+		}
+		triggerChange("/" + subjectAddress + "/" + resourceName, false);
+	}
+
+	private void triggerCriticalChangeCLI() {
+		String subjectAddress = "";
+		String resourceName = "";
+		if (CLI) {
+			try {
+				System.out.print("Add Resource\n");
+				System.out.print("Subject Address <IPv6:port>\n");
+				subjectAddress = scanner.next();
+				System.out.print("Resource Name: ");
+				resourceName = scanner.next();
+			} catch (InputMismatchException e) {
+				System.out.println("Invalid input");
+				scanner.nextLine();
+			}
+		} else {
+			subjectAddress = "::1:5683";
+			resourceName = "temperature";
+		}
+		triggerChange("/" + subjectAddress + "/" + resourceName, true);
 	}
 
 	private void clearObservationCLI() {
-//		System.out.print("Add Resourse\n");
-//		System.out.print("Subject IPv6:port\n");
-		String subjectAddress = "::1:5683";// scanner.next();
-//		System.out.print("Add Resourse\n");
-//		System.out.print("Resource Name: ");
-		String resourceName = "temperature"; // scanner.next();
+		String subjectAddress = "";
+		String resourceName = "";
+		if (CLI) {
+			try {
+				System.out.print("Clear Resource\n");
+				System.out.print("Subject Address <IPv6:port>\n");
+				subjectAddress = scanner.next();
+				System.out.print("Resource Name: ");
+				resourceName = scanner.next();
+			} catch (InputMismatchException e) {
+				System.out.println("Invalid input");
+				scanner.nextLine();
+			}
+		} else {
+			subjectAddress = "::1:5683";
+			resourceName = "temperature";
+		}
 		clearObservation("/" + subjectAddress + "/" + resourceName);
 	}
 
@@ -224,37 +306,46 @@ public class ProxyObserver {
 		server.printHelpMenuCLI();
 		server.addResourceCLI();
 		while (true) {
-			System.out.print("ProxyObserver> ");
-			switch (scanner.nextInt()) {
-			case 1:
-				server.init();
-				break;
-			case 2:
-				server.addResourceCLI();
-				break;
-			case 3:
-				server.deleteResourceCLI();
-				break;
-			case 4:
-				server.printHelpMenuCLI();
-				break;
-			case 5:
-				server.clearObservationCLI();
-			case 6:
-				server.triggerChangeCLI();
-				break;
-			case 7:
-				server.changeStateCLI();
-				break;
-			case 8:
-				System.out.println("Exiting... Good bye!");
-				server.clearObservationCLI();
-				System.exit(0);
-				break;
-			default:
-				continue;
+			try {
+				System.out.print("ProxyObserver> ");
+				switch (scanner.nextInt()) {
+				case 1:
+					server.init();
+					break;
+				case 2:
+					server.addResourceCLI();
+					break;
+				case 3:
+					server.deleteResourceCLI();
+					break;
+				case 4:
+					server.printHelpMenuCLI();
+					break;
+				case 5:
+					server.clearObservationCLI();
+				case 6:
+					server.triggerChangeCLI();
+					break;
+				case 7:
+					server.triggerCriticalChangeCLI();
+					break;
+				case 8:
+					server.changeStateCLI();
+					break;
+				case 9:
+					System.out.println("Exiting... Good bye!");
+					server.clearObservationCLI();
+					System.exit(0);
+					break;
+				default:
+					continue;
+				}
+			} catch (InputMismatchException e) {
+				System.out.println("Invalid command");
+				scanner.nextLine();
 			}
 		}
+
 	}
 
 }

@@ -1,4 +1,5 @@
  docs/
+ lib/
 lib/Californium/californium-2.0.x/.gitattributes
 lib/Californium/californium-2.0.x/about.html
 lib/Californium/californium-2.0.x/californium-180.png
