@@ -1,6 +1,6 @@
 package anaws;
 
-import java.net.InetSocketAddress;
+import java.sql.Timestamp;
 import java.util.*;
 
 import org.eclipse.californium.core.CoapClient;
@@ -26,6 +26,7 @@ public class Observer {
 	private int id;
 	private int requestedPriority;
 	private boolean CLI;
+	private boolean autocomplete;
 
 	private String ipv6Proxy;
 
@@ -34,18 +35,19 @@ public class Observer {
 	private HashMap<String, CoapObserveRelation> relations;
 
 	public Observer(String ipv6Proxy, int portProxy) {
-		this(ipv6Proxy, portProxy, false);
+		this(ipv6Proxy, portProxy, false, true);
 	}
 
-	public Observer(String ipv6Proxy, int portProxy, boolean CLI) {
+	public Observer(String ipv6Proxy, int portProxy, boolean CLI, boolean autocomplete) {
 		this.observerCoap = new CoapClient();
 		this.ipv6Proxy = ipv6Proxy;
 		this.portProxy = portProxy;
 		this.CLI = CLI;
+		this.autocomplete = autocomplete;
 
 		this.resourceList = new HashSet<WebLink>();
 		this.relations = new HashMap<String, CoapObserveRelation>();
-//		this.observerCoap.setURI("coap://[" + this.ipv6Proxy + "]:" + this.portProxy);
+		this.observerCoap.setURI("coap://[" + this.ipv6Proxy + "]:" + this.portProxy);
 
 		this.instanceCount++;
 		this.id = instanceCount;
@@ -137,7 +139,7 @@ public class Observer {
 		String URI = "coap://[" + this.ipv6Proxy + "]:" + this.portProxy + path;
 		observeRequest.setURI(URI);
 		if (DEBUG)
-			System.out.println("Observer #" + id + ">\t[DEBUG] Send Observe request: " + observeRequest.toString());
+			System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")] Observer #" + id + ">\t[DEBUG] Send Observe request: " + observeRequest.toString());
 		CoapObserveRelation relation = observerCoap.observeAndWait(observeRequest,
 				new ResponseHandler(this, priority, resourceName, URI, true));
 
@@ -171,7 +173,7 @@ public class Observer {
 	/*******************************
 	 * COMMAND LINE TESTING FUNCTIONS
 	 *******************************/
-
+	
 	public void resourceRegistrationCLI() {
 		if (resourceList.isEmpty()) {
 			System.out.println("No resource available, please run discovery first");
@@ -183,10 +185,10 @@ public class Observer {
 		String resourceName = "";
 		int priority = 1;
 
-		if (CLI) {
+		if (!autocomplete) {
 			try {
 				System.out.print("Requesting an Observe Relations\n");
-				System.out.print("Subject IPv6:port\n");
+				System.out.print("Sensor Address <IPv6:port> \n");
 				subjectAddress = scanner.next();
 				System.out.print("Resource Name: ");
 				resourceName = scanner.next();
@@ -216,7 +218,7 @@ public class Observer {
 	public void resourceCancellationCLI() {
 		String resourceName = "";
 
-		if (CLI) {
+		if (!autocomplete) {
 			try {
 				System.out.print("Resource Cancellation\n");
 				System.out.print("Resource Name: ");
@@ -232,8 +234,8 @@ public class Observer {
 	}
 
 	public void printHelpMenu() {
-		String commandList = "1) Request the list of resources\n" + "2) Resource registration\n"
-				+ "3) Resource cancellation\n" + "4) Print Help Menu\n" + "5) Exit\n";
+		String commandList = "1) Print Help Menu\n" + "2) Resource registration\n"
+				+ "3) Resource cancellation\n" + "4) Request the list of resources\n" + "5) Exit\n";
 		System.out.println("List of commands:\n" + commandList);
 	}
 
@@ -250,17 +252,19 @@ public class Observer {
 
 	public static void main(String[] args) {
 		scanner = new Scanner(System.in);
-		Observer observerClient = new Observer("::1", 5683, true);
+		Observer observerClient = new Observer("::1", 5683, true, true);
 
 		System.out.println("Welcome to the Observer's Command Line Interface");
 		observerClient.printHelpMenu();
 		if (observerClient.isCLI()) {
+			if (observerClient.autocomplete)
+				observerClient.resourceRegistrationCLI();
 			while (true) {
 				try {
 					System.out.print("Observer> ");
 					switch (scanner.nextInt()) {
 					case 1:
-						observerClient.resourceDiscovery();
+						observerClient.printHelpMenu();
 						break;
 					case 2:
 						observerClient.resourceRegistrationCLI();
@@ -269,7 +273,7 @@ public class Observer {
 						observerClient.resourceCancellationCLI();
 						break;
 					case 4:
-						observerClient.printHelpMenu();
+						observerClient.resourceDiscovery();
 						break;
 					case 5:
 						observerClient.exit();
