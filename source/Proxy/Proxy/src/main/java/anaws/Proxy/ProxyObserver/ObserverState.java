@@ -1,4 +1,4 @@
-package anaws;
+package anaws.Proxy.ProxyObserver;
 
 public class ObserverState {
 	private int originalMID;

@@ -45,7 +45,7 @@ public class Observer {
 
 		this.resourceList = new HashSet<WebLink>();
 		this.relations = new HashMap<String, CoapObserveRelation>();
-		this.observerCoap.setURI("coap://[" + this.ipv6Proxy + "]:" + this.portProxy);
+//		this.observerCoap.setURI("coap://[" + this.ipv6Proxy + "]:" + this.portProxy);
 
 		this.instanceCount++;
 		this.id = instanceCount;
@@ -54,7 +54,7 @@ public class Observer {
 		builder.setPort(6000 + id);
 		builder.setNetworkConfig(NetworkConfig.getStandard());
 		observerCoap.setEndpoint(builder.build());
-
+		
 		resourceDiscovery();
 	}
 
@@ -148,11 +148,13 @@ public class Observer {
 			relations.put(resourceName, relation);
 	}
 
-	private void resourceDiscovery() {
+	public void resourceDiscovery() {
 		System.out.print("Discovery...\n");
+		Set<WebLink> weblinks = observerCoap.discover();
 		resourceList.clear();
-		resourceList.addAll(observerCoap.discover());
+		resourceList.addAll(weblinks);
 		System.out.println(resourceList.toString());
+
 	}
 
 	private void resourceCancellation(String resourceName) {
@@ -280,8 +282,9 @@ public class Observer {
 					scanner.nextLine();
 				}
 			}
-		} else
+		} else {
 			observerClient.resourceRegistrationCLI();
+		}
 	}
 
 }

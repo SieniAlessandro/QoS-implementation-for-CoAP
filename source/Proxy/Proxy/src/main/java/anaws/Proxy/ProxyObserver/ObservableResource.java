@@ -1,4 +1,4 @@
-package anaws;
+package anaws.Proxy.ProxyObserver;
 
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.Option;
@@ -10,7 +10,6 @@ import org.eclipse.californium.core.server.resources.CoapExchange;
 import org.eclipse.californium.core.server.resources.ConcurrentCoapResource;
 import org.eclipse.californium.core.server.ServerState;
 
-import com.thoughtworks.xstream.XStream;
 
 public class ObservableResource extends ConcurrentCoapResource {
 
@@ -48,11 +47,6 @@ public class ObservableResource extends ConcurrentCoapResource {
 		this.server = server;
 	}
 
-	@Override
-	public String toString() {
-		this.server = null;
-		return new XStream().toXML(this);
-	}
 
 	public int getPriority(int priority) throws IllegalArgumentException {
 		int dec;

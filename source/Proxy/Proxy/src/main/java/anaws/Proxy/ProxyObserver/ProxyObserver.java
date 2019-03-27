@@ -1,9 +1,9 @@
-package anaws;
+package anaws.Proxy.ProxyObserver;
 
 import java.util.HashMap;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+
+import anaws.Proxy.*;
+
 import java.util.InputMismatchException;
 import java.util.Map;
 import java.util.Scanner;
@@ -27,9 +27,6 @@ import java.util.Collection;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.server.resources.Resource;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
 
 import org.eclipse.californium.core.server.ServerState;
 
@@ -143,35 +140,19 @@ public class ProxyObserver {
 //			ex.printStackTrace();
 //		}
 
-		try {
-			JAXBContext jaxbContext = JAXBContext.newInstance(ObservableResource.class);
-			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-			File file = new File(pathname);
-
-			// Write XML to StringWriter
-			jaxbMarshaller.marshal(updated, file );
-
-			// Verify XML Content
-			String xmlContent = file.toString();
-			System.out.println(xmlContent);
-
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		}
 	}
 
 	public void readResourcesFile() {
 		Resource subject = null;
 		String pathname = "Local/Node_1.bin";
-
-		try (FileInputStream fin = new FileInputStream(new File(pathname));
-				ObjectInputStream bin = new ObjectInputStream(fin)) {
-			subject = (Resource) bin.readObject();
-		} catch (IOException | ClassNotFoundException ex) {
-			System.err.println(ex.getMessage());
-		}
+//
+//		try (FileInputStream fin = new FileInputStream(new File(pathname));
+//				ObjectInputStream bin = new ObjectInputStream(fin)) {
+//			subject = (Resource) bin.readObject();
+//		} catch (IOException | ClassNotFoundException ex) {
+//			System.err.println(ex.getMessage());
+//		}
 
 		if (subject != null)
 			proxyObserver.add(subject);
