@@ -1,3 +1,6 @@
+package anaws.Proxy.ProxySubject;
+
+
 public class SensorNode{
 
 	String IPaddress;

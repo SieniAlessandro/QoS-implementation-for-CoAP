@@ -1,3 +1,6 @@
+package anaws.Proxy.ProxySubject;
+
+
 import java.util.*;
 
 public class Registrator{

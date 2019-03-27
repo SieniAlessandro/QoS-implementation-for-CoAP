@@ -1,3 +1,6 @@
+package anaws.Proxy.ProxySubject;
+
+
 public class Registration{
 
 	SensorNode Sensor;
