@@ -2,6 +2,7 @@ package anaws.Proxy.ProxyObserver;
 
 import java.util.HashMap;
 
+import anaws.Proxy.ProxySubject.ProxySubject;
 import anaws.Proxy.ProxySubject.SensorNode;
 
 import java.util.InputMismatchException;
@@ -20,11 +21,12 @@ import org.eclipse.californium.core.server.ServerState;
 public class ProxyObserver {
 
 	private CoapServer proxyObserver;
+	
+	private ProxySubject proxySubject;
 	private Map<String, ObservableResource> resourceList;
 	private Map<String, ObserverState> observers;
 	private static Scanner scanner;
 
-	// USARE LA STRUTTURA DEL PROXY sensor QUANDO PRONTA
 	private ArrayList<SensorNode> sensors;
 
 	private boolean CLI;
@@ -40,6 +42,10 @@ public class ProxyObserver {
 
 		System.out.println("\t[INFO] Starting listening...");
 		proxyObserver.start();
+	}
+	
+	public void addProxySubject(ProxySubject proxySubject ) {
+		this.proxySubject = proxySubject;
 	}
 
 	public void setState(String sensorAddress, ServerState state) {
@@ -131,7 +137,7 @@ public class ProxyObserver {
 				+ "\" removed from the resource list\n");
 	}
 
-	public void triggerChange(String resourceName, double value, boolean critical) {
+	synchronized public void triggerChange(String resourceName, double value, boolean critical) {
 		if (resourceList.get(resourceName).getObserverCount() == 0) {
 			System.out.println("No Observe Relations on this resource");
 			return;
@@ -342,7 +348,6 @@ public class ProxyObserver {
 				scanner.nextLine();
 			}
 		}
-
 	}
 
 }

@@ -10,6 +10,9 @@ import org.eclipse.californium.core.coap.Response;
 import org.eclipse.californium.core.coap.CoAP.Type;
 import org.eclipse.californium.core.server.resources.CoapExchange;
 import org.eclipse.californium.core.server.resources.ConcurrentCoapResource;
+
+import anaws.Proxy.ProxySubject.SensorData;
+
 import org.eclipse.californium.core.server.ServerState;
 
 public class ObservableResource extends ConcurrentCoapResource {
@@ -21,7 +24,7 @@ public class ObservableResource extends ConcurrentCoapResource {
 
 	private int maxAge = 60;
 	private ProxyObserver server;
-	private double resourceValue;
+	private SensorData resourceValue;
 
 	public double getResourceValue() {
 		return resourceValue;
@@ -124,7 +127,6 @@ public class ObservableResource extends ConcurrentCoapResource {
 				response.setOptions(new OptionSet().addOption(new Option(OptionNumberRegistry.OBSERVE, PROPOSAL)));
 				server.getObserverState(observerID).setNegotiationState(true);
 				exchange.respond(response);
-//				exchange.advanced().getRelation().cancel();
 				if (DEBUG) {
 					System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")]  [INFO] Negotiation Started: " + response.toString());
 				}
