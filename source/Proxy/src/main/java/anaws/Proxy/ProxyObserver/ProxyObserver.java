@@ -319,6 +319,7 @@ public class ProxyObserver {
 					break;
 				case 4:
 					server.clearObservationCLI();
+					break;
 				case 5:
 					server.triggerChangeCLI();
 					break;
