@@ -28,5 +28,5 @@
 \contentsline {subsubsection}{\numberline {2.2.1.4}server.ServerMessageDeliverer}{11}{subsubsection.2.2.1.4}% 
 \contentsline {subsubsection}{\numberline {2.2.1.5}server.ServerState}{12}{subsubsection.2.2.1.5}% 
 \contentsline {subsubsection}{\numberline {2.2.1.6}CoapResource}{12}{subsubsection.2.2.1.6}% 
-\contentsline {paragraph}{ServerState}{12}{subsubsection.2.2.1.6}% 
-\contentsline {paragraph}{Notifica basata su priorit\IeC {\`a}}{13}{lstnumber.2.9.9}% 
+\contentsline {paragraph}{Aggiornamento relazioni dopo il cambio stato del sensore}{12}{subsubsection.2.2.1.6}% 
+\contentsline {paragraph}{Notifica basata su priorit\IeC {\`a}}{13}{lstnumber.2.7.11}% 

@@ -13,6 +13,7 @@ import org.eclipse.californium.core.server.resources.ConcurrentCoapResource;
 
 import anaws.Proxy.ProxySubject.ProxySubject;
 import anaws.Proxy.ProxySubject.SensorData;
+import anaws.Proxy.ProxySubject.SensorNode;
 
 import org.eclipse.californium.core.server.ServerState;
 
@@ -22,10 +23,10 @@ public class ObservableResource extends ConcurrentCoapResource {
 
 	final private boolean DEBUG = true;
 	final private int PROPOSAL = CoAP.QoSLevel.CRITICAL_HIGH_PRIORITY;
-
-	private int maxAge = 60;
+	
 	private ProxyObserver server;
 	private SensorData data;
+	private String sensorAddress;
 
 	public SensorData getSensorData() {
 		return data;
@@ -35,13 +36,13 @@ public class ObservableResource extends ConcurrentCoapResource {
 		this.data = data;
 	}
 
-	public ObservableResource(String name, ProxyObserver server) {
+	public ObservableResource(String name, ProxyObserver server, String sensorAddress) {
 		super(name, THREAD_POOL_SIZE);
-		super.serverState = ServerState.AVAILABLE;
 		this.setObservable(true);
 		this.setObserveType(Type.CON);
 		this.setVisible(true);
 		this.server = server;
+		this.sensorAddress = sensorAddress;
 	}
 
 	public int getPriority(int priority) throws IllegalArgumentException {
@@ -70,13 +71,15 @@ public class ObservableResource extends ConcurrentCoapResource {
 	public void handleGET(CoapExchange exchange) {
 		System.out.println("---------------------------------------");
 		int observeField = exchange.getRequestOptions().getObserve();
+		
+		SensorNode sensor = server.requestSensorNode(sensorAddress);
 
 		if (observeField == 1) {
 			System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")]  [INFO] Cancel observe request from " + exchange.getSourcePort()
 			+ " for the resource: " + exchange.advanced().getRequest().getURI() );
 			return;
 		}
-		if (super.serverState.equals(ServerState.UNVAVAILABLE)) {
+		if (sensor.getState().equals(ServerState.UNVAVAILABLE)) {
 			System.out.println("Subject is unavailable");
 			return;
 		}
@@ -93,7 +96,7 @@ public class ObservableResource extends ConcurrentCoapResource {
 			if (DEBUG)
 				System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")]  [DEBUG] Observer " + observerID + " not present, added to the list ");
 			server.addObserver(observerID, new ObserverState(mid, false));
-			handleRegistration(priority, observerID, exchange);
+			handleRegistration(priority, observerID, exchange, sensor);
 			return;
 		}
 		
@@ -104,18 +107,18 @@ public class ObservableResource extends ConcurrentCoapResource {
 			// This is a notification because the exchange has the same MID of the original
 			// request
 			System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")]  [INFO] Resource value changed");
-			sendNotification(exchange, false);
+			sendNotification(exchange, sensor, false);
 		} else {
 			// The observer is already present but this is not a notification then it is a
 			// request of reregistration
-			handleRegistration(priority, observerID, exchange);
+			handleRegistration(priority, observerID, exchange, sensor);
 		}
 	}
 
-	private void handleRegistration(int priority, String observerID, CoapExchange exchange) {
+	private void handleRegistration(int priority, String observerID, CoapExchange exchange, SensorNode sensor) {
 		// Registration phase
 		if (!server.getObserverState(observerID).isNegotiationState()) {
-			if (priority < 3 && super.serverState.equals(ServerState.ONLY_CRITICAL)) {
+			if (priority < 3 && sensor.getState().equals(ServerState.ONLY_CRITICAL)) {
 				// First part of the negotiation, where subject make its proposal
 				Response response = new Response(CoAP.ResponseCode.NOT_ACCEPTABLE);
 				response.setOptions(new OptionSet().addOption(new Option(OptionNumberRegistry.OBSERVE, PROPOSAL)));
@@ -128,24 +131,27 @@ public class ObservableResource extends ConcurrentCoapResource {
 				System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")]  [INFO] Accepting the request from " + exchange.getSourcePort()
 						+ " request without negotiation: " + exchange.getRequestOptions().toString());
 				server.getObserverState(observerID).setOriginalMID(exchange.advanced().getRequest().getMID());
-				
-				server.requestRegistration(data.getRegistration().getSensorNode(), getName(), priority > 2 ? true:false );
+				if (DEBUG)
+					System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")]  [DEBUG] Current SensorData: " + this.data);
+				server.requestRegistration(server.requestSensorNode(sensorAddress), getName(), priority > 2 ? true:false );
 				// Request accepted without negotiation
-				sendNotification(exchange, true);
+				sendNotification(exchange, sensor, true);
 			}
 		} else {
 			// This is the second part of a negotiation
 			server.getObserverState(observerID).setNegotiationState(false);
 			server.getObserverState(observerID).setOriginalMID(exchange.advanced().getRequest().getMID());
-			server.requestRegistration(data.getRegistration().getSensorNode(), getName(), priority > 2 ? true:false );
-			sendNotification(exchange, true);
+			
+			server.requestRegistration(sensor, getName(), priority > 2 ? true:false );
+			
+			sendNotification(exchange, sensor, true);
 			System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")]  [INFO] Negotiation ended ");
 		}
 	}
 
-	private void sendNotification(CoapExchange exchange, boolean refresh) {
+	private void sendNotification(CoapExchange exchange, SensorNode sensor, boolean refresh) {
 		if ( refresh ) {
-			data = server.requestValueCache(this.data.getRegistration().getSensorNode(), this.getName());
+			data = server.requestValueCache(sensor, this.getName());
 			if ( data == null ) {
 				System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")]  [INFO] ProxySubject avoided to send the refresh because the max is going to expire soon" );
 				return;
