@@ -51,6 +51,15 @@ public class CacheTable{
 		}
 		return null;
 	}
+	synchronized public SensorData getData(SensorNode sensor,String type) {
+		for (SensorData sd : cache) {
+			if(sd.getRegistration().getSensorNode().equals(sensor) && sd.getRegistration().getType().contentEquals(type)){
+				return sd;
+			}
+		}
+		return null;
+		
+	}
 	synchronized public int countRegistration(Registration r){
 		int ret = 0;
 		for(SensorData d : cache){
