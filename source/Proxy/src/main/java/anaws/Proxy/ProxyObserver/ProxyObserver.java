@@ -72,7 +72,9 @@ public class ProxyObserver {
 	}
 
 	public void clearObservation(SensorNode sensor, String resourceName) {
-		resourceList.get(resourceName).clearAndNotifyObserveRelations(CoAP.ResponseCode.SERVICE_UNAVAILABLE);
+		String key = "/" + sensor.toString() + "/" + resourceName;
+
+		resourceList.get(key).clearAndNotifyObserveRelations(CoAP.ResponseCode.SERVICE_UNAVAILABLE);
 	}
 
 	public void clearAllObservation() {
