@@ -11,7 +11,9 @@ public class Registrator{
 		int registrationNeeded = this.RegistrationNeeded(_r);
 		if( registrationNeeded == 1){
 			System.out.println("Nuova registrazione necessaria");
-			if(_r.register()){
+			//boolean result = _r.register();
+			boolean result = true;
+			if(result){
 				this.reg.add(_r);
 				return 1;
 			}
@@ -22,7 +24,9 @@ public class Registrator{
 			System.out.println("Aggiornamento registrazione");
 			Registration r = findAssociate(_r);
 			this.removeRegistration(r);
-			if(_r.register()){
+			//boolean result = _r.register();
+			boolean result = true;
+			if(result){
 				this.reg.add(_r);
 				return 2;
 			}

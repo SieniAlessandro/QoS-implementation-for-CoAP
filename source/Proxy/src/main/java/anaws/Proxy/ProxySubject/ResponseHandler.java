@@ -10,6 +10,9 @@ import org.eclipse.californium.core.CoapObserveRelation;
 import org.eclipse.californium.core.CoapResponse;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
+
+import anaws.Proxy.ProxyObserver.ProxyObserver;
+
 import org.eclipse.californium.core.coap.CoAP.Code;
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.Option;
@@ -21,9 +24,11 @@ public class ResponseHandler implements CoapHandler {
 	final private boolean DEBUG = true;
 	private CacheTable cache;
 	private Registration registration;
-	public ResponseHandler(CacheTable cache,Registration registration) {
+	private ProxyObserver observer;
+	public ResponseHandler(CacheTable cache,Registration registration,ProxyObserver observer) {
 		this.cache = cache;
 		this.registration = registration;
+		this.observer = observer;
 	}
 	public void onLoad(CoapResponse response) {
 		if (DEBUG) 
@@ -44,6 +49,7 @@ public class ResponseHandler implements CoapHandler {
 		boolean critic = (response.getOptions().getObserve() == CoAP.QoSLevel.CRITICAL_HIGH_PRIORITY)?true:false;
 		SensorData newData = new SensorData(this.registration,Value,maxAge,critic);
 		cache.insertData(newData);
+		this.observer.triggerChange(newData);
 		
 	}
 	public void onError() {

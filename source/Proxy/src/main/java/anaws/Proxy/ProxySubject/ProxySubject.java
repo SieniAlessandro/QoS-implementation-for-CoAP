@@ -24,11 +24,12 @@ public class ProxySubject{
 		new Updater(this.cache, this.registrator).start();
 	}
 	public void newRegistration(SensorNode sensor,String type,boolean critic){
-		Registration r = new Registration(this.cache,sensor,type,critic,coapClient);
+		Registration r = new Registration(this.cache,sensor,type,critic,coapClient,proxyObserver);
 		int result = registrator.newRegistration(r);
 		if(result == 2)
 			cache.updateRegistrations(r);
 		else if(result == -1){
+			this.proxyObserver.clearObservation(sensor, type);
 		}
 	} 
 	public SensorData getValue(String resource,String type){

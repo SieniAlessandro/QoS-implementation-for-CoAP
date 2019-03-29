@@ -6,6 +6,8 @@ import org.eclipse.californium.core.*;
 import org.eclipse.californium.core.coap.*;
 import org.eclipse.californium.core.coap.CoAP.Code;
 
+import anaws.Proxy.ProxyObserver.ProxyObserver;
+
 
 public class Registration{
 
@@ -15,13 +17,15 @@ public class Registration{
 	boolean critic;
 	CoapClient coapClient;
 	CoapObserveRelation coapRelation;
+	ProxyObserver observer;
 	
-	public Registration(CacheTable _cache,SensorNode _sensor,String _type,boolean _critic,CoapClient coapClient){
+	public Registration(CacheTable _cache,SensorNode _sensor,String _type,boolean _critic,CoapClient coapClient,ProxyObserver observer){
 		this.cache = _cache; 
 		this.sensor = _sensor;
 		this.type = _type;
 		critic = _critic;
 		this.coapClient = coapClient;
+		this.observer = observer;
 	}
 	public boolean register() {
 		return this.resourceRegistration(this.sensor.getAddress(),this.sensor.getPort(),(this.critic == true)?CoAP.QoSLevel.CRITICAL_HIGH_PRIORITY:CoAP.QoSLevel.NON_CRITICAL_LOW_PRIORITY, this.type);
@@ -37,7 +41,7 @@ public class Registration{
 		}
 		 String URI = "coap://[" + address + "]:" + port + "/"+path;
 		 observeRequest.setURI(URI);	
-		 coapRelation = coapClient.observeAndWait(observeRequest,new ResponseHandler(this.cache,this));
+		 coapRelation = coapClient.observeAndWait(observeRequest,new ResponseHandler(this.cache,this,this.observer));
 		 if(coapRelation.isCanceled() == false) {
 			 System.out.println("Registrazione con il sensore avvenuta");
 			 return false;
