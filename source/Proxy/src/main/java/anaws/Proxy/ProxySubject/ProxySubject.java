@@ -25,9 +25,15 @@ public class ProxySubject{
 	}
 	public void newRegistration(SensorNode sensor,String type,boolean critic){
 		Registration r = new Registration(this.cache,sensor,type,critic,coapClient);
-		registrator.newRegistration(r);
+		int result = registrator.newRegistration(r);
+		if(result == 2){
+			cache.updateRegistrations(r);
+			
+		}
+		else if(result == -1){
+		}
 	} 
-	public SensorData getValue(SensorNode sensor,String type){
-		return cache.getData(sensor, type);
+	public SensorData getValue(String resource,String type){
+		return cache.getData(resource, type);
 	}
 }

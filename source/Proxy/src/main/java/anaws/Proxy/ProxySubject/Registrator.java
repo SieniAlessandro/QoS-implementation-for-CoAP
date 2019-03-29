@@ -7,32 +7,58 @@ public class Registrator{
 		reg = new ArrayList<Registration>();
 	}
 	
-	synchronized public boolean newRegistration(Registration _r){
-		if(RegistrationNeeded(_r) == true){
+	synchronized public int newRegistration(Registration _r){
+		int registrationNeeded = this.RegistrationNeeded(_r);
+		if( registrationNeeded == 1){
 			System.out.println("Nuova registrazione necessaria");
-			reg.add(_r);
-			return true;
+			if(_r.register()){
+				this.reg.add(_r);
+				return 1;
+			}
+			else {
+				return -1;
+			}
+		}
+		else if (registrationNeeded == 2) {
+			System.out.println("Aggiornamento registrazione");
+			Registration r = findAssociate(_r);
+			this.removeRegistration(r);
+			if(_r.register()){
+				this.reg.add(_r);
+				return 2;
+			}
+			else {
+				return -1;
+			}
 		}
 		else{
 			System.out.println("Registrazione non necessaria");
-			return false;
+			return 0;
 		}
 
 	}
-	synchronized private boolean RegistrationNeeded(Registration _r){
+	synchronized private int RegistrationNeeded(Registration _r){
 		for (Registration r: reg){
 			System.out.println(r.getSensorNode().toString().equals(r.getSensorNode().toString()));
 			if(r.equals(_r))
-				return false;
+				return 0;
 			else if(r.getSensorNode().toString().equals(r.getSensorNode().toString())){
 				if(r.getType() == _r.getType() && (_r.isCritic() == false && r.isCritic() == true)){
-					return true;
+					return 2;
 				}
 				else
-					return false;
+					return 0;
 			}
 		}
-		return true;
+		return 1;
+	}
+	synchronized private Registration findAssociate(Registration _r) {
+		for (Registration r: reg){
+			if(r.getSensorNode().toString().equals(r.getSensorNode().toString()) && 
+			   r.getType() == _r.getType() && (_r.isCritic() == false && r.isCritic() == true))
+			   	return r;
+		}
+		return null;
 	}
 	synchronized public void removeRegistration(Registration _r){
 		if(reg.contains(_r)) {

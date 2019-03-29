@@ -15,17 +15,17 @@ public class SensorData{
 		this.maxAge = maxAge;
 		this.critic = isCritic;
 	}
-	synchronized public void updateValue(double value,int maxage){
+	synchronized public void updateValue(double value,long l){
 		this.value = value;
-		this.maxAge = maxage;
+		this.maxAge = l;
 	}
-	synchronized public boolean updateTime(int time){
+	synchronized public boolean updateTime(long time){
 		this.maxAge = this.maxAge - time;
 		if(this.maxAge <= 0)
-			return false;x
+			return false;
 		return true;
 	}
-
+	
 	synchronized public double getValue(){ return this.value; }
 
 	synchronized public long getTime(){ return this.maxAge; }

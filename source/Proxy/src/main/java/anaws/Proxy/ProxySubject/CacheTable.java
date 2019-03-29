@@ -4,6 +4,7 @@ import java.util.*;
 
 
 public class CacheTable{
+	private static final long THRESHOLD = 0;
 	ArrayList<SensorData> cache;
 	public CacheTable(){
 		cache = new ArrayList<SensorData>();
@@ -51,10 +52,13 @@ public class CacheTable{
 		}
 		return null;
 	}
-	synchronized public SensorData getData(SensorNode sensor,String type) {
+	synchronized public SensorData getData(String resource,String type) {
 		for (SensorData sd : cache) {
-			if(sd.getRegistration().getSensorNode().equals(sensor) && sd.getRegistration().getType().contentEquals(type)){
-				return sd;
+			if(sd.getRegistration().getSensorNode().toString().equals(resource) && sd.getRegistration().getType().contentEquals(type)){
+				if(sd.getTime() <= this.THRESHOLD)
+					return null;
+				else
+					return sd;
 			}
 		}
 		return null;

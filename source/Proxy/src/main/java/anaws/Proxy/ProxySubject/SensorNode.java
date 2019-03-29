@@ -8,6 +8,7 @@ public class SensorNode{
 	int Port;
 	double battery;
 	ServerState actualState;
+	
 	public SensorNode(String address,int port){
 		IPaddress = address;
 		Port = port;
@@ -23,6 +24,8 @@ public class SensorNode{
 		return actualState;
 
 	}
+	public String getAddress() {return this.IPaddress;}
+	public int getPort() {return this.Port;}
 	public ServerState getState(){return actualState;}
 	
 	public String toString(){

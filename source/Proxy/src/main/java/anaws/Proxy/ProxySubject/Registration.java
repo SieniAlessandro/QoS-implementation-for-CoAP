@@ -23,13 +23,10 @@ public class Registration{
 		critic = _critic;
 		this.coapClient = coapClient;
 	}
-	public Registration(CacheTable _cache,String address,int port,String _type,boolean _critic,CoapClient coapClient){
-		this.sensor = new SensorNode(address,port);
-		this.type = _type;
-		this.critic = _critic;
-		this.resourceRegistration(address, port,(this.critic == true)?CoAP.QoSLevel.CRITICAL_HIGH_PRIORITY:CoAP.QoSLevel.NON_CRITICAL_LOW_PRIORITY, this.type);
-	}
-	private void resourceRegistration(String address,int port, int priority, String path) {
+	public boolean register() {
+		return this.resourceRegistration(this.sensor.getAddress(),this.sensor.getPort(),(this.critic == true)?CoAP.QoSLevel.CRITICAL_HIGH_PRIORITY:CoAP.QoSLevel.NON_CRITICAL_LOW_PRIORITY, this.type);
+	}	
+	private boolean resourceRegistration(String address,int port, int priority, String path) {
 		Request observeRequest = new Request(Code.GET);
 		try {
 			// Set the priority level using the first 2 bits of the observe option value
@@ -39,11 +36,24 @@ public class Registration{
 			System.out.println("Invalid Priority Level");
 		}
 		 String URI = "coap://[" + address + "]:" + port + "/"+path;
-		 observeRequest.setURI(URI);
+		 observeRequest.setURI(URI);	
 		 coapRelation = coapClient.observeAndWait(observeRequest,new ResponseHandler(this.cache,this));
+		 if(coapRelation.isCanceled() == false) {
+			 System.out.println("Registrazione con il sensore avvenuta");
+			 return false;
+		 }else {
+			 System.out.println("Errore nella registrazione");
+			 return true;
+		 }
+		 
 	}
+	
 	public void sendCancelation() {
 		coapRelation.proactiveCancel();
+	}
+	
+	public boolean isCanceled() {
+		return coapRelation.isCanceled();
 	}
 	public SensorNode getSensorNode() { return sensor; }
 	public String getType() { return type; }

@@ -38,11 +38,12 @@ public class ResponseHandler implements CoapHandler {
 			onError();
 			return;
 		}
-		// Creating the sensorValue
+		// Creating the sensorData
 		double Value = Double.valueOf(response.getResponseText());
 		long maxAge = response.getOptions().getMaxAge();
 		boolean critic = (response.getOptions().getObserve() == CoAP.QoSLevel.CRITICAL_HIGH_PRIORITY)?true:false;
-		cache.insertData(new SensorData(this.registration,Value,maxAge,critic));
+		SensorData newData = new SensorData(this.registration,Value,maxAge,critic);
+		cache.insertData(newData);
 		
 	}
 	public void onError() {
