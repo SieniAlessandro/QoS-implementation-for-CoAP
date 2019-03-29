@@ -11,6 +11,7 @@ import org.eclipse.californium.core.coap.CoAP.Type;
 import org.eclipse.californium.core.server.resources.CoapExchange;
 import org.eclipse.californium.core.server.resources.ConcurrentCoapResource;
 
+import anaws.Proxy.ProxySubject.ProxySubject;
 import anaws.Proxy.ProxySubject.SensorData;
 
 import org.eclipse.californium.core.server.ServerState;
@@ -24,29 +25,22 @@ public class ObservableResource extends ConcurrentCoapResource {
 
 	private int maxAge = 60;
 	private ProxyObserver server;
-	private SensorData resourceValue;
+	private SensorData data;
 
-	public double getResourceValue() {
-		return resourceValue;
+	public SensorData getSensorData() {
+		return data;
 	}
 
-	public void setResourceValue(double resourceValue) {
-		this.resourceValue = resourceValue;
+	public void setSensorData(SensorData data) {
+		this.data = data;
 	}
 
-	public ObservableResource() {
-		super("default_name", THREAD_POOL_SIZE);
+	public ObservableResource(String name, ProxyObserver server) {
+		super(name, THREAD_POOL_SIZE);
 		super.serverState = ServerState.AVAILABLE;
 		this.setObservable(true);
 		this.setObserveType(Type.CON);
 		this.setVisible(true);
-	}
-
-	public void setName(String name) {
-		super.setName(name);
-	}
-
-	public void setServer(ProxyObserver server) {
 		this.server = server;
 	}
 
@@ -110,7 +104,7 @@ public class ObservableResource extends ConcurrentCoapResource {
 			// This is a notification because the exchange has the same MID of the original
 			// request
 			System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")]  [INFO] Resource value changed");
-			sendNotification(exchange);
+			sendNotification(exchange, false);
 		} else {
 			// The observer is already present but this is not a notification then it is a
 			// request of reregistration
@@ -135,21 +129,28 @@ public class ObservableResource extends ConcurrentCoapResource {
 						+ " request without negotiation: " + exchange.getRequestOptions().toString());
 				server.getObserverState(observerID).setOriginalMID(exchange.advanced().getRequest().getMID());
 				// Request accepted without negotiation
-				sendNotification(exchange);
+				sendNotification(exchange, true);
 			}
 		} else {
 			// This is the second part of a negotiation
 			server.getObserverState(observerID).setNegotiationState(false);
 			server.getObserverState(observerID).setOriginalMID(exchange.advanced().getRequest().getMID());
-			sendNotification(exchange);
+			sendNotification(exchange, true);
 			System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")]  [INFO] Negotiation ended ");
 		}
 	}
 
-	private void sendNotification(CoapExchange exchange) {
-		String value = "Value: " + resourceValue;
-		exchange.setMaxAge(maxAge);
-		exchange.respond(value);
+	private void sendNotification(CoapExchange exchange, boolean refresh) {
+		if ( refresh ) {
+			data = server.requestValueCache(this.data.getRegistration().getSensorNode(), this.getName());
+			if ( data == null ) {
+				System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")]  [INFO] ProxySubject avoided to send the refresh because the max is going to expire soon" );
+				return;
+			}
+		}
+		double value = data.getValue();
+		exchange.setMaxAge(data.getTime());
+		exchange.respond(Double.toString(value));
 		System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")]  [INFO] Notification sent to : " + exchange.getSourcePort() + " notification: " + value);
 	}
 }

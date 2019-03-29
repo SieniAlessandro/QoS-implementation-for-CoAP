@@ -3,6 +3,8 @@ package anaws.Proxy.ProxyObserver;
 import java.util.HashMap;
 
 import anaws.Proxy.ProxySubject.ProxySubject;
+import anaws.Proxy.ProxySubject.Registration;
+import anaws.Proxy.ProxySubject.SensorData;
 import anaws.Proxy.ProxySubject.SensorNode;
 
 import java.util.InputMismatchException;
@@ -69,7 +71,7 @@ public class ProxyObserver {
 		return observers.containsKey(key);
 	}
 
-	public void clearObservation(String resourceName) {
+	public void clearObservation(SensorNode sensor, String resourceName) {
 		resourceList.get(resourceName).clearAndNotifyObserveRelations(CoAP.ResponseCode.SERVICE_UNAVAILABLE);
 	}
 
@@ -79,9 +81,7 @@ public class ProxyObserver {
 
 	public void addResource(SensorNode sensor, String resourceName) {
 
-		ObservableResource resource = new ObservableResource();
-		resource.setName(resourceName);
-		resource.setServer(this);
+		ObservableResource resource = new ObservableResource(resourceName, this);
 
 		if (sensors.contains(sensor)) {
 			// sensor already present
@@ -91,8 +91,7 @@ public class ProxyObserver {
 			}
 		} else {
 			sensors.add(sensor);
-			CoapResource sensorResource = new ObservableResource();
-			sensorResource.setName(sensor.toString());
+			CoapResource sensorResource = new ObservableResource(sensor.toString(), this);
 			sensorResource.setVisible(false);
 			sensorResource.add(resource);
 			proxyObserver.add(sensorResource);
@@ -138,23 +137,33 @@ public class ProxyObserver {
 	}
 
 	synchronized public void triggerChange(SensorData data) {
-		if (resourceList.get(resourceName).getObserverCount() == 0) {
+		String resourceName = data.getRegistration().getType();
+		String sensor = data.getRegistration().getSensorNode().toString();
+		boolean critical = data.getCritic();
+		double value = data.getValue();
+		String key = "/" + sensor + "/" + resourceName;
+		
+		
+		if (resourceList.get(key).getObserverCount() == 0) {
 			System.out.println("No Observe Relations on this resource");
 			return;
 		}
-		resourceList.get(resourceName).setResourceValue(value);
+		resourceList.get(key).setSensorData(data);
 
 		if (!critical) {
-//		resourceList.get(resourceName).setResourceValue(proxysensor.fetchResource(resourceName));
-			resourceList.get(resourceName).changed();
+			resourceList.get(key).changed();
 		} else
-			resourceList.get(resourceName).changed(new CriticalRelationFilter());
+			resourceList.get(key).changed(new CriticalRelationFilter());
 
-		System.out.println("Current observers on this resource :" + resourceList.get(resourceName).getObserverCount());
+		System.out.println("Current observers on this resource :" + resourceList.get(key).getObserverCount());
 	}
 
 	public void readResourcesFile() {
 
+	}
+	
+	public SensorData requestValueCache(SensorNode sensor, String resourceName ) {	
+		return proxySubject.getValue(sensor.toString(), resourceName);
 	}
 
 	/*******************************
@@ -268,7 +277,10 @@ public class ProxyObserver {
 			sensor = new SensorNode("::1", 5683);
 			resourceName = "temperature";
 		}
-		triggerChange("/" + sensor.toString() + "/" + resourceName, Math.random() * 10 + 20, false);
+		
+		SensorData data = new SensorData(new Registration(null, sensor, resourceName, false, null), Math.random() * 10 + 20, 60, false);
+		
+		triggerChange(data);
 	}
 
 	private void triggerCriticalChangeCLI() {
@@ -282,7 +294,9 @@ public class ProxyObserver {
 			sensor = new SensorNode("::1", 5683);
 			resourceName = "temperature";
 		}
-		triggerChange("/" + sensor.toString() + "/" + resourceName, Math.random() * 10 + 30, true);
+		SensorData data = new SensorData(new Registration(null, sensor, resourceName, false, null), Math.random() * 10 + 30, 60, false);
+		
+		triggerChange(data);
 	}
 
 	private void clearObservationCLI() {
@@ -298,7 +312,7 @@ public class ProxyObserver {
 		}
 
 		System.out.println("Clear relation: " + sensor.toString() + "/" + resourceName);
-		clearObservation("/" + sensor.toString() + "/" + resourceName);
+//		clearObservation("/" + sensor.toString() + "/" + resourceName);
 	}
 
 	public static void main(String[] args) {
