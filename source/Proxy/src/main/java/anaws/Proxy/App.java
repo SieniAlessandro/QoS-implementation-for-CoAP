@@ -1,14 +1,11 @@
 package anaws.Proxy;
 
-import anaws.Proxy.ProxyObserver.*;
-import org.eclipse.californium.core.server.resources.Resource;
-
-
+import anaws.Proxy.ProxySubject.*;
 public class App 
 {
     public static void main( String[] args )
     {
-    	ProxyObserver.main(null);
-    
+    	ProxySubject.main(null);
+
     }
 }

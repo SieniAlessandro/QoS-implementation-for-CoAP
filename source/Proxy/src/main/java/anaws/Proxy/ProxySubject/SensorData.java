@@ -5,19 +5,10 @@ package anaws.Proxy.ProxySubject;
 public class SensorData{
 
 	double Value;
-	//SensorNode Sensor;
 	int Maxage;
-	//String Type;
 	boolean Critic;
 	Registration Reg;
 
-	/*public SensorData(SensorNode sensor,double value,String type,int maxage,boolean critic){
-		Maxage = maxage;
-		Value = value;
-		Sensor = sensor;
-		Type = type;
-		Critic = critic;
-	}*/
 	public SensorData(Registration r, double v,int m,boolean c){
 		Reg = r;
 		Value = v;

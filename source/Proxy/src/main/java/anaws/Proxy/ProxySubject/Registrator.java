@@ -1,6 +1,4 @@
 package anaws.Proxy.ProxySubject;
-
-
 import java.util.*;
 
 public class Registrator{
@@ -22,28 +20,31 @@ public class Registrator{
 
 	}
 	synchronized private boolean RegistrationNeeded(Registration _r){
-	
 		for (Registration r: reg){
 			System.out.println(r.getSensorNode().toString().equals(r.getSensorNode().toString()));
 			if(r.equals(_r))
 				return false;
 			else if(r.getSensorNode().toString().equals(r.getSensorNode().toString())){
 				if(r.getType() == _r.getType() && (_r.isCritic() == false && r.isCritic() == true)){
-					System.out.println("Critico non corretto");
 					return true;
 				}
-				else{
-					System.out.println("Critico corretto");
+				else
 					return false;
-				}
 			}
 		}
-		System.out.println("BELLA ZIIIII!!");
 		return true;
 	}
 	synchronized public void removeRegistration(Registration _r){
-		reg.remove(_r);
-		System.out.println("Registrazione associata rimossa");
+		if(reg.contains(_r)) {
+			reg.remove(_r);
+			_r.sendCancelation();
+			System.out.println("Registrazione associata rimossa");
+		}
+		else {
+			System.out.println("Registrazione non presente");
+		}
+		
+		
 
 	}
 }
