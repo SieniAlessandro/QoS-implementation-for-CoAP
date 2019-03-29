@@ -137,7 +137,7 @@ public class ProxyObserver {
 				+ "\" removed from the resource list\n");
 	}
 
-	synchronized public void triggerChange(String resourceName, double value, boolean critical) {
+	synchronized public void triggerChange(SensorData data) {
 		if (resourceList.get(resourceName).getObserverCount() == 0) {
 			System.out.println("No Observe Relations on this resource");
 			return;
