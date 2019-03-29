@@ -19,9 +19,11 @@ import org.eclipse.californium.core.coap.OptionSet;
 public class ResponseHandler implements CoapHandler {
 
 	final private boolean DEBUG = true;
-	private CacheTable Cache;
-	public ResponseHandler(CacheTable cache) {
-		this.Cache = cache;
+	private CacheTable cache;
+	private Registration registration;
+	public ResponseHandler(CacheTable cache,Registration registration) {
+		this.cache = cache;
+		this.registration = registration;
 	}
 	public void onLoad(CoapResponse response) {
 		if (DEBUG) 
@@ -37,10 +39,12 @@ public class ResponseHandler implements CoapHandler {
 			return;
 		}
 		// Creating the sensorValue
-		String Value = response.getResponseText();
+		double Value = Double.valueOf(response.getResponseText());
+		long maxAge = response.getOptions().getMaxAge();
+		boolean critic = (response.getOptions().getObserve() == CoAP.QoSLevel.CRITICAL_HIGH_PRIORITY)?true:false;
+		cache.insertData(new SensorData(this.registration,Value,maxAge,critic));
 		
 	}
-
 	public void onError() {
 		
 	}

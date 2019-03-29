@@ -21,7 +21,7 @@ public class Registration{
 		this.sensor = _sensor;
 		this.type = _type;
 		critic = _critic;
-		coapClient = coapClient;
+		this.coapClient = coapClient;
 	}
 	public Registration(CacheTable _cache,String address,int port,String _type,boolean _critic,CoapClient coapClient){
 		this.sensor = new SensorNode(address,port);
@@ -40,7 +40,7 @@ public class Registration{
 		}
 		 String URI = "coap://[" + address + "]:" + port + "/"+path;
 		 observeRequest.setURI(URI);
-		 coapRelation = coapClient.observeAndWait(observeRequest,new ResponseHandler(this.cache));
+		 coapRelation = coapClient.observeAndWait(observeRequest,new ResponseHandler(this.cache,this));
 	}
 	public void sendCancelation() {
 		coapRelation.proactiveCancel();
