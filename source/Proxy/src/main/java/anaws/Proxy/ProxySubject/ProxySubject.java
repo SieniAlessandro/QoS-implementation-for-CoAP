@@ -24,6 +24,7 @@ public class ProxySubject{
 		new Updater(this.cache, this.registrator).start();
 	}
 	public void newRegistration(SensorNode sensor,String type,boolean critic){
+		System.out.print("ProxySubject: Richiesta nuova registrazione");
 		Registration r = new Registration(this.cache,sensor,type,critic,coapClient,proxyObserver);
 		int result = registrator.newRegistration(r);
 		if(result == 2)
@@ -32,6 +33,7 @@ public class ProxySubject{
 			this.proxyObserver.clearObservation(sensor, type);
 		}
 	} 
+	
 	public SensorData getValue(String resource,String type){
 		return cache.getData(resource, type);
 	}
