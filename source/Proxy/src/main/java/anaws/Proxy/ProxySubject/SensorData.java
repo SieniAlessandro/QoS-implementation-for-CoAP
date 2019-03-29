@@ -32,5 +32,5 @@ public class SensorData{
 
 	synchronized public boolean getCritic(){ return this.critic; }
 
-	synchronized Registration getRegistration(){ return this.registration;}
+	synchronized public Registration getRegistration(){ return this.registration;}
 }
