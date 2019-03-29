@@ -33,4 +33,8 @@ public class SensorData{
 	synchronized public boolean getCritic(){ return this.critic; }
 
 	synchronized public Registration getRegistration(){ return this.registration;}
+	
+	public void changeRegistration(Registration r) {
+		this.registration = r;
+	}
 }

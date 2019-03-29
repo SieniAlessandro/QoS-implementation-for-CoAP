@@ -15,9 +15,8 @@ public class Registrator{
 				this.reg.add(_r);
 				return 1;
 			}
-			else {
+			else
 				return -1;
-			}
 		}
 		else if (registrationNeeded == 2) {
 			System.out.println("Aggiornamento registrazione");
@@ -27,9 +26,8 @@ public class Registrator{
 				this.reg.add(_r);
 				return 2;
 			}
-			else {
+			else
 				return -1;
-			}
 		}
 		else{
 			System.out.println("Registrazione non necessaria");

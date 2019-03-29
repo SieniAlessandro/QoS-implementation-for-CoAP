@@ -73,4 +73,11 @@ public class CacheTable{
 		return ret;
 
 	}
+	synchronized public void updateRegistrations(Registration r) {
+		for (SensorData d : cache) {
+			if(d.getRegistration().equals(r)) {
+				d.changeRegistration(r);
+			}
+		}
+	}
 }
