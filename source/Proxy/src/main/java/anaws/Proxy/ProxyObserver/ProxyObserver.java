@@ -142,7 +142,6 @@ public class ProxyObserver {
 		String resourceName = data.getRegistration().getType();
 		String sensor = data.getRegistration().getSensorNode().toString();
 		boolean critical = data.getCritic();
-		double value = data.getValue();
 		String key = "/" + sensor + "/" + resourceName;
 		
 		
@@ -166,6 +165,10 @@ public class ProxyObserver {
 	
 	public SensorData requestValueCache(SensorNode sensor, String resourceName ) {	
 		return proxySubject.getValue(sensor.toString(), resourceName);
+	}
+	
+	public void requestRegistration(SensorNode sensor, String resourceName, boolean critical ) {
+		proxySubject.newRegistration(sensor, resourceName, critical);
 	}
 
 	/*******************************

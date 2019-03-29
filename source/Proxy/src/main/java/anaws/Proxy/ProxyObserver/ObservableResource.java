@@ -128,6 +128,8 @@ public class ObservableResource extends ConcurrentCoapResource {
 				System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")]  [INFO] Accepting the request from " + exchange.getSourcePort()
 						+ " request without negotiation: " + exchange.getRequestOptions().toString());
 				server.getObserverState(observerID).setOriginalMID(exchange.advanced().getRequest().getMID());
+				
+				server.requestRegistration(data.getRegistration().getSensorNode(), getName(), priority > 2 ? true:false );
 				// Request accepted without negotiation
 				sendNotification(exchange, true);
 			}
@@ -135,6 +137,7 @@ public class ObservableResource extends ConcurrentCoapResource {
 			// This is the second part of a negotiation
 			server.getObserverState(observerID).setNegotiationState(false);
 			server.getObserverState(observerID).setOriginalMID(exchange.advanced().getRequest().getMID());
+			server.requestRegistration(data.getRegistration().getSensorNode(), getName(), priority > 2 ? true:false );
 			sendNotification(exchange, true);
 			System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")]  [INFO] Negotiation ended ");
 		}
