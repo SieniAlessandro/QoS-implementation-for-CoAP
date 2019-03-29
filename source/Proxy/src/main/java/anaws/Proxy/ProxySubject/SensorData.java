@@ -4,33 +4,33 @@ package anaws.Proxy.ProxySubject;
 
 public class SensorData{
 
-	double Value;
-	int Maxage;
-	boolean Critic;
-	Registration Reg;
+	double value;
+	long maxAge;
+	boolean critic;
+	Registration registration;
 
-	public SensorData(Registration r, double v,int m,boolean c){
-		Reg = r;
-		Value = v;
-		Maxage = m;
-		Critic = c;
+	public SensorData(Registration registration, double value,long maxAge,boolean isCritic){
+		this.registration = registration;
+		this.value = value;
+		this.maxAge = maxAge;
+		this.critic = isCritic;
 	}
 	synchronized public void updateValue(double value,int maxage){
-		Value = value;
-		Maxage = maxage;
+		this.value = value;
+		this.maxAge = maxage;
 	}
 	synchronized public boolean updateTime(int time){
-		Maxage = Maxage - time;
-		if(Maxage <= 0)
-			return false;
+		this.maxAge = this.maxAge - time;
+		if(this.maxAge <= 0)
+			return false;x
 		return true;
 	}
 
-	synchronized public double getValue(){ return Value; }
+	synchronized public double getValue(){ return this.value; }
 
-	synchronized public int getTime(){ return Maxage; }
+	synchronized public long getTime(){ return this.maxAge; }
 
-	synchronized public boolean getCritic(){ return Critic; }
+	synchronized public boolean getCritic(){ return this.critic; }
 
-	synchronized Registration getRegistration(){ return Reg;}
+	synchronized public Registration getRegistration(){ return this.registration;}
 }
