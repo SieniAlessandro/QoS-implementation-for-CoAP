@@ -158,10 +158,6 @@ public class CoapResource implements Resource {
 	/* Indicates whether this resource is observable by clients. */
 	private boolean observable;
 
-	// CHANGE_START
-	protected ServerState serverState;
-	// CHANGE_END
-
 	/*
 	 * The child resources. We need a ConcurrentHashMap to have stronger guarantees
 	 * in a multi-threaded environment (e.g. for discovery to work properly).
@@ -215,21 +211,6 @@ public class CoapResource implements Resource {
 		this.notificationOrderer = new ObserveNotificationOrderer();
 	}
 
-	// CHANGE_START
-	public void setServerState(ServerState serverState) {
-		this.serverState = serverState;
-
-		if (serverState == ServerState.ONLY_CRITICAL) {
-			clearNonCriticalObserveRelations();
-		} else if (serverState == ServerState.UNVAVAILABLE) {
-			clearObserveRelations();
-		}
-	}
-
-	public ServerState getServerState() {
-		return serverState;
-	}
-	// CHANGE_END
 
 	/**
 	 * Handles any request in the given exchange. By default it responds with a 4.05
@@ -574,11 +555,13 @@ public class CoapResource implements Resource {
 	}
 
 	// CHANGE_START
-	public void clearNonCriticalObserveRelations() {
+	public void clearAndNotifyNonCriticalObserveRelations(ResponseCode code) {
 		for (ObserveRelation relation : observeRelations) {
 			if (relation.getQoS() == CoAP.QoSLevel.NON_CRITICAL_MEDIUM_PRIORITY
-					|| relation.getQoS() == CoAP.QoSLevel.NON_CRITICAL_LOW_PRIORITY)
+					|| relation.getQoS() == CoAP.QoSLevel.NON_CRITICAL_LOW_PRIORITY) {
 				relation.cancel();
+				relation.getExchange().sendResponse(new Response(code));
+			}
 		}
 	}
 	// CHANGE_END

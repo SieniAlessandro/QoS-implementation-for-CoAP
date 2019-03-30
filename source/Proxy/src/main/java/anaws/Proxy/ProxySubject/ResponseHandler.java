@@ -31,6 +31,7 @@ public class ResponseHandler implements CoapHandler {
 		this.observer = observer;
 	}
 	public void onLoad(CoapResponse response) {
+		
 		if (DEBUG) 
 			System.out.println("---------------------------------------");
 		if ( response.getCode().equals(CoAP.ResponseCode.SERVICE_UNAVAILABLE) ) {
@@ -39,14 +40,14 @@ public class ResponseHandler implements CoapHandler {
 			return;
 		}
 		if (!response.getOptions().hasObserve() ) {
-			System.out.println("Risorsa non presente");
-			onError();
+			System.out.println("Risorsa non presente: " + response.advanced().toString());
 			return;
 		}
 		// Creating the sensorData
 		double Value = Double.valueOf(response.getResponseText());
 		long maxAge = response.getOptions().getMaxAge();
 		boolean critic = (response.getOptions().getObserve() == CoAP.QoSLevel.CRITICAL_HIGH_PRIORITY)?true:false;
+		System.out.println("Ricevuto nuovo valore: " + Value);
 		SensorData newData = new SensorData(this.registration,Value,maxAge,critic);
 		cache.insertData(newData);
 		this.observer.triggerChange(newData);

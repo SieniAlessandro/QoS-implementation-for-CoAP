@@ -23,13 +23,11 @@ import org.eclipse.californium.core.server.ServerState;
 public class ProxyObserver {
 
 	private CoapServer proxyObserver;
-	
+
 	private ProxySubject proxySubject;
 	private Map<String, ObservableResource> resourceList;
 	private Map<String, ObserverState> observers;
 	private static Scanner scanner;
-
-	private ArrayList<SensorNode> sensors;
 
 	private boolean CLI;
 	private boolean autocomplete;
@@ -38,25 +36,15 @@ public class ProxyObserver {
 		this.proxyObserver = new CoapServer();
 		this.observers = new HashMap<String, ObserverState>();
 		this.resourceList = new HashMap<String, ObservableResource>();
-		this.sensors = new ArrayList<SensorNode>();
 		this.CLI = CLI;
 		this.autocomplete = autocomplete;
 
 		System.out.println("\t[INFO] Starting listening...");
 		proxyObserver.start();
 	}
-	
-	public void addProxySubject(ProxySubject proxySubject ) {
-		this.proxySubject = proxySubject;
-	}
 
-	public void setState(String sensorAddress, ServerState state) {
-		for (ObservableResource o : resourceList.values()) {
-			if (o.getPath().equals(sensorAddress)) {
-				System.out.println("State of " + o.getURI() + " changed from " + o.getServerState() + " to " + state);
-				o.setServerState(state);
-			}
-		}
+	public void addProxySubject(ProxySubject proxySubject) {
+		this.proxySubject = proxySubject;
 	}
 
 	public void addObserver(String key, ObserverState state) {
@@ -71,39 +59,37 @@ public class ProxyObserver {
 		return observers.containsKey(key);
 	}
 
-	public void clearObservation(SensorNode sensor, String resourceName) {
-		String key = "/" + sensor.toString() + "/" + resourceName;
+	/****************************************
+	 * INTERACTION WITH PROXYSUBJECT MODULE *
+	 ****************************************/
+	
+	public void addResource(SensorNode sensor, String resourceName, boolean first) {
+		ObservableResource resource = new ObservableResource(resourceName, this, sensor.toString());
 
-		resourceList.get(key).clearAndNotifyObserveRelations(CoAP.ResponseCode.SERVICE_UNAVAILABLE);
-	}
-
-	public void clearAllObservation() {
-		resourceList.values().forEach(r -> r.clearAndNotifyObserveRelations(CoAP.ResponseCode.SERVICE_UNAVAILABLE));
-	}
-
-	public void addResource(SensorNode sensor, String resourceName) {
-
-		ObservableResource resource = new ObservableResource(resourceName, this);
-
-		if (sensors.contains(sensor)) {
+		if ( first ) {
+			// first resource of this sensor then create the sensorResource that has the added resource as child 
+			CoapResource sensorResource = new ObservableResource(sensor.toString(), this, sensor.toString());
+			sensorResource.setVisible(false);
+			sensorResource.add(resource);
+			proxyObserver.add(sensorResource);
+		} else {
 			// sensor already present
 			for (Resource r : proxyObserver.getRoot().getChildren()) {
 				if (r.getName().equals(sensor.toString()))
 					r.add(resource);
 			}
-		} else {
-			sensors.add(sensor);
-			CoapResource sensorResource = new ObservableResource(sensor.toString(), this);
-			sensorResource.setVisible(false);
-			sensorResource.add(resource);
-			proxyObserver.add(sensorResource);
 		}
 
 		resourceList.put(resource.getURI(), resource);
+
+//		resource.setSensorData(requestValueCache(sensor, resourceName));
+		resource.setSensorData(new SensorData(new Registration(null, sensor, resourceName, false, null),
+				Math.random() * 10 + 30, 60, false));
+
 		System.out.println("Resource \"" + resource.getName() + "\" of sensor \"" + sensor.toString()
 				+ "\" added to the resource list\n");
 	}
-
+	
 	public void deleteResource(SensorNode sensor, String resourceName) {
 
 		Resource sensorResource = null;
@@ -124,28 +110,18 @@ public class ProxyObserver {
 		// check if the sensor has no resource then remove it
 		if (sensorResource.getChildren().isEmpty()) {
 			proxyObserver.remove(sensorResource);
-
-			// da levare quando si userà la struttura del proxy subject
-			for (SensorNode s : sensors) {
-				if (s.toString().equals(sensorResource.getName())) {
-					sensors.remove(s);
-					break;
-				}
-			}
 		}
 
 		System.out.println("Resource \"" + resourceName + "\" of sensor \"" + sensor.toString()
 				+ "\" removed from the resource list\n");
 	}
-
+	
 	synchronized public void triggerChange(SensorData data) {
 		String resourceName = data.getRegistration().getType();
 		String sensor = data.getRegistration().getSensorNode().toString();
 		boolean critical = data.getCritic();
-		double value = data.getValue();
 		String key = "/" + sensor + "/" + resourceName;
-		
-		
+
 		if (resourceList.get(key).getObserverCount() == 0) {
 			System.out.println("No Observe Relations on this resource");
 			return;
@@ -159,13 +135,39 @@ public class ProxyObserver {
 
 		System.out.println("Current observers on this resource :" + resourceList.get(key).getObserverCount());
 	}
+	
+	public void clearObservation(SensorNode sensor, String resourceName) {
+		String key = "/" + sensor.toString() + "/" + resourceName;
 
-	public void readResourcesFile() {
+		resourceList.get(key).clearAndNotifyObserveRelations(CoAP.ResponseCode.SERVICE_UNAVAILABLE);
+	}
 
+	public void clearAllObservation() {
+		resourceList.values().forEach(r -> r.clearAndNotifyObserveRelations(CoAP.ResponseCode.SERVICE_UNAVAILABLE));
+	}
+
+	synchronized public void clearObservationAfterStateChanged(String sensorAddress, ServerState state) {
+		for (ObservableResource o : resourceList.values()) {
+			if (o.getPath().equals(sensorAddress)) {
+				if (state == ServerState.ONLY_CRITICAL) {
+					o.clearAndNotifyNonCriticalObserveRelations(CoAP.ResponseCode.SERVICE_UNAVAILABLE);
+				} else if (state == ServerState.UNVAVAILABLE) {
+					o.clearAndNotifyObserveRelations(CoAP.ResponseCode.SERVICE_UNAVAILABLE);
+				}
+			}
+		}
 	}
 	
-	public SensorData requestValueCache(SensorNode sensor, String resourceName ) {	
+	public SensorData requestValueCache(SensorNode sensor, String resourceName) {
 		return proxySubject.getValue(sensor.toString(), resourceName);
+	}
+
+	public void requestRegistration(SensorNode sensor, String resourceName, boolean critical) {
+		proxySubject.newRegistration(sensor, resourceName, critical);
+	}
+	
+	public SensorNode requestSensorNode(String sensorAddress) {
+		return proxySubject.getSensorNode(sensorAddress);
 	}
 
 	/*******************************
@@ -192,13 +194,13 @@ public class ProxyObserver {
 		try {
 			switch (cmd) {
 			case 1:
-				setState("/" + sensor.toString() + "/", ServerState.AVAILABLE);
+				clearObservationAfterStateChanged("/" + sensor.toString() + "/", ServerState.AVAILABLE);
 				break;
 			case 2:
-				setState("/" + sensor.toString() + "/", ServerState.ONLY_CRITICAL);
+				clearObservationAfterStateChanged("/" + sensor.toString() + "/", ServerState.ONLY_CRITICAL);
 				break;
 			case 3:
-				setState("/" + sensor.toString() + "/", ServerState.UNVAVAILABLE);
+				clearObservationAfterStateChanged("/" + sensor.toString() + "/", ServerState.UNVAVAILABLE);
 				break;
 			default:
 				System.out.print("Invalid State\n");
@@ -237,7 +239,7 @@ public class ProxyObserver {
 		return resourceName;
 	}
 
-	private void addResourceCLI() {
+	public void addResourceCLI() {
 		SensorNode sensor = null;
 		String resourceName = "";
 		if (!autocomplete) {
@@ -249,7 +251,7 @@ public class ProxyObserver {
 			resourceName = "temperature";
 		}
 
-		addResource(sensor, resourceName);
+		addResource(sensor, resourceName, true);
 	}
 
 	private void deleteResourceCLI() {
@@ -279,9 +281,10 @@ public class ProxyObserver {
 			sensor = new SensorNode("::1", 5683);
 			resourceName = "temperature";
 		}
-		
-		SensorData data = new SensorData(new Registration(null, sensor, resourceName, false, null), Math.random() * 10 + 20, 60, false);
-		
+
+		SensorData data = new SensorData(new Registration(null, sensor, resourceName, false, null),
+				Math.random() * 10 + 20, 60, false);
+
 		triggerChange(data);
 	}
 
@@ -296,8 +299,9 @@ public class ProxyObserver {
 			sensor = new SensorNode("::1", 5683);
 			resourceName = "temperature";
 		}
-		SensorData data = new SensorData(new Registration(null, sensor, resourceName, false, null), Math.random() * 10 + 30, 60, false);
-		
+		SensorData data = new SensorData(new Registration(null, sensor, resourceName, false, null),
+				Math.random() * 10 + 30, 60, false);
+
 		triggerChange(data);
 	}
 
@@ -368,15 +372,3 @@ public class ProxyObserver {
 
 }
 
-/*
- * TODO ProxySubject: - sicuramente non ti trova californium version
- * 2.0.0-SNAPSHOT, aggiungi il contenuto dello zip che ti ho mandato su telegram
- * nella directory: Mac: /Users/<user_name>/.m2/repository/org/eclipse -
- * aggiungere campo a SensorNode di tipo ServerState ( import
- * org.eclipse.californium.core.server.ServerState ). DOPO che il valore di
- * questo campo cambia chiamare la funzione
- * ProxyObserver.setSensorState(SensorNode sensor ), in modo da aggiornare il
- * campo ServerState delle risorse di quel sensore ( server nella registrazione
- * tra proxy e observer )
- * 
- */

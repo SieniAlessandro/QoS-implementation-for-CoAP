@@ -8,7 +8,7 @@ public class CacheTable{
 	ArrayList<SensorData> cache;
 	public CacheTable(){
 		cache = new ArrayList<SensorData>();
-		System.out.println("Create tabella cache");
+		System.out.println("CacheTable: Creata tabella cache");
 	}
 	synchronized public ArrayList<Registration> updateTime(int time){
 		ArrayList<Registration> toDelete = new ArrayList<Registration>();

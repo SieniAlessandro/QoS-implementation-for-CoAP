@@ -42,19 +42,20 @@ public class Registration{
 		try {
 			// Set the priority level using the first 2 bits of the observe option value
 			observeRequest.setObserve();
-			observeRequest.setOptions(new OptionSet().addOption(new Option(OptionNumberRegistry.OBSERVE, priority)));
+			observeRequest.setOptions(new OptionSet().addOption(new Option(OptionNumberRegistry.OBSERVE, 0)));
 			} catch (IllegalArgumentException ex) {
 			System.out.println("Invalid Priority Level");
 		}
-		 String URI = "coap://[" + address + "]:" + port + "/"+path;
+		 String URI = "coap://[" + address + "]:" + port + "/sensors/"+path;
 		 observeRequest.setURI(URI);	
-		 coapRelation = coapClient.observeAndWait(observeRequest,new ResponseHandler(this.cache,this,this.observer));
+		 //coapRelation = coapClient.observeAndWait(observeRequest,new ResponseHandler(this.cache,this,this.observer));
+		 coapRelation = coapClient.observe(observeRequest, new ResponseHandler(this.cache,this,this.observer));
 		 if(coapRelation.isCanceled() == false) {
 			 System.out.println("Registrazione con il sensore avvenuta");
-			 return false;
+			 return true;
 		 }else {
 			 System.out.println("Errore nella registrazione");
-			 return true;
+			 return false;
 		 }
 		 
 	}
