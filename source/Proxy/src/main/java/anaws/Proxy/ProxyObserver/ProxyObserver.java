@@ -150,7 +150,7 @@ public class ProxyObserver {
 		for (ObservableResource o : resourceList.values()) {
 			if (o.getPath().equals(sensorAddress)) {
 				if (state == ServerState.ONLY_CRITICAL) {
-					o.clearAndNotifyNonCriticalObserveRelations(CoAP.ResponseCode.SERVICE_UNAVAILABLE);
+					//o.clearAndNotifyNonCriticalObserveRelations(CoAP.ResponseCode.SERVICE_UNAVAILABLE);
 				} else if (state == ServerState.UNVAVAILABLE) {
 					o.clearAndNotifyObserveRelations(CoAP.ResponseCode.SERVICE_UNAVAILABLE);
 				}

@@ -10,6 +10,7 @@ import org.eclipse.californium.core.CoapObserveRelation;
 import org.eclipse.californium.core.CoapResponse;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
+import org.eclipse.californium.core.server.ServerState;
 
 import anaws.Proxy.ProxyObserver.ProxyObserver;
 
@@ -20,7 +21,7 @@ import org.eclipse.californium.core.coap.OptionNumberRegistry;
 import org.eclipse.californium.core.coap.OptionSet;
 
 public class ResponseHandler implements CoapHandler {
-
+	final private long CRITICAL_MAX_AGE = 10;
 	final private boolean DEBUG = true;
 	private CacheTable cache;
 	private Registration registration;
@@ -44,13 +45,21 @@ public class ResponseHandler implements CoapHandler {
 			return;
 		}
 		// Creating the sensorData
-		double Value = Double.valueOf(response.getResponseText());
-		long maxAge = response.getOptions().getMaxAge();
-		boolean critic = (response.getOptions().getObserve() == CoAP.QoSLevel.CRITICAL_HIGH_PRIORITY)?true:false;
-		System.out.println("Ricevuto nuovo valore: " + Value);
-		SensorData newData = new SensorData(this.registration,Value,maxAge,critic);
-		cache.insertData(newData);
-		this.observer.triggerChange(newData);
+		if(this.registration.getType().equals("battery")) {
+			//Updating battery
+			ServerState actualState = this.registration.getSensorNode().updateBattery(Double.valueOf(response.getResponseText()));
+			if(actualState == ServerState.UNVAVAILABLE) {
+			}
+		}
+		else {
+			double Value = Double.valueOf(response.getResponseText());
+			long maxAge = response.getOptions().getMaxAge();
+			boolean critic = (maxAge == this.CRITICAL_MAX_AGE)?true:false;
+			System.out.println("Ricevuto nuovo valore: " + Value);
+			SensorData newData = new SensorData(this.registration,Value,maxAge,critic);
+			cache.insertData(newData);
+			this.observer.triggerChange(newData);
+		}
 		
 	}
 	public void onError() {

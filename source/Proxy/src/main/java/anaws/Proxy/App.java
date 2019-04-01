@@ -9,5 +9,7 @@ public class App
 //    	ProxySubject.main(null);
     	ProxyObserver po = new ProxyObserver(false, false);
     	ProxySubject ps = new ProxySubject(po);	
+    	ps.newRegistration(ps.getSensorNode("[fd00::c30c:0:0:2]:5683"), "temperature", false);
+    	//ps.newRegistration(ps.getSensorNode("[fd00::c30c:0:0:3]:5683"), "temperature", true);
     }
 }

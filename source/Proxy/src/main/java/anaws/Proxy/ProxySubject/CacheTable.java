@@ -14,7 +14,7 @@ public class CacheTable{
 		ArrayList<Registration> toDelete = new ArrayList<Registration>();
 		for(Iterator<SensorData> i = cache.iterator();i.hasNext();){
 			SensorData d = i.next();
-			System.out.println(d);
+			System.out.println(d.toString());
 			if(d.updateTime(time) == false){
 				i.remove();
 				if(countRegistration(d.getRegistration()) == 1){
@@ -31,8 +31,6 @@ public class CacheTable{
 			//In this case there isn't any value and so the new value is appended
 			System.out.println("Inserimento nuovo valore nella cache");
 			cache.add(data);
-
-			// RIMBALZA(SENSORDATA) AMEDEO
 			return true;
 		}
 		//Otherwise the old value is updated 

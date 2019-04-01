@@ -37,4 +37,8 @@ public class SensorData{
 	public void changeRegistration(Registration r) {
 		this.registration = r;
 	}
+	public String toString() {
+		return "Value: "+value+" | Coming from: "+registration.getSensorNode().getUri()+" | Type: "+registration.getType()
+	 +" | with MaxAge: "+maxAge+" is critic: "+critic;
+	}
 }

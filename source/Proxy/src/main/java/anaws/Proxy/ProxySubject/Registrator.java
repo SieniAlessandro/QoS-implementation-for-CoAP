@@ -2,6 +2,7 @@ package anaws.Proxy.ProxySubject;
 import java.util.*;
 
 public class Registrator{
+	
 	ArrayList<Registration> reg;
 	public Registrator(){
 		reg = new ArrayList<Registration>();
@@ -41,15 +42,15 @@ public class Registrator{
 	}
 	synchronized private int RegistrationNeeded(Registration _r){
 		for (Registration r: reg){
-			System.out.println(r.getSensorNode().toString().equals(r.getSensorNode().toString()));
 			if(r.equals(_r))
 				return 0;
-			else if(r.getSensorNode().toString().equals(r.getSensorNode().toString())){
-				if(r.getType() == _r.getType() && (_r.isCritic() == false && r.isCritic() == true)){
-					return 2;
+			else if(r.getSensorNode().toString().equals(_r.getSensorNode().toString())) {
+				if(r.getType() == _r.getType()) {
+					if((_r.isCritic() == false && r.isCritic() == true))
+						return 2;
+					else if (r.isCritic() == _r.isCritic() || _r.isCritic() == true && _r.isCritic() == false)
+						return 0;
 				}
-				else
-					return 0;
 			}
 		}
 		return 1;
