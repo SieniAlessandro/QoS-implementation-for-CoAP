@@ -49,9 +49,16 @@
 
 #define PLATFORM_HAS_TEMPERATURE 1
 #define PLATFORM_HAS_BATTERY 1
-#define PLATFORM_HAS_LIGHT 1
+
+#define BATTERY_END_EVENT 7
 
 
+#define INITIAL_BATTERY 1000
+#define SENSING_DRAIN 1
+#define TRANSMITTING_DRAIN 5
+static uint32_t battery = INITIAL_BATTERY;
+
+uint32_t reduceBattery(uint32_t drain);
 /*******************************************************
  *******************************************************/
 

@@ -44,44 +44,41 @@
 #include "rest-engine.h"
 #include "dev/battery-sensor.h"
 #include "er-coap.h"
-#define INITIAL_BATTERY 100
 
-static void battery_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset);
-static void battery_periodic_handler(void);
+static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset);
+static void periodic_handler(void);
 
 #define MAX_AGE      255
 #define INTERVAL_MAX (MAX_AGE - 1)
-
 /* A simple getter example. Returns the reading from light sensor with a simple etag */
 PERIODIC_RESOURCE(res_battery,
          "title=\"Battery status\";rt=\"Battery\";obs",
-         battery_get_handler,
+         get_handler,
          NULL,
          NULL,
          NULL,
          CLOCK_SECOND,
-         battery_periodic_handler);
+         periodic_handler);
 
-
-static int battery = INITIAL_BATTERY;
 static int32_t interval_counter = INTERVAL_MAX;
 
 static void
-battery_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
+get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
 {
   //int battery = battery_sensor.value(0);
-  printf("Battery sensed%d\n", battery);
+  printf("Battery sensed%lu\n", battery);
   unsigned int accept = -1;
   coap_get_header_accept(request, &accept);
 
+  battery /= 10;
   if(accept == -1 || accept == REST.type.TEXT_PLAIN) {
     REST.set_header_content_type(response, REST.type.TEXT_PLAIN);
-    snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "%d", battery);
+    snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "%lu", battery);
 
     REST.set_response_payload(response, (uint8_t *)buffer, strlen((char *)buffer));
   } else if(accept == REST.type.APPLICATION_JSON) {
     REST.set_header_content_type(response, REST.type.APPLICATION_JSON);
-    snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "{'battery':%d}", battery);
+    snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "{'battery':%lu}", battery);
 
     REST.set_response_payload(response, buffer, strlen((char *)buffer));
   } else {
@@ -89,19 +86,30 @@ battery_get_handler(void *request, void *response, uint8_t *buffer, uint16_t pre
     const char *msg = "Supporting content-types text/plain and application/json";
     REST.set_response_payload(response, msg, strlen(msg));
   }
+  REST.set_header_max_age(response, MAX_AGE);
+
+  battery = reduceBattery(TRANSMITTING_DRAIN);
 }
 
+
+uint32_t level = 31;
+
 static void
-battery_periodic_handler()
+periodic_handler()
 {
+
   //int battery = battery_sensor.value(0);
-  battery = (battery != 0) ? battery-1 : 0;
+  battery = reduceBattery(SENSING_DRAIN);
   ++interval_counter;
-  if(battery < 0){
-    printf("BATTERIA FINITA\n");
+  if(battery == 0){
+    char* data = "BATTERIA FINITA";
+    printf("%s\n", data);
+    //process_post(&rest_server, BATTERY_END_EVENT, data);
     return;
   }
-  if(battery <= 30 || interval_counter >= INTERVAL_MAX) {
+
+  if(battery/10 <= level || interval_counter >= INTERVAL_MAX) {
+     level /= 2;
      interval_counter = 0;
     /* Notify the registered observers which will trigger the res_get_handler to create the response. */
     REST.notify_subscribers(&res_battery);

@@ -125,7 +125,7 @@ get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_s
   }
 
   REST.set_header_max_age(response, variable_max_age);
-
+  battery = reduceBattery(TRANSMITTING_DRAIN);
   /* The REST.subscription_handler() will be called for observable resources by the REST framework. */
 }
 
@@ -138,6 +138,9 @@ int TEMPERATURE_VALUES[60] = {10,38,-34,-6,22,50,-22,6,34,-38,-10,18,46,-26,2,30
 static void
 periodic_handler()
 {
+  if(battery <= 0)
+    return;
+
   //Formula to get the real temperature//
   // USE THIS FOR THE REAL SENSOR NODE//
   //int temperature = (temperature_sensor.value(0)/10-396)/10;
@@ -145,11 +148,15 @@ periodic_handler()
   int temperature = TEMPERATURE_VALUES[interval_counter];
   ++interval_counter;
 
+  battery = reduceBattery(SENSING_DRAIN);
+
+
   if(temperature >= CRITICAL_THRESHOLD && abs(temperature - temperature_old) >= CRITICAL_CHANGE){
     dataLevel = CRITICAL;
   }else{
     if(interval_counter >= INTERVAL_MIN && 
-      abs(temperature - temperature_old) >= NON_CRITICAL_CHANGE){
+      abs(temperature - temperature_old) >= NON_CRITICAL_CHANGE &&
+      battery > 30){
       dataLevel = NON_CRITICAL;
     }else{
       dataLevel = -1;

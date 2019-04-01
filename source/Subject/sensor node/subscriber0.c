@@ -105,10 +105,11 @@ extern resource_t res_light;
 
 
 /*---------------------------------------------------------------------------*/
-PROCESS(udp_client_process, "UDP client process");
-PROCESS(rest_server_example, "Erbium Example Server");
 
-AUTOSTART_PROCESSES(&udp_client_process, &rest_server_example);
+PROCESS(udp_client_process, "UDP client process");
+PROCESS(rest_server, "Erbium Server");
+
+AUTOSTART_PROCESSES(&udp_client_process, &rest_server);
 /*---------------------------------------------------------------------------*/
 static int seq_id;
 static int reply;
@@ -277,11 +278,11 @@ PROCESS_THREAD(udp_client_process, ev, data)
 
 
 
-PROCESS_THREAD(rest_server_example, ev, data)
+PROCESS_THREAD(rest_server, ev, data)
 {
   PROCESS_BEGIN();
 
-  PRINTF("Starting Erbium Example Server\n");
+  PRINTF("Starting Erbium Server\n");
 
   /* Initialize the REST engine. */
   rest_init_engine();
@@ -304,7 +305,9 @@ PROCESS_THREAD(rest_server_example, ev, data)
 
   while(1){
     PROCESS_WAIT_EVENT();
-
+      if(ev == BATTERY_END_EVENT){
+        printf("The battery is terminated!\n");
+      }
   } /* while (1) */
 
   PROCESS_END();
