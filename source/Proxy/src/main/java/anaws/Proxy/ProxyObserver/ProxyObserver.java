@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapServer;
+import org.eclipse.californium.core.WebLink;
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.server.resources.Resource;
 
@@ -64,18 +65,18 @@ public class ProxyObserver {
 	 ****************************************/
 	
 	public void addResource(SensorNode sensor, String resourceName, boolean first) {
-		ObservableResource resource = new ObservableResource(resourceName, this, sensor.toString());
+		ObservableResource resource = new ObservableResource(resourceName, this, sensor.getUri());
 
 		if ( first ) {
 			// first resource of this sensor then create the sensorResource that has the added resource as child 
-			CoapResource sensorResource = new ObservableResource(sensor.toString(), this, sensor.toString());
+			CoapResource sensorResource = new ObservableResource(sensor.getUri(), this, sensor.getUri());
 			sensorResource.setVisible(false);
 			sensorResource.add(resource);
 			proxyObserver.add(sensorResource);
 		} else {
 			// sensor already present
 			for (Resource r : proxyObserver.getRoot().getChildren()) {
-				if (r.getName().equals(sensor.toString()))
+				if (r.getName().equals(sensor.getUri()))
 					r.add(resource);
 			}
 		}
@@ -86,7 +87,7 @@ public class ProxyObserver {
 		resource.setSensorData(new SensorData(new Registration(null, sensor, resourceName, false, null),
 				Math.random() * 10 + 30, 60, false));
 
-		System.out.println("Resource \"" + resource.getName() + "\" of sensor \"" + sensor.toString()
+		System.out.println("Resource \"" + resource.getName() + "\" of sensor \"" + sensor.getUri()
 				+ "\" added to the resource list\n");
 	}
 	
@@ -95,7 +96,7 @@ public class ProxyObserver {
 		Resource sensorResource = null;
 		// find sensor resource
 		for (Resource sr : proxyObserver.getRoot().getChildren()) {
-			if (sr.getName().equals(sensor.toString())) {
+			if (sr.getName().equals(sensor.getUri())) {
 				sensorResource = sr;
 				break;
 			}
@@ -112,7 +113,7 @@ public class ProxyObserver {
 			proxyObserver.remove(sensorResource);
 		}
 
-		System.out.println("Resource \"" + resourceName + "\" of sensor \"" + sensor.toString()
+		System.out.println("Resource \"" + resourceName + "\" of sensor \"" + sensor.getUri()
 				+ "\" removed from the resource list\n");
 	}
 	
@@ -137,7 +138,7 @@ public class ProxyObserver {
 	}
 	
 	public void clearObservation(SensorNode sensor, String resourceName) {
-		String key = "/" + sensor.toString() + "/" + resourceName;
+		String key = "/" + sensor.getUri() + "/" + resourceName;
 
 		resourceList.get(key).clearAndNotifyObserveRelations(CoAP.ResponseCode.SERVICE_UNAVAILABLE);
 	}
@@ -159,7 +160,7 @@ public class ProxyObserver {
 	}
 	
 	public SensorData requestValueCache(SensorNode sensor, String resourceName) {
-		return proxySubject.getValue(sensor.toString(), resourceName);
+		return proxySubject.getValue(sensor.getUri(), resourceName);
 	}
 
 	public void requestRegistration(SensorNode sensor, String resourceName, boolean critical) {
@@ -194,13 +195,13 @@ public class ProxyObserver {
 		try {
 			switch (cmd) {
 			case 1:
-				clearObservationAfterStateChanged("/" + sensor.toString() + "/", ServerState.AVAILABLE);
+				clearObservationAfterStateChanged("/" + sensor.getUri() + "/", ServerState.AVAILABLE);
 				break;
 			case 2:
-				clearObservationAfterStateChanged("/" + sensor.toString() + "/", ServerState.ONLY_CRITICAL);
+				clearObservationAfterStateChanged("/" + sensor.getUri() + "/", ServerState.ONLY_CRITICAL);
 				break;
 			case 3:
-				clearObservationAfterStateChanged("/" + sensor.toString() + "/", ServerState.UNVAVAILABLE);
+				clearObservationAfterStateChanged("/" + sensor.getUri() + "/", ServerState.UNVAVAILABLE);
 				break;
 			default:
 				System.out.print("Invalid State\n");
@@ -317,8 +318,8 @@ public class ProxyObserver {
 			resourceName = "temperature";
 		}
 
-		System.out.println("Clear relation: " + sensor.toString() + "/" + resourceName);
-//		clearObservation("/" + sensor.toString() + "/" + resourceName);
+		System.out.println("Clear relation: " + sensor.getUri() + "/" + resourceName);
+//		clearObservation("/" + sensor.getUri() + "/" + resourceName);
 	}
 
 	public static void main(String[] args) {
