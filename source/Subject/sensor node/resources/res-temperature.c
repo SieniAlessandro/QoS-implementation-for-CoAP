@@ -57,7 +57,7 @@ static void periodic_handler(void);
 #define INTERVAL_MAX (MAX_AGE - 1)
 #define NON_CRITICAL_CHANGE       3
 #define CRITICAL_CHANGE 1
-#define CRITICAL_THRESHOLD 50 //TO DEFINE
+#define CRITICAL_THRESHOLD 30 //TO DEFINE
 
 static uint32_t variable_max_age = MAX_AGE;
 
@@ -76,7 +76,7 @@ PERIODIC_RESOURCE(res_temperature,
          NULL,
          NULL,
          NULL,
-         CLOCK_SECOND,
+         5*CLOCK_SECOND,
          periodic_handler);
 
 static void
@@ -95,6 +95,7 @@ get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_s
   if(requestLevel == 0 || requestLevel == CRITICAL){
     coap_set_header_observe(request, 0);
     if(requestLevel == CRITICAL){
+      printf("RICHIESTI SOLO VALORI CRITICI\n");
       requestedLevel = 1;
     }else{
       requestedLevel = 0;
@@ -107,12 +108,18 @@ get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_s
 
   if(accept == -1 || accept == REST.type.TEXT_PLAIN) {
     REST.set_header_content_type(response, REST.type.TEXT_PLAIN);
-    snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "%d", temperature_old);
+    if(dataLevel == CRITICAL)
+      snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "%d!", temperature_old);
+    else
+      snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "%d", temperature_old);
 
     REST.set_response_payload(response, (uint8_t *)buffer, strlen((char *)buffer));
   } else if(accept == REST.type.APPLICATION_JSON) {
     REST.set_header_content_type(response, REST.type.APPLICATION_JSON);
-    snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "{'temperature':%d}", temperature_old);
+    if(dataLevel == CRITICAL)
+      snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "{'temperature':%d!}", temperature_old);
+    else
+      snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "{'temperature':%d}", temperature_old);
     //Putting the data type Critical or Not in the Observe place of the response
     //coap_set_header_observe(response, dataLevel);
     //DO NOT WORK
@@ -151,25 +158,30 @@ periodic_handler()
   battery = reduceBattery(SENSING_DRAIN);
 
 
-  if(temperature >= CRITICAL_THRESHOLD && abs(temperature - temperature_old) >= CRITICAL_CHANGE){
-    dataLevel = CRITICAL;
-  }else{
-    if(interval_counter >= INTERVAL_MIN && 
-      abs(temperature - temperature_old) >= NON_CRITICAL_CHANGE &&
-      battery > 30){
-      dataLevel = NON_CRITICAL;
-    }else{
-      dataLevel = -1;
-    }
-  }
-
   if(interval_counter+1 >= variable_max_age) {
      interval_counter = 0;
      if(temperature >= CRITICAL)
         dataLevel = CRITICAL;
      else
-        dataLevel = NON_CRITICAL;
+        if(requestedLevel == 0)
+          dataLevel = NON_CRITICAL;
+        else
+          dataLevel = -1;
+  }else{
+    if(temperature >= CRITICAL_THRESHOLD && abs(temperature - temperature_old) >= CRITICAL_CHANGE){
+      dataLevel = CRITICAL;
+    }else{
+      if( requestedLevel == 0 &&
+          interval_counter >= INTERVAL_MIN && 
+          abs(temperature - temperature_old) >= NON_CRITICAL_CHANGE &&
+          battery > 30){
+            dataLevel = NON_CRITICAL;
+      }else{
+            dataLevel = -1;
+      }
+    }
   }
+
 
   if(dataLevel != -1){
     temperature_old = temperature;
@@ -185,7 +197,7 @@ periodic_handler()
     }else{
       if(dataLevel == NON_CRITICAL){
         if(variable_max_age == MIN_MAX_AGE)
-          variable_max_age = MIN_MAX_AGE + 1;
+          variable_max_age = 10;
         else{
           variable_max_age += 10;
           if(variable_max_age > MAX_AGE)
