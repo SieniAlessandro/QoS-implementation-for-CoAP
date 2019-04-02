@@ -52,9 +52,19 @@ public class ResponseHandler implements CoapHandler {
 			}
 		}
 		else {
-			double Value = Double.valueOf(response.getResponseText());
+			String Message = response.getResponseText();
+			System.out.println("Messaggio ricevuto: "+Message);
+			double Value;
 			long maxAge = response.getOptions().getMaxAge();
-			boolean critic = (maxAge == this.CRITICAL_MAX_AGE)?true:false;
+			boolean critic;
+			if(Message.contains("!")) {
+				critic = true;
+				Value = Double.valueOf(Message.substring(0, Message.indexOf("!")));
+			}
+			else {
+				critic = false;
+				Value = Double.valueOf(Message);
+			}
 			System.out.println("Ricevuto nuovo valore: " + Value);
 			SensorData newData = new SensorData(this.registration,Value,maxAge,critic);
 			cache.insertData(newData);
