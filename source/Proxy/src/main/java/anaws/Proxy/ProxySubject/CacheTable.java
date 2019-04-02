@@ -35,7 +35,7 @@ public class CacheTable{
 		}
 		//Otherwise the old value is updated 
 		System.out.println("Aggiornamento vecchio valore");
-		old.updateValue(data.getValue(),data.getTime());
+		old.updateValue(data.getValue(),data.getTime(),data.getCritic());
 		//RIMBALZA(SENSORDATA) AMEDEO
 		return false;
 	}

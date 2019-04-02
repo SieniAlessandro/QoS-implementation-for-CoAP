@@ -58,10 +58,12 @@ public class ResponseHandler implements CoapHandler {
 			long maxAge = response.getOptions().getMaxAge();
 			boolean critic;
 			if(Message.contains("!")) {
+				System.out.println("VALORE CRITICO!");
 				critic = true;
 				Value = Double.valueOf(Message.substring(0, Message.indexOf("!")));
 			}
 			else {
+				System.out.println("VALORE NON CRITICO!");
 				critic = false;
 				Value = Double.valueOf(Message);
 			}

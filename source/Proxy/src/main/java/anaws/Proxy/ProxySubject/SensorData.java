@@ -15,9 +15,10 @@ public class SensorData{
 		this.maxAge = maxAge;
 		this.critic = isCritic;
 	}
-	synchronized public void updateValue(double value,long l){
+	synchronized public void updateValue(double value,long l,boolean isCritic){
 		this.value = value;
 		this.maxAge = l;
+		this.critic = isCritic;
 	}
 	synchronized public boolean updateTime(long time){
 		this.maxAge = this.maxAge - time;
@@ -39,6 +40,6 @@ public class SensorData{
 	}
 	public String toString() {
 		return "Value: "+value+" | Coming from: "+registration.getSensorNode().getUri()+" | Type: "+registration.getType()
-	 +" | with MaxAge: "+maxAge+" is critic: "+critic;
+	 +" | with MaxAge: "+maxAge+" is critic: "+this.critic;
 	}
 }
