@@ -40,7 +40,8 @@ public class ProxyObserver {
 		this.CLI = CLI;
 		this.autocomplete = autocomplete;
 
-		System.out.println("\t[INFO] Starting listening...");
+		System.out.println("[" + new Timestamp(System.currentTimeMillis())
+				+ ")][ProxyObserver][INFO] Coap Server Started");
 		proxyObserver.start();
 	}
 
@@ -70,7 +71,8 @@ public class ProxyObserver {
 		String key = "/" + address + "/" + resourceName;
 		ObservableResource resource = resourceList.get(key);
 		if (resource == null)
-			System.out.println("Resource not present");
+			System.out.println("[" + new Timestamp(System.currentTimeMillis())
+					+ ")][ProxyObserver][ERROR] Resource not found");
 		return resource;
 	}
 	
@@ -81,14 +83,15 @@ public class ProxyObserver {
 	public void resourceChanged(SensorNode sensor, String resourceName ) {
 		SensorData data = requestValueCache(sensor, resourceName);
 		boolean isCritical = data.getCritic();
+		ObservableResource resource = getResource(sensor, resourceName);
+		System.out.println("[" + new Timestamp(System.currentTimeMillis())
+				+ ")][ProxyObserver][INFO] " + sensor.getUri() + "/" + resourceName + " changed, isCritical: " + data.getCritic() +  ". Current observers: " + resource.getObserverCount());
 
 		updateResource(sensor, resourceName, data);
-		System.out.println("Resource changed, new data: " + data.toString());
-
 		if (!isCritical)
-			getResource(sensor, resourceName).changed(new CriticalRelationFilter());
+			resource.changed(new CriticalRelationFilter());
 		else
-			getResource(sensor, resourceName).changed();
+			resource.changed();
 	}
 	
 	/****************************************
@@ -149,29 +152,9 @@ public class ProxyObserver {
 			proxyObserver.remove(sensorResource);
 		}
 
-		System.out.println("Resource \"" + resourceName + "\" of sensor \"" + getUnbrachetAddress(sensor.getUri())
+		System.out.println("[" + new Timestamp(System.currentTimeMillis())
+				+ ")][ProxyObserver][INFO] Resource \"" + resourceName + "\" of sensor \"" + getUnbrachetAddress(sensor.getUri())
 				+ "\" removed from the resource list\n");
-	}
-	
-	public void triggerChange(SensorData data) {
-		System.out.println("**************************** DENTRO TRIGGER CHANGE *******************************");
-//		String resourceName = data.getRegistration().getType();
-//		String sensor = getUnbrachetAddress(data.getRegistration().getSensorNode().getUri());
-//		boolean critical = data.getCritic();
-//		String key = "/" + sensor + "/" + resourceName;
-//		
-//		if (resourceList.get(key).getObserverCount() == 0) {
-//			System.out.println("No Observe Relations on this resource");
-//			return;
-//		}
-//		resourceList.get(key).setSensorData(data);
-//
-//		if (!critical) {
-//			resourceList.get(key).changed();
-//		} else
-//			resourceList.get(key).changed(new CriticalRelationFilter());
-//
-//		System.out.println("Current observers on this resource :" + resourceList.get(key).getObserverCount());
 	}
 	
 	public void clearObservation(SensorNode sensor, String resourceName) {
@@ -188,7 +171,7 @@ public class ProxyObserver {
 		for (ObservableResource o : resourceList.values()) {
 			if (o.getPath().equals(sensorAddress)) {
 				if (state == ServerState.ONLY_CRITICAL) {
-					//o.clearAndNotifyNonCriticalObserveRelations(CoAP.ResponseCode.SERVICE_UNAVAILABLE);
+					o.clearAndNotifyNonCriticalObserveRelations(CoAP.ResponseCode.SERVICE_UNAVAILABLE);
 				} else if (state == ServerState.UNVAVAILABLE) {
 					o.clearAndNotifyObserveRelations(CoAP.ResponseCode.SERVICE_UNAVAILABLE);
 				}
@@ -201,7 +184,7 @@ public class ProxyObserver {
 	}
 
 	public void requestRegistration(SensorNode sensor, String resourceName, boolean critical) {
-		System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")]  [DEBUG] Requesting registration to proxySubject");
+		System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")][DEBUG] Requesting registration to proxySubject");
 		proxySubject.newRegistration(sensor, resourceName, critical);
 	}
 	
@@ -310,41 +293,6 @@ public class ProxyObserver {
 
 	}
 
-	private void triggerChangeCLI() {
-		SensorNode sensor = null;
-		String resourceName = "";
-		if (!autocomplete) {
-			System.out.print("Change value of the resource: \n");
-			sensor = readSensorNetworkConfig();
-			resourceName = readResourceName();
-		} else {
-			sensor = new SensorNode("::1", 5683);
-			resourceName = "temperature";
-		}
-
-		SensorData data = new SensorData(new Registration(null, sensor, resourceName, false, null),
-				Math.random() * 10 + 20, 60, false);
-
-		triggerChange(data);
-	}
-
-	private void triggerCriticalChangeCLI() {
-		SensorNode sensor = null;
-		String resourceName = "";
-		if (!autocomplete) {
-			System.out.print("Change value of the resource: \n");
-			sensor = readSensorNetworkConfig();
-			resourceName = readResourceName();
-		} else {
-			sensor = new SensorNode("::1", 5683);
-			resourceName = "temperature";
-		}
-		SensorData data = new SensorData(new Registration(null, sensor, resourceName, false, null),
-				Math.random() * 10 + 30, 60, false);
-
-		triggerChange(data);
-	}
-
 	private void clearObservationCLI() {
 		SensorNode sensor = null;
 		String resourceName = "";
@@ -387,10 +335,8 @@ public class ProxyObserver {
 					server.clearObservationCLI();
 					break;
 				case 5:
-					server.triggerChangeCLI();
 					break;
 				case 6:
-					server.triggerCriticalChangeCLI();
 					break;
 				case 7:
 					server.changeStateCLI();

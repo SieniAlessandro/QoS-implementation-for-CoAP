@@ -19,7 +19,6 @@ public class Observer {
 
 	final private boolean DEBUG = true;
 
-	private static int instanceCount = 0;
 	private static Scanner scanner;
 
 	private int portProxy;
@@ -31,32 +30,31 @@ public class Observer {
 	private String ipv6Proxy;
 
 	private CoapClient observerCoap;
-	private HashSet<WebLink> resourceList;
+	private ArrayList<WebLink> resourceList;
 	private HashMap<String, CoapObserveRelation> relations;
 
-	public Observer(String ipv6Proxy, int portProxy) {
-		this(ipv6Proxy, portProxy, false, true);
+	public Observer(String ipv6Proxy, int portProxy, int port) {
+		this(ipv6Proxy, portProxy, port, false, true);
 	}
 
-	public Observer(String ipv6Proxy, int portProxy, boolean CLI, boolean autocomplete) {
+	public Observer(String ipv6Proxy, int portProxy, int port, boolean CLI, boolean autocomplete) {
 		this.observerCoap = new CoapClient();
 		this.ipv6Proxy = ipv6Proxy;
 		this.portProxy = portProxy;
 		this.CLI = CLI;
 		this.autocomplete = autocomplete;
 
-		this.resourceList = new HashSet<WebLink>();
+		this.resourceList = new ArrayList<WebLink>();
 		this.relations = new HashMap<String, CoapObserveRelation>();
 		this.observerCoap.setURI("coap://[" + this.ipv6Proxy + "]:" + this.portProxy);
 
-		this.instanceCount++;
-		this.id = instanceCount;
+		this.id = port;
 
 		CoapEndpoint.Builder builder = new CoapEndpoint.Builder();
-		builder.setPort(6000 + id);
+		builder.setPort(port);
 		builder.setNetworkConfig(NetworkConfig.getStandard());
 		observerCoap.setEndpoint(builder.build());
-		
+
 		resourceDiscovery();
 	}
 
@@ -139,7 +137,8 @@ public class Observer {
 		String URI = "coap://[" + this.ipv6Proxy + "]:" + this.portProxy + path;
 		observeRequest.setURI(URI);
 		if (DEBUG)
-			System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")] Observer #" + id + ">\t[DEBUG] Send Observe request: " + observeRequest.toString());
+			System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")] Observer #" + id
+					+ ">\t[DEBUG] Send Observe request: " + observeRequest.toString());
 		CoapObserveRelation relation = observerCoap.observeAndWait(observeRequest,
 				new ResponseHandler(this, priority, resourceName, URI, true));
 
@@ -170,10 +169,22 @@ public class Observer {
 		relation.proactiveCancel();
 	}
 
+	private String getRandomURI() {
+		WebLink randomURI = new WebLink("well-known"); 
+		while (randomURI.getURI().contains("well-known") || randomURI.getURI().contains("battery"))
+			randomURI = resourceList.get((int) Math.floor(Math.random() * resourceList.size()));
+		return randomURI.getURI();
+	}
+
+	private String[] splitURI(String uri) {
+		String[] splitted = uri.split("/");
+		return splitted;
+	}
+
 	/*******************************
 	 * COMMAND LINE TESTING FUNCTIONS
 	 *******************************/
-	
+
 	public void resourceRegistrationCLI() {
 		if (resourceList.isEmpty()) {
 			System.out.println("No resource available, please run discovery first");
@@ -184,14 +195,18 @@ public class Observer {
 		String subjectAddress = "";
 		String resourceName = "";
 		int priority = 1;
-		
+
 		if (!autocomplete) {
 			try {
-				System.out.print("Requesting an Observe Relations\n");
-				System.out.print("Sensor Address ( format \"[IPv6]:port\" ) \n");
-				subjectAddress = scanner.next();
-				System.out.print("Resource Name: ");
-				resourceName = scanner.next();
+				System.out.print("Requesting an Observe Relations\nSelect a resource:\n");
+				for (int i = 0; i < resourceList.size(); i++) {
+					System.out.println(String.valueOf(i + 1) + ") " + resourceList.get(i));
+				}
+				int index = scanner.nextInt();
+				index -= 1;
+				String[] splitted = splitURI(resourceList.get(index).getURI());
+				subjectAddress = splitted[1];
+				resourceName = splitted[2];
 				System.out.print("Priority: ");
 				priority = getQoSBits(scanner.nextInt());
 			} catch (InputMismatchException e) {
@@ -199,8 +214,9 @@ public class Observer {
 				scanner.nextLine();
 			}
 		} else {
-			subjectAddress = "::1:5683";
-			resourceName = "temperature";
+			String[] splitted = splitURI(getRandomURI());
+			subjectAddress = splitted[1];
+			resourceName = splitted[2];
 			priority = getQoSBits(requestedPriority);
 		}
 		String path = "/" + subjectAddress + "/" + resourceName;
@@ -225,7 +241,7 @@ public class Observer {
 				resourceName = scanner.next();
 			} catch (InputMismatchException e) {
 				System.out.println("Invalid input");
-				scanner.nextLine();		
+				scanner.nextLine();
 			}
 		} else
 			resourceName = "temperature";
@@ -234,8 +250,8 @@ public class Observer {
 	}
 
 	public void printHelpMenu() {
-		String commandList = "1) Print Help Menu\n" + "2) Resource registration\n"
-				+ "3) Resource cancellation\n" + "4) Request the list of resources\n" + "5) Exit\n";
+		String commandList = "1) Print Help Menu\n" + "2) Resource registration\n" + "3) Resource cancellation\n"
+				+ "4) Request the list of resources\n" + "5) Exit\n";
 		System.out.println("List of commands:\n" + commandList);
 	}
 
@@ -252,7 +268,10 @@ public class Observer {
 
 	public static void main(String[] args) {
 		scanner = new Scanner(System.in);
-		Observer observerClient = new Observer("::1", 5683, true, false);
+		boolean CLI = Boolean.parseBoolean(args[3]);
+		boolean autocomplete = Boolean.parseBoolean(args[4]);
+		Observer observerClient = new Observer(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]), CLI,
+				autocomplete);
 
 		System.out.println("Welcome to the Observer's Command Line Interface");
 		observerClient.printHelpMenu();
@@ -261,7 +280,7 @@ public class Observer {
 				observerClient.resourceRegistrationCLI();
 			while (true) {
 				try {
-					System.out.print("Observer> ");
+					System.out.print("Observer # " + Integer.parseInt(args[2]) + "> ");
 					switch (scanner.nextInt()) {
 					case 1:
 						observerClient.printHelpMenu();
