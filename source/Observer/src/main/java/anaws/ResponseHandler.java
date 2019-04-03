@@ -63,7 +63,7 @@ public class ResponseHandler implements CoapHandler {
 			return;
 		} else if (response.getCode().equals(CoAP.ResponseCode.NOT_ACCEPTABLE) && acceptProposal) {
 			if (DEBUG)
-				System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")] Observer #" + observer.getId() + "> [DEBUG] Nogotiation started, subject proposes " + response.getOptions());
+				System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")] Observer #" + observer.getId() + "> [DEBUG] Negotiation started, subject proposes " + response.getOptions());
 			// Subject started the negotiation, observer need to accept it
 			Request observeRequest = new Request(Code.GET);
 			observeRequest.setObserve();

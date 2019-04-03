@@ -184,11 +184,11 @@ public class Observer {
 		String subjectAddress = "";
 		String resourceName = "";
 		int priority = 1;
-
+		
 		if (!autocomplete) {
 			try {
 				System.out.print("Requesting an Observe Relations\n");
-				System.out.print("Sensor Address <IPv6:port> \n");
+				System.out.print("Sensor Address ( format \"[IPv6]:port\" ) \n");
 				subjectAddress = scanner.next();
 				System.out.print("Resource Name: ");
 				resourceName = scanner.next();
@@ -252,7 +252,7 @@ public class Observer {
 
 	public static void main(String[] args) {
 		scanner = new Scanner(System.in);
-		Observer observerClient = new Observer("::1", 5683, true, true);
+		Observer observerClient = new Observer("::1", 5683, true, false);
 
 		System.out.println("Welcome to the Observer's Command Line Interface");
 		observerClient.printHelpMenu();

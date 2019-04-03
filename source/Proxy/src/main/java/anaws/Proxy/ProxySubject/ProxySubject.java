@@ -39,10 +39,14 @@ public class ProxySubject{
 		System.out.println("ProxySubject: Richiesta nuova registrazione");
 		Registration r = new Registration(this.cache,sensor,type,critic,coapClient);
 		int result = registrator.newRegistration(r);
-		if(result == 2)
+		if(result == 2) {
 			cache.updateRegistrations(r);
+		}
 		else if(result == -1){
 			this.proxyObserver.clearObservation(sensor, type);
+		} else if ( result == 1 ) {
+			cache.insertData(new SensorData(r, 0.0, 500, false));
+			proxyObserver.startNotificationListener(r);
 		}
 	} 
 	public SensorNode getSensorNode(String URI) {
@@ -53,9 +57,13 @@ public class ProxySubject{
 		coapClient.setURI("coap://"+s.getUri());
 		HashSet<WebLink> a = new HashSet<WebLink>();
 		a.addAll((Set<WebLink>)coapClient.discover());
+		boolean first = true;
 		for (WebLink x : a) {
 			if(x.getURI().contains("/sensors/")) {
+				String resourceName = x.getURI().substring(9);
 				s.addResource(x.getURI().substring(9));
+				proxyObserver.addResource(s, resourceName, first);
+				first = false;
 			}
 		}
 		//ArrayList<String> offeredResources = s.getResources();

@@ -10,7 +10,7 @@ import anaws.Proxy.ProxySubject.SensorNode;
 import java.util.InputMismatchException;
 import java.util.Map;
 import java.util.Scanner;
-
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import org.eclipse.californium.core.CoapResource;
@@ -59,24 +59,60 @@ public class ProxyObserver {
 	public boolean isObserverPresent(String key) {
 		return observers.containsKey(key);
 	}
+	
+	private String getUnbrachetAddress( String sensor ) {
+		String address = sensor.replace("[", "");
+		return address = address.replace("]", "");
+	}
+	
+	public ObservableResource getResource(SensorNode sensor, String resourceName ) {
+		String address = getUnbrachetAddress(sensor.getUri());
+		String key = "/" + address + "/" + resourceName;
+		ObservableResource resource = resourceList.get(key);
+		if (resource == null)
+			System.out.println("Resource not present");
+		return resource;
+	}
+	
+	public void updateResource(SensorNode sensor, String resourceName, SensorData data ) {
+		getResource(sensor, resourceName).setSensorData(data);
+	}
+	
+	public void resourceChanged(SensorNode sensor, String resourceName ) {
+		SensorData data = requestValueCache(sensor, resourceName);
+		boolean isCritical = data.getCritic();
 
+		updateResource(sensor, resourceName, data);
+		System.out.println("Resource changed, new data: " + data.toString());
+
+		if (!isCritical)
+			getResource(sensor, resourceName).changed(new CriticalRelationFilter());
+		else
+			getResource(sensor, resourceName).changed();
+	}
+	
 	/****************************************
 	 * INTERACTION WITH PROXYSUBJECT MODULE *
 	 ****************************************/
 	
+	public void startNotificationListener(Registration registration) {
+		new NotificationListener(this, registration).start();
+	}
+	
 	public void addResource(SensorNode sensor, String resourceName, boolean first) {
 		ObservableResource resource = new ObservableResource(resourceName, this, sensor.getUri());
-
+		
+		
 		if ( first ) {
 			// first resource of this sensor then create the sensorResource that has the added resource as child 
-			CoapResource sensorResource = new ObservableResource(sensor.getUri(), this, sensor.getUri());
+			CoapResource sensorResource = new ObservableResource(getUnbrachetAddress(sensor.getUri()), this, sensor.getUri());
 			sensorResource.setVisible(false);
 			sensorResource.add(resource);
 			proxyObserver.add(sensorResource);
 		} else {
 			// sensor already present
 			for (Resource r : proxyObserver.getRoot().getChildren()) {
-				if (r.getName().equals(sensor.getUri()))
+				if (r.getName().equals(getUnbrachetAddress(sensor.getUri())))
 					r.add(resource);
 			}
 		}
@@ -96,7 +132,7 @@ public class ProxyObserver {
 		Resource sensorResource = null;
 		// find sensor resource
 		for (Resource sr : proxyObserver.getRoot().getChildren()) {
-			if (sr.getName().equals(sensor.getUri())) {
+			if (sr.getName().equals(getUnbrachetAddress(sensor.getUri()))) {
 				sensorResource = sr;
 				break;
 			}
@@ -113,32 +149,33 @@ public class ProxyObserver {
 			proxyObserver.remove(sensorResource);
 		}
 
-		System.out.println("Resource \"" + resourceName + "\" of sensor \"" + sensor.getUri()
+		System.out.println("Resource \"" + resourceName + "\" of sensor \"" + getUnbrachetAddress(sensor.getUri())
 				+ "\" removed from the resource list\n");
 	}
 	
-	synchronized public void triggerChange(SensorData data) {
-		String resourceName = data.getRegistration().getType();
-		String sensor = data.getRegistration().getSensorNode().toString();
-		boolean critical = data.getCritic();
-		String key = "/" + sensor + "/" + resourceName;
-
-		if (resourceList.get(key).getObserverCount() == 0) {
-			System.out.println("No Observe Relations on this resource");
-			return;
-		}
-		resourceList.get(key).setSensorData(data);
-
-		if (!critical) {
-			resourceList.get(key).changed();
-		} else
-			resourceList.get(key).changed(new CriticalRelationFilter());
-
-		System.out.println("Current observers on this resource :" + resourceList.get(key).getObserverCount());
+	public void triggerChange(SensorData data) {
+		System.out.println("**************************** DENTRO TRIGGER CHANGE *******************************");
+//		String resourceName = data.getRegistration().getType();
+//		String sensor = getUnbrachetAddress(data.getRegistration().getSensorNode().getUri());
+//		boolean critical = data.getCritic();
+//		String key = "/" + sensor + "/" + resourceName;
+//		
+//		if (resourceList.get(key).getObserverCount() == 0) {
+//			System.out.println("No Observe Relations on this resource");
+//			return;
+//		}
+//		resourceList.get(key).setSensorData(data);
+//
+//		if (!critical) {
+//			resourceList.get(key).changed();
+//		} else
+//			resourceList.get(key).changed(new CriticalRelationFilter());
+//
+//		System.out.println("Current observers on this resource :" + resourceList.get(key).getObserverCount());
 	}
 	
 	public void clearObservation(SensorNode sensor, String resourceName) {
-		String key = "/" + sensor.getUri() + "/" + resourceName;
+		String key = "/" + getUnbrachetAddress(sensor.getUri()) + "/" + resourceName;
 
 		resourceList.get(key).clearAndNotifyObserveRelations(CoAP.ResponseCode.SERVICE_UNAVAILABLE);
 	}
@@ -147,7 +184,7 @@ public class ProxyObserver {
 		resourceList.values().forEach(r -> r.clearAndNotifyObserveRelations(CoAP.ResponseCode.SERVICE_UNAVAILABLE));
 	}
 
-	synchronized public void clearObservationAfterStateChanged(String sensorAddress, ServerState state) {
+	public void clearObservationAfterStateChanged(String sensorAddress, ServerState state) {
 		for (ObservableResource o : resourceList.values()) {
 			if (o.getPath().equals(sensorAddress)) {
 				if (state == ServerState.ONLY_CRITICAL) {
@@ -164,12 +201,14 @@ public class ProxyObserver {
 	}
 
 	public void requestRegistration(SensorNode sensor, String resourceName, boolean critical) {
+		System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")]  [DEBUG] Requesting registration to proxySubject");
 		proxySubject.newRegistration(sensor, resourceName, critical);
 	}
 	
 	public SensorNode requestSensorNode(String sensorAddress) {
 		return proxySubject.getSensorNode(sensorAddress);
 	}
+
 
 	/*******************************
 	 * COMMAND LINE TESTING FUNCTIONS
@@ -195,13 +234,13 @@ public class ProxyObserver {
 		try {
 			switch (cmd) {
 			case 1:
-				clearObservationAfterStateChanged("/" + sensor.getUri() + "/", ServerState.AVAILABLE);
+				clearObservationAfterStateChanged("/" + getUnbrachetAddress(sensor.getUri()) + "/", ServerState.AVAILABLE);
 				break;
 			case 2:
-				clearObservationAfterStateChanged("/" + sensor.getUri() + "/", ServerState.ONLY_CRITICAL);
+				clearObservationAfterStateChanged("/" + getUnbrachetAddress(sensor.getUri()) + "/", ServerState.ONLY_CRITICAL);
 				break;
 			case 3:
-				clearObservationAfterStateChanged("/" + sensor.getUri() + "/", ServerState.UNVAVAILABLE);
+				clearObservationAfterStateChanged("/" + getUnbrachetAddress(sensor.getUri()) + "/", ServerState.UNVAVAILABLE);
 				break;
 			default:
 				System.out.print("Invalid State\n");
@@ -318,12 +357,12 @@ public class ProxyObserver {
 			resourceName = "temperature";
 		}
 
-		System.out.println("Clear relation: " + sensor.getUri() + "/" + resourceName);
+		System.out.println("Clear relation: " + getUnbrachetAddress(sensor.getUri()) + "/" + resourceName);
 //		clearObservation("/" + sensor.getUri() + "/" + resourceName);
 	}
 
 	public static void main(String[] args) {
-		ProxyObserver server = new ProxyObserver(true, true);
+		ProxyObserver server = new ProxyObserver(true, false);
 		scanner = new Scanner(System.in);
 
 		System.out.println("Welcome to the ProxyObserver Command Line Interface");

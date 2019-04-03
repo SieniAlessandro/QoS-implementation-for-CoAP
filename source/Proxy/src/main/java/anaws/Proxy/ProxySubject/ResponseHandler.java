@@ -55,6 +55,8 @@ public class ResponseHandler implements CoapHandler {
 			double Value;
 			long maxAge = response.getOptions().getMaxAge();
 			boolean critic;
+			System.out.println("Messaggio ricevuto: " + Message);
+
 			if(Message.contains("!")) {
 				critic = true;
 				Value = Double.valueOf(Message.substring(0, Message.indexOf("!")));
@@ -66,10 +68,14 @@ public class ResponseHandler implements CoapHandler {
 			System.out.println("Ricevuto nuovo valore: " + Value);
 			SensorData newData = new SensorData(this.registration,Value,maxAge,critic);
 			cache.insertData(newData);
-			this.observer.triggerChange(newData);
+			
+			synchronized(registration) {
+				this.registration.notify();
+			}
 		}
 		
 	}
+	
 	public void onError() {
 		
 	}

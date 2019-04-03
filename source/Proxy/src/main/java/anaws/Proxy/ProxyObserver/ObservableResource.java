@@ -66,6 +66,7 @@ public class ObservableResource extends ConcurrentCoapResource {
 		}
 		return dec;
 	}
+	
 
 	@Override
 	public void handleGET(CoapExchange exchange) {

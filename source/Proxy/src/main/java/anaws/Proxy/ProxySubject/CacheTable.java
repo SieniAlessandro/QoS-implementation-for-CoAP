@@ -14,7 +14,7 @@ public class CacheTable{
 		ArrayList<Registration> toDelete = new ArrayList<Registration>();
 		for(Iterator<SensorData> i = cache.iterator();i.hasNext();){
 			SensorData d = i.next();
-			System.out.println(d.toString());
+//			System.out.println(d.toString());
 			if(d.updateTime(time) == false){
 				i.remove();
 				if(countRegistration(d.getRegistration()) == 1){
@@ -52,7 +52,7 @@ public class CacheTable{
 	}
 	synchronized public SensorData getData(String resource,String type) {
 		for (SensorData sd : cache) {
-			if(sd.getRegistration().getSensorNode().toString().equals(resource) && sd.getRegistration().getType().contentEquals(type)){
+			if(sd.getRegistration().getSensorNode().getUri().equals(resource) && sd.getRegistration().getType().contentEquals(type)){
 				if(sd.getTime() <= this.THRESHOLD)
 					return null;
 				else
