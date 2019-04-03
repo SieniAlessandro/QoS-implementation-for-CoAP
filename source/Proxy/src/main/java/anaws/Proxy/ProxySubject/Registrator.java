@@ -11,7 +11,7 @@ public class Registrator{
 	synchronized public int newRegistration(Registration _r){
 		int registrationNeeded = this.RegistrationNeeded(_r);
 		if( registrationNeeded == 1){
-			System.out.println("Registrator: Nuova registrazione necessaria");
+			Log.info("Registrator", "New registration needed");
 			boolean result = _r.register();
 			//boolean result = true;
 			if(result){
@@ -22,7 +22,8 @@ public class Registrator{
 				return -1;
 		}
 		else if (registrationNeeded == 2) {
-			System.out.println("Registrator: Aggiornamento registrazione");
+			Log.info("Registrator","Updating old registration");
+			//System.out.println("Registrator: Aggiornamento registrazione");
 			Registration r = findAssociate(_r);
 			this.removeRegistration(r);
 			boolean result = _r.register();
@@ -35,7 +36,8 @@ public class Registrator{
 				return -1;
 		}
 		else{
-			System.out.println("Registrator: Registrazione non necessaria");
+			Log.info("Registrator", "New registration not needed");
+			//System.out.println("Registrator: Registrazione non necessaria");
 			return 0;
 		}
 
@@ -56,6 +58,7 @@ public class Registrator{
 		return 1;
 	}
 	synchronized private Registration findAssociate(Registration _r) {
+		Log.info("Registrator", "Finding the associated registration....");
 		for (Registration r: reg){
 			if(r.getSensorNode().toString().equals(r.getSensorNode().toString()) && 
 			   r.getType() == _r.getType() && (_r.isCritic() == false && r.isCritic() == true))
@@ -67,10 +70,10 @@ public class Registrator{
 		if(reg.contains(_r)) {
 			reg.remove(_r);
 			_r.sendCancelation();
-			System.out.println("Registrazione associata rimossa");
+			Log.info("Registrator", "Registration requested removed");
 		}
 		else {
-			System.out.println("Registrazione non presente");
+			Log.info("Registrator", "Registration requested not found");
 		}
 		
 		

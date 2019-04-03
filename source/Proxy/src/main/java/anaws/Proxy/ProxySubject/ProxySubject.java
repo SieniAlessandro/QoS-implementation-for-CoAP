@@ -36,7 +36,7 @@ public class ProxySubject{
 		}
 	}
 	public void newRegistration(SensorNode sensor,String type,boolean critic){
-		System.out.println("ProxySubject: Richiesta nuova registrazione");
+		Log.info("ProxySubject", "Request for new registration");
 		Registration r = new Registration(this.cache,sensor,type,critic,coapClient);
 		int result = registrator.newRegistration(r);
 		if(result == 2) {
@@ -56,21 +56,19 @@ public class ProxySubject{
 		SensorNode s = new SensorNode(address,port);
 		coapClient.setURI("coap://"+s.getUri());
 		HashSet<WebLink> a = new HashSet<WebLink>();
+		Log.info("ProxySubject", "Discovering for resources");
 		a.addAll((Set<WebLink>)coapClient.discover());
 		boolean first = true;
 		for (WebLink x : a) {
 			if(x.getURI().contains("/sensors/")) {
 				String resourceName = x.getURI().substring(9);
 				s.addResource(x.getURI().substring(9));
-				proxyObserver.addResource(s, resourceName, first);
-				first = false;
+				if(!x.getURI().contains("battery")) {
+					proxyObserver.addResource(s, resourceName, first);
+					first = false;
+				}
 			}
 		}
-		//ArrayList<String> offeredResources = s.getResources();
-		/*for (String se: offeredResources) {
-			System.out.println("******");
-			System.out.println(se);
-		}*/
 		this.sensors.addSensor(s);
 	}
 	public SensorData getValue(String resource,String type){

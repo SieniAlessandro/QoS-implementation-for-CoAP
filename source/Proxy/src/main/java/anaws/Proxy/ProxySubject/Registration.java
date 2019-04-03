@@ -52,10 +52,11 @@ public class Registration{
 		 System.out.println(observeRequest.toString());
 		 coapRelation = coapClient.observe(observeRequest, new ResponseHandler(this.cache,this,this.observer));
 		 if(coapRelation.isCanceled() == false) {
-			 System.out.println("Registrazione con il sensore avvenuta");
+			 //System.out.println("Registrazione con il sensore avvenuta");
+			 Log.info("Registration", "Registration Succeded");
 			 return true;
 		 }else {
-			 System.out.println("Errore nella registrazione");
+			 Log.error("Registration", "Error during the registration");
 			 return false;
 		 }
 		 

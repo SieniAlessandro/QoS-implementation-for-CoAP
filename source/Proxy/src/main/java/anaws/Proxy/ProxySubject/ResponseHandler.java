@@ -35,27 +35,24 @@ public class ResponseHandler implements CoapHandler {
 		if (DEBUG) 
 			System.out.println("---------------------------------------");
 		if ( response.getCode().equals(CoAP.ResponseCode.SERVICE_UNAVAILABLE) ) {
-			System.out.println("Risorsa non raggiungibile");
-			onError();
+			Log.error("ResponseHandler", "resource unreachable");
 			return;
 		}
 		if (!response.getOptions().hasObserve() ) {
-			System.out.println("Risorsa non presente: " + response.advanced().toString());
+			Log.error("ResponseHandler", "resource not available: " + response.advanced().toString());
 			return;
 		}
 		// Creating the sensorData
 		if(this.registration.getType().equals("battery")) {
 			//Updating battery
-			ServerState actualState = this.registration.getSensorNode().updateBattery(Double.valueOf(response.getResponseText()));
-			if(actualState == ServerState.UNVAVAILABLE) {
-			}
+			Log.info("ResponseHandler", "Updating battery Level"); 
+			this.registration.getSensorNode().updateBattery(Double.valueOf(response.getResponseText()));
 		}
 		else {
 			String Message = response.getResponseText();
 			double Value;
 			long maxAge = response.getOptions().getMaxAge();
 			boolean critic;
-			System.out.println("Messaggio ricevuto: " + Message);
 
 			if(Message.contains("!")) {
 				critic = true;
