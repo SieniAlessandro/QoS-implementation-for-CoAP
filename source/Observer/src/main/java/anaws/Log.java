@@ -1,4 +1,4 @@
-package anaws.Proxy.ProxySubject;
+package anaws.Proxy;
 
 import java.sql.Timestamp;
 

@@ -137,14 +137,13 @@ public class Observer {
 		String URI = "coap://[" + this.ipv6Proxy + "]:" + this.portProxy + path;
 		observeRequest.setURI(URI);
 		if (DEBUG)
-			System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")] Observer #" + id
-					+ ">\t[DEBUG] Send Observe request: " + observeRequest.toString());
+			Log.debug("Observer", "Send Observe request: " + observeRequest.toString());
 		CoapObserveRelation relation = observerCoap.observeAndWait(observeRequest,
 				new ResponseHandler(this, priority, resourceName, URI, true));
 
 		if (relation.isCanceled()) {
 			if (DEBUG)
-				System.out.println("Observer #" + id + ">\t[DEBUG] Relation is canceled");
+				Log.debug("Observer", "Relation is canceled");
 		} else
 			relations.put(resourceName, relation);
 	}
@@ -162,7 +161,7 @@ public class Observer {
 
 		CoapObserveRelation relation = relations.get(resourceName);
 		if (relation == null) {
-			System.out.println("Observe relation on " + resourceName + " not found");
+		Log.info("Observer", "Observe relation on " + resourceName + " not found");
 			return;
 		}
 
@@ -170,7 +169,7 @@ public class Observer {
 	}
 
 	private String getRandomURI() {
-		WebLink randomURI = new WebLink("well-known"); 
+		WebLink randomURI = new WebLink("well-known");
 		while (randomURI.getURI().contains("well-known") || randomURI.getURI().contains("battery"))
 			randomURI = resourceList.get((int) Math.floor(Math.random() * resourceList.size()));
 		return randomURI.getURI();

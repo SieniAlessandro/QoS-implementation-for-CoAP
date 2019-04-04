@@ -19,8 +19,7 @@ public class NotificationListener extends Thread {
 	public void run() {
 		SensorNode sensor = registration.getSensorNode();
 		String resourceName = registration.getType();
-		System.out.println("[" + new Timestamp(System.currentTimeMillis())
-				+ ")][ProxyObserver][INFO] Notification Listener of resource " + sensor.getUri() + "/" + resourceName + " started" );
+		Log.info("ProxyObserver", "Notification Listener of resource " + sensor.getUri() + "/" + resourceName + " started" );
 		while (true) {
 			try {
 				synchronized (registration) {
@@ -29,8 +28,7 @@ public class NotificationListener extends Thread {
 
 				ObservableResource resource = proxyObserver.getResource(sensor, resourceName);
 				if (resource.getObserverCount() == 0) {
-					System.out.println("[" + new Timestamp(System.currentTimeMillis())
-							+ ")][ProxyObserver][WARNING] No Observe Relations on this resource");
+					Log.info("ProxyObserver", "No Observe Relations on this resource");
 					continue;
 				}
 				proxyObserver.resourceChanged(sensor, resourceName);

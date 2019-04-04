@@ -40,8 +40,7 @@ public class ProxyObserver {
 		this.CLI = CLI;
 		this.autocomplete = autocomplete;
 
-		System.out.println("[" + new Timestamp(System.currentTimeMillis())
-				+ ")][ProxyObserver][INFO] Coap Server Started");
+		Log.info("ProxyObserver", "Coap Server Started");
 		proxyObserver.start();
 	}
 
@@ -60,32 +59,30 @@ public class ProxyObserver {
 	public boolean isObserverPresent(String key) {
 		return observers.containsKey(key);
 	}
-	
+
 	private String getUnbrachetAddress( String sensor ) {
 		String address = sensor.replace("[", "");
 		return address = address.replace("]", "");
 	}
-	
+
 	public ObservableResource getResource(SensorNode sensor, String resourceName ) {
 		String address = getUnbrachetAddress(sensor.getUri());
 		String key = "/" + address + "/" + resourceName;
 		ObservableResource resource = resourceList.get(key);
 		if (resource == null)
-			System.out.println("[" + new Timestamp(System.currentTimeMillis())
-					+ ")][ProxyObserver][ERROR] Resource not found");
+			Log.error("ProxyObserver", "Resource not found");
 		return resource;
 	}
-	
+
 	public void updateResource(SensorNode sensor, String resourceName, SensorData data ) {
 		getResource(sensor, resourceName).setSensorData(data);
 	}
-	
+
 	public void resourceChanged(SensorNode sensor, String resourceName ) {
 		SensorData data = requestValueCache(sensor, resourceName);
 		boolean isCritical = data.getCritic();
 		ObservableResource resource = getResource(sensor, resourceName);
-		System.out.println("[" + new Timestamp(System.currentTimeMillis())
-				+ ")][ProxyObserver][INFO] " + sensor.getUri() + "/" + resourceName + " changed, isCritical: " + data.getCritic() +  ". Current observers: " + resource.getObserverCount());
+		Log.info("ProxyObserver", "" + sensor.getUri() + "/" + resourceName + " changed, isCritical: " + data.getCritic() +  ". Current observers: " + resource.getObserverCount());
 
 		updateResource(sensor, resourceName, data);
 		if (!isCritical)
@@ -93,21 +90,21 @@ public class ProxyObserver {
 		else
 			resource.changed();
 	}
-	
+
 	/****************************************
 	 * INTERACTION WITH PROXYSUBJECT MODULE *
 	 ****************************************/
-	
+
 	public void startNotificationListener(Registration registration) {
 		new NotificationListener(this, registration).start();
 	}
-	
+
 	public void addResource(SensorNode sensor, String resourceName, boolean first) {
 		ObservableResource resource = new ObservableResource(resourceName, this, sensor.getUri());
-		
-		
+
+
 		if ( first ) {
-			// first resource of this sensor then create the sensorResource that has the added resource as child 
+			// first resource of this sensor then create the sensorResource that has the added resource as child
 			CoapResource sensorResource = new ObservableResource(getUnbrachetAddress(sensor.getUri()), this, sensor.getUri());
 			sensorResource.setVisible(false);
 			sensorResource.add(resource);
@@ -126,10 +123,10 @@ public class ProxyObserver {
 		resource.setSensorData(new SensorData(new Registration(null, sensor, resourceName, false, null),
 				Math.random() * 10 + 30, 60, false));
 
-		System.out.println("Resource \"" + resource.getName() + "\" of sensor \"" + sensor.getUri()
+		Log.info("ProxyObserver, ""Resource \"" + resource.getName() + "\" of sensor \"" + sensor.getUri()
 				+ "\" added to the resource list\n");
 	}
-	
+
 	public void deleteResource(SensorNode sensor, String resourceName) {
 
 		Resource sensorResource = null;
@@ -152,11 +149,10 @@ public class ProxyObserver {
 			proxyObserver.remove(sensorResource);
 		}
 
-		System.out.println("[" + new Timestamp(System.currentTimeMillis())
-				+ ")][ProxyObserver][INFO] Resource \"" + resourceName + "\" of sensor \"" + getUnbrachetAddress(sensor.getUri())
+		Log.info("ProxyObserver", "Resource \"" + resourceName + "\" of sensor \"" + getUnbrachetAddress(sensor.getUri())
 				+ "\" removed from the resource list\n");
 	}
-	
+
 	public void clearObservation(SensorNode sensor, String resourceName) {
 		String key = "/" + getUnbrachetAddress(sensor.getUri()) + "/" + resourceName;
 
@@ -178,16 +174,16 @@ public class ProxyObserver {
 			}
 		}
 	}
-	
+
 	public SensorData requestValueCache(SensorNode sensor, String resourceName) {
 		return proxySubject.getValue(sensor.getUri(), resourceName);
 	}
 
 	public void requestRegistration(SensorNode sensor, String resourceName, boolean critical) {
-		System.out.println("[" + new Timestamp(System.currentTimeMillis()) + ")][DEBUG] Requesting registration to proxySubject");
+		Log.debug("ProxyObserver", "Requesting registration to proxySubject");
 		proxySubject.newRegistration(sensor, resourceName, critical);
 	}
-	
+
 	public SensorNode requestSensorNode(String sensorAddress) {
 		return proxySubject.getSensorNode(sensorAddress);
 	}
@@ -230,7 +226,7 @@ public class ProxyObserver {
 				break;
 			}
 		} catch (InputMismatchException e) {
-			System.out.println("Invalid input");
+			Log.error("ProxyObserver", "Invalid input");
 			scanner.nextLine();
 		}
 	}
@@ -244,7 +240,7 @@ public class ProxyObserver {
 			String port = scanner.next();
 			sensor = new SensorNode(ip, Integer.parseInt(port));
 		} catch (InputMismatchException e) {
-			System.out.println("Invalid input");
+			Log.error("ProxyObserver", "Invalid input");
 			scanner.nextLine();
 		}
 		return sensor;
@@ -256,7 +252,7 @@ public class ProxyObserver {
 			System.out.print("Resource name: \n");
 			resourceName = scanner.next();
 		} catch (InputMismatchException e) {
-			System.out.println("Invalid input");
+			Log.error("ProxyObserver", "Invalid input");
 			scanner.nextLine();
 		}
 		return resourceName;
@@ -357,4 +353,3 @@ public class ProxyObserver {
 	}
 
 }
-

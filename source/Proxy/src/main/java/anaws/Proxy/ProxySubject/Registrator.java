@@ -1,6 +1,8 @@
 package anaws.Proxy.ProxySubject;
 import java.util.*;
 
+import anaws.Proxy.Log;
+
 public class Registrator{
 	
 	ArrayList<Registration> reg;

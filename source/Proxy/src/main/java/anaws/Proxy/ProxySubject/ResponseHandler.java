@@ -12,6 +12,7 @@ import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.californium.core.server.ServerState;
 
+import anaws.Proxy.Log;
 import anaws.Proxy.ProxyObserver.ProxyObserver;
 
 import org.eclipse.californium.core.coap.CoAP.Code;

@@ -75,9 +75,8 @@ public class ObservableResource extends ConcurrentCoapResource {
 		SensorNode sensor = server.requestSensorNode(sensorAddress);
 
 		if (observeField == 1) {
-			System.out.println("[" + new Timestamp(System.currentTimeMillis())
-					+ ")][ProxyObserver][INFO] Cancel observe request from " + exchange.getSourcePort()
-					+ " for the resource: " + exchange.advanced().getRequest().getURI());
+			Log.info("ObservableResource", "Cancel observe request from " + exchange.getSourcePort()
+			+ " for the resource: " + exchange.advanced().getRequest().getURI());
 			return;
 		}
 		if (sensor.getState().equals(ServerState.UNVAVAILABLE)) {
@@ -87,25 +86,22 @@ public class ObservableResource extends ConcurrentCoapResource {
 
 		int priority = getPriority(observeField);
 		if (DEBUG)
-			System.out.println("[" + new Timestamp(System.currentTimeMillis())
-					+ ")][ProxyObserver][DEBUG] handleGET request with priority: " + priority);
+			Log.debug("ObservableResource", "handleGET request with priority: " + priority);
 
 		// store observer information if the endpoint is not already present
 		String observerID = exchange.getSourceAddress() + ":" + exchange.getSourcePort();
 		int mid = exchange.advanced().getRequest().getMID();
 		if (!server.isObserverPresent(observerID)) {
 			if (DEBUG)
-				System.out.println("[" + new Timestamp(System.currentTimeMillis())
-						+ ")][ProxyObserver][DEBUG] Observer " + observerID + " not present, added to the list ");
+				Log.debug("ObservableResource", "Observer " + observerID + " not present, added to the list ");
 			server.addObserver(observerID, new ObserverState(mid, false));
 			handleRegistration(priority, observerID, exchange, sensor);
 			return;
 		}
 
 		if (DEBUG)
-			System.out.println(
-					"[" + new Timestamp(System.currentTimeMillis()) + ")][ProxyObserver][DEBUG] original MID: "
-							+ server.getObserverState(observerID).getOriginalMID() + " currentMID: " + mid);
+			Log.debug("ObservableResource", " original MID: "
+					+ server.getObserverState(observerID).getOriginalMID() + " currentMID: " + mid);
 
 		if (mid == server.getObserverState(observerID).getOriginalMID()) {
 			// This is a notification because the exchange has the same MID of the original
@@ -127,17 +123,14 @@ public class ObservableResource extends ConcurrentCoapResource {
 				response.setOptions(new OptionSet().addOption(new Option(OptionNumberRegistry.OBSERVE, PROPOSAL)));
 				server.getObserverState(observerID).setNegotiationState(true);
 				exchange.respond(response);
-				System.out.println("[" + new Timestamp(System.currentTimeMillis())
-						+ ")][ProxyObserver][INFO] Negotiation Started: " + response.toString());
+				Log.info("ObservableResource", "Negotiation Started: " + response.toString());
 
 			} else {
-				System.out.println("[" + new Timestamp(System.currentTimeMillis())
-						+ ")][ProxyObserver][INFO] Accepting the request from " + exchange.getSourcePort()
-						+ " request without negotiation: " + exchange.getRequestOptions().toString());
+				Log.info("ObservableResource", "Accepting the request from " + exchange.getSourcePort()
+				+ " request without negotiation: " + exchange.getRequestOptions().toString());
 				server.getObserverState(observerID).setOriginalMID(exchange.advanced().getRequest().getMID());
 				if (DEBUG)
-					System.out.println("[" + new Timestamp(System.currentTimeMillis())
-							+ ")][ProxyObserver][DEBUG] Current SensorData: " + this.data);
+					Log.debug("ObservableResource", "Current SensorData: " + this.data);
 				server.requestRegistration(server.requestSensorNode(sensorAddress), getName(),
 						priority > 2 ? true : false);
 				// Request accepted without negotiation
@@ -151,8 +144,7 @@ public class ObservableResource extends ConcurrentCoapResource {
 
 			server.requestRegistration(sensor, getName(), priority > 2 ? true : false);
 
-			System.out.println(
-					"[" + new Timestamp(System.currentTimeMillis()) + ")][ProxyObserver][INFO] Negotiation ended ");
+			Log.info("ObservableResource", "Negotiation ended ");
 			sendNotification(exchange, sensor);
 		}
 	}
@@ -161,8 +153,7 @@ public class ObservableResource extends ConcurrentCoapResource {
 		double value = data.getValue();
 		exchange.setMaxAge(data.getTime());
 		exchange.respond(Double.toString(value));
-		System.out.println(
-				"[" + new Timestamp(System.currentTimeMillis()) + ")][ProxyObserver][INFO] Notification sent to: "
+		Log.info("ObservableResource", "Notification sent to: "
 						+ exchange.getSourcePort() + " | notification: " + value + " | isCritical: " + data.getCritic() );
 	}
 }
