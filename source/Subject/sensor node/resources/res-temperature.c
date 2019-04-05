@@ -38,6 +38,11 @@
  *      Cristiano De Alti <cristiano_dealti@hotmail.com>
  */
 
+
+#include "../common.h"
+#include "dev/temperature-sensor.h"
+
+/*
 #include "contiki.h"
 
 
@@ -46,22 +51,21 @@
 #include <string.h>
 #include "rest-engine.h"
 #include "er-coap.h"
-#if PLATFORM_HAS_TEMPERATURE
+//#if PLATFORM_HAS_TEMPERATURE
 #include "dev/temperature-sensor.h"
-
+*/
 static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset);
 static void periodic_handler(void);
 
 #define MAX_AGE      60
-#define INTERVAL_MIN 5
 #define INTERVAL_MAX (MAX_AGE - 1)
 #define NON_CRITICAL_CHANGE       3
 #define CRITICAL_CHANGE 1
 #define CRITICAL_THRESHOLD 30 //TO DEFINE
 
 static uint32_t variable_max_age = MAX_AGE;
+static int32_t interval_counter = INTERVAL_MAX;
 
-static int32_t interval_counter = INTERVAL_MIN;
 static int temperature_old = INT_MIN;
 static uint32_t dataLevel = CRITICAL; //0 if not critical, 0x800000
 static uint8_t requestedLevel = 0; //0 all, 1 only criticals
@@ -87,7 +91,8 @@ get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_s
    * Otherwise the requests must be stored with the observer list and passed by REST.notify_subscribers().
    * This would be a TODO in the corresponding files in contiki/apps/erbium/!
    */
-  printf("CALLED THE GET HANDLER\n");
+  //printf("CALLED THE GET HANDLER\n");
+  stampa(temperature_old, "temperature", dataLevel);
 
   uint32_t requestLevel;
   coap_get_header_observe(request, &requestLevel);
@@ -95,12 +100,12 @@ get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_s
   if(requestLevel == 0 || requestLevel == CRITICAL){
     coap_set_header_observe(request, 0);
     if(requestLevel == CRITICAL){
-      printf("RICHIESTI SOLO VALORI CRITICI\n");
+      //printf("RICHIESTI SOLO VALORI CRITICI\n");
       requestedLevel = 1;
     }else{
       requestedLevel = 0;
     }
-    printf("requestLevel received: %lu. requestedLevel changed:%u\n", requestLevel,requestedLevel);
+    //printf("requestLevel received: %lu. requestedLevel changed:%u\n", requestLevel,requestedLevel);
   }
   
   unsigned int accept = -1;
@@ -171,8 +176,7 @@ periodic_handler()
     if(temperature >= CRITICAL_THRESHOLD && abs(temperature - temperature_old) >= CRITICAL_CHANGE){
       dataLevel = CRITICAL;
     }else{
-      if( requestedLevel == 0 &&
-          interval_counter >= INTERVAL_MIN && 
+      if( requestedLevel == 0 && 
           abs(temperature - temperature_old) >= NON_CRITICAL_CHANGE &&
           battery > 30){
             dataLevel = NON_CRITICAL;
@@ -187,7 +191,7 @@ periodic_handler()
     temperature_old = temperature;
     /* Notify the registered observers which will trigger the res_get_handler to create the response. */
     if(requestedLevel == 1 && dataLevel == NON_CRITICAL){
-      printf("Data non critical detected, but not requested. RequestedLevel:%u. DataLevel: %lu\n", requestedLevel, dataLevel);
+      //printf("Data non critical detected, but not requested. RequestedLevel:%u. DataLevel: %lu\n", requestedLevel, dataLevel);
       return;
     }
 
@@ -208,4 +212,4 @@ periodic_handler()
     REST.notify_subscribers(&res_temperature);
   }
 }
-#endif /* PLATFORM_HAS_TEMPERATURE */
+//#endif /* PLATFORM_HAS_TEMPERATURE */

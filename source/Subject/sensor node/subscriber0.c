@@ -1,32 +1,7 @@
-/*
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the Institute nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- * This file is part of the Contiki operating system.
- *
- */
+#define SUBSCRIBER
 
+#include "common.h"
+/*
 #include "contiki.h"
 #include "lib/random.h"
 #include "sys/ctimer.h"
@@ -45,9 +20,6 @@
 
 #include "rest-engine.h"
 
-/* Only for TMOTE Sky? */
-//#include "dev/serial-line.h"
-//#include "dev/uart1.h"
 #include "net/ipv6/uip-ds6-route.h"
 
 
@@ -85,23 +57,19 @@ static uip_ipaddr_t server_ipaddr;
 #define PRINT6ADDR(addr)
 #define PRINTLLADDR(addr)
 #endif
+*/
 
-
-#if PLATFORM_HAS_TEMPERATURE
+//#if PLATFORM_HAS_TEMPERATURE
 #include "dev/temperature-sensor.h"
 extern resource_t res_temperature;
-#endif
-#if PLATFORM_HAS_BATTERY
+//#endif
+//#if PLATFORM_HAS_BATTERY
 #include "dev/battery-sensor.h"
 extern resource_t res_battery;
-#endif
-#if PLATFORM_HAS_LIGHT
-#include "dev/light-sensor.h"
-extern resource_t res_light;
-#endif
+//#endif
 
-
-
+static struct uip_udp_conn *client_conn;
+static uip_ipaddr_t server_ipaddr;
 
 
 /*---------------------------------------------------------------------------*/
@@ -169,7 +137,6 @@ print_local_addresses(void)
        (state == ADDR_TENTATIVE || state == ADDR_PREFERRED)) {
       PRINT6ADDR(&uip_ds6_if.addr_list[i].ipaddr);
       PRINTF("\n");
-      /* hack to make address "final" */
       if (state == ADDR_TENTATIVE) {
   uip_ds6_if.addr_list[i].state = ADDR_PREFERRED;
       }
@@ -288,26 +255,20 @@ PROCESS_THREAD(rest_server, ev, data)
   rest_init_engine();
 
   /* Activate the application-specific resources. */
-  #if PLATFORM_HAS_BATTERY
   rest_activate_resource(&res_battery, "sensors/battery");  
   SENSORS_ACTIVATE(battery_sensor);  
-  #endif
-
-  #if PLATFORM_HAS_TEMPERATURE
+  
+  
   rest_activate_resource(&res_temperature, "sensors/temperature");
   SENSORS_ACTIVATE(temperature_sensor);
-  #endif
 
-  #if PLATFORM_HAS_LIGHT
-  rest_activate_resource(&res_light, "sensors/light");
-  SENSORS_ACTIVATE(light_sensor);
-  #endif
-
+  printf("timestamp,indirizzoIP,valore,nomeRisorsa,critico\n");
+  
   while(1){
     PROCESS_WAIT_EVENT();
-      if(ev == BATTERY_END_EVENT){
-        printf("The battery is terminated!\n");
-      }
+      //if(ev == BATTERY_END_EVENT){
+      //  printf("The battery is terminated!\n");
+      //}
   } /* while (1) */
 
   PROCESS_END();

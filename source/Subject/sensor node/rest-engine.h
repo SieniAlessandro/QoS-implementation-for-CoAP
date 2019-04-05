@@ -41,9 +41,9 @@
 #define REST_ENGINE_H_
 /*****************************************************
   PROJECT ANAWS CONSTANTS
-******************************************************/
+******************************************************
 
-#define MIN_MAX_AGE 10
+#define MIN_MAX_AGE 255
 #define CRITICAL 0x800000
 #define NON_CRITICAL 0
 
@@ -59,7 +59,13 @@
 static uint32_t battery = INITIAL_BATTERY;
 
 uint32_t reduceBattery(uint32_t drain);
-/*******************************************************
+#include "net/ipv6/uip-ds6-route.h"
+#include "net/ip/uip.h"
+#include "net/ipv6/uip-ds6.h"
+#include "net/ip/uip-udp-packet.h"
+
+void stampa(int value, char* resourceName, uint32_t dataLevel);
+*******************************************************
  *******************************************************/
 
 

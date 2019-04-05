@@ -67,11 +67,7 @@ LIST(restful_periodic_services);
  * This function must be called by server processes before any resources are
  * registered through rest_activate_resource().
  */
-uint32_t reduceBattery(uint32_t drain){
-  battery = (battery != 0 && (battery - drain) < battery) ? battery-drain : 0;
-  printf("Actual Battery:%lu\n", battery);
-  return battery;
-}
+/***************************************************************/
 
 void
 rest_init_engine(void)

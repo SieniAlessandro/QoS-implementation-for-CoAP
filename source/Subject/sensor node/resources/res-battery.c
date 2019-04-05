@@ -36,14 +36,19 @@
  *      Matthias Kovatsch <kovatsch@inf.ethz.ch>
  */
 
-#include "contiki.h"
 
-#if PLATFORM_HAS_BATTERY
+#include "../common.h"
+#include "dev/battery-sensor.h"
+
+
+/*
+#include "contiki.h"
 
 #include <string.h>
 #include "rest-engine.h"
 #include "dev/battery-sensor.h"
 #include "er-coap.h"
+*/
 
 static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset);
 static void periodic_handler(void);
@@ -57,7 +62,7 @@ PERIODIC_RESOURCE(res_battery,
          NULL,
          NULL,
          NULL,
-         CLOCK_SECOND,
+         5*CLOCK_SECOND,
          periodic_handler);
 
 static int32_t interval_counter = INTERVAL_MAX;
@@ -66,7 +71,7 @@ static void
 get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
 {
   //int battery = battery_sensor.value(0);
-  printf("Battery sensed%lu\n", battery);
+  //printf("Battery sensed%lu\n", battery);
   unsigned int accept = -1;
   coap_get_header_accept(request, &accept);
 
@@ -92,7 +97,7 @@ get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_s
 }
 
 
-uint32_t level = 31;
+uint32_t thresholdLevel = 31;
 
 static void
 periodic_handler()
@@ -102,17 +107,16 @@ periodic_handler()
   battery = reduceBattery(SENSING_DRAIN);
   ++interval_counter;
   if(battery == 0){
-    char* data = "BATTERIA FINITA";
-    printf("%s\n", data);
+    //char* data = "BATTERIA FINITA";
+    //printf("%s\n", data);
     //process_post(&rest_server, BATTERY_END_EVENT, data);
-    return;
+    abort();
   }
 
-  if(battery/10 <= level || interval_counter >= INTERVAL_MAX) {
-     level /= 2;
+  if(battery/10 <= thresholdLevel || interval_counter >= INTERVAL_MAX) {
+     thresholdLevel /= 2;
      interval_counter = 0;
     /* Notify the registered observers which will trigger the res_get_handler to create the response. */
     REST.notify_subscribers(&res_battery);
   }
 }
-#endif /* PLATFORM_HAS_BATTERY */

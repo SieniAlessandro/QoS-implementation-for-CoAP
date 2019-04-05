@@ -1,4 +1,4 @@
-all: er-example-server er-example-client
+all: subscriber0 common.c
 # use target "er-plugtest-server" explicitly when requried 
 
 CONTIKI=/home/user/contiki
@@ -26,6 +26,7 @@ SMALL=1
 # REST Engine shall use Erbium CoAP implementation
 APPS += er-coap
 APPS += rest-engine
+APPS += project-anaws
 
 # optional rules to get assembly
 #CUSTOM_RULE_C_TO_OBJECTDIR_O = 1
@@ -33,16 +34,6 @@ APPS += rest-engine
 
 CONTIKI_WITH_IPV6 = 1
 include $(CONTIKI)/Makefile.include
-
-# minimal-net target is currently broken in Contiki
-ifeq ($(TARGET), minimal-net)
-CFLAGS += -DHARD_CODED_ADDRESS=\"fdfd::10\"
-${info INFO: er-example compiling with large buffers}
-CFLAGS += -DUIP_CONF_BUFFER_SIZE=1300
-CFLAGS += -DREST_MAX_CHUNK_SIZE=1024
-CFLAGS += -DCOAP_MAX_HEADER_SIZE=176
-CONTIKI_WITH_RPL=0
-endif
 
 # optional rules to get assembly
 #$(OBJECTDIR)/%.o: asmdir/%.S
