@@ -7,6 +7,7 @@ import org.eclipse.californium.core.coap.Option;
 import org.eclipse.californium.core.coap.OptionNumberRegistry;
 import org.eclipse.californium.core.coap.OptionSet;
 import org.eclipse.californium.core.coap.Response;
+import org.eclipse.californium.core.coap.CoAP.ResponseCode;
 import org.eclipse.californium.core.coap.CoAP.Type;
 import org.eclipse.californium.core.server.resources.CoapExchange;
 import org.eclipse.californium.core.server.resources.ConcurrentCoapResource;
@@ -107,7 +108,7 @@ public class ObservableResource extends ConcurrentCoapResource {
 		if (mid == server.getObserverState(observerID).getOriginalMID()) {
 			// This is a notification because the exchange has the same MID of the original
 			// request
-			sendNotification(exchange, sensor);
+			sendNotification(exchange, sensor, false);
 		} else {
 			// The observer is already present but this is not a notification then it is a
 			// request of reregistration
@@ -132,10 +133,17 @@ public class ObservableResource extends ConcurrentCoapResource {
 				server.getObserverState(observerID).setOriginalMID(exchange.advanced().getRequest().getMID());
 				if (DEBUG)
 					Log.debug("ObservableResource", "Current SensorData: " + this.data);
-				server.requestRegistration(server.requestSensorNode(sensorAddress), getName(),
+				boolean registrationOk = server.requestRegistration(sensor, getName(),
 						priority > 2 ? true : false);
-				// Request accepted without negotiation
-				sendNotification(exchange, sensor);
+				if (registrationOk) {
+					// Request accepted without negotiation
+					Log.info("ObservableResource", "Registration done proxy - subject done!");
+					while( data == null)
+						data = server.requestValueCache(sensor, getName());
+					sendNotification(exchange, sensor, true);
+				} else {
+					// delete relation
+				}
 
 			}
 		} else {
@@ -143,17 +151,27 @@ public class ObservableResource extends ConcurrentCoapResource {
 			server.getObserverState(observerID).setNegotiationState(false);
 			server.getObserverState(observerID).setOriginalMID(exchange.advanced().getRequest().getMID());
 
-			server.requestRegistration(sensor, getName(), priority > 2 ? true : false);
+			boolean registrationOk = server.requestRegistration(sensor, getName(), priority > 2 ? true : false);
+			if (registrationOk) {
+				// Request accepted without negotiation
+				Log.info("ObservableResource", "Negotiation ended ");
+				while( data == null)
+					data = server.requestValueCache(sensor, getName());
+				sendNotification(exchange, sensor, true);			
+			} else {
+				// delete relation
+			}
 
-			Log.info("ObservableResource", "Negotiation ended ");
-			sendNotification(exchange, sensor);
 		}
 	}
 
-	private void sendNotification(CoapExchange exchange, SensorNode sensor) {
+	private void sendNotification(CoapExchange exchange, SensorNode sensor, boolean first) {
 		double value = data.getValue();
 		exchange.setMaxAge(data.getTime());
-		exchange.respond(Double.toString(value));
+		if (first)
+			exchange.respond(ResponseCode.CONTENT, Double.toString(value));
+		else 
+			exchange.respond(Double.toString(value));
 		Log.info("ObservableResource", "Notification sent to: "
 						+ exchange.getSourcePort() + " | notification: " + value + " | isCritical: " + data.getCritic() );
 	}

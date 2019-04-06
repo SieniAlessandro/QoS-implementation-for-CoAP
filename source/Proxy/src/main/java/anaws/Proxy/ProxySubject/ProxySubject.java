@@ -40,9 +40,10 @@ public class ProxySubject{
 		Log.info("ProxySubject", "Request for new registration");
 		Registration r = new Registration(this.cache,sensor,type,critic,coapClient);
 		int result = registrator.newRegistration(r);
-		if(result == 2) {
+		if ( result == 1 ) {
+			proxyObserver.startNotificationListener(r);
+		} else if(result == 2) {
 			cache.updateRegistrations(r);
-			return true;
 		}
 		else if(result == -1){
 			this.proxyObserver.clearObservation(sensor, type);

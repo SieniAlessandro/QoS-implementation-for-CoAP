@@ -1,6 +1,5 @@
 package anaws;
 
-import java.sql.Timestamp;
 import java.util.*;
 
 import org.eclipse.californium.core.CoapClient;

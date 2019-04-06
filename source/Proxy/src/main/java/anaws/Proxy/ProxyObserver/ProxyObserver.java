@@ -11,12 +11,9 @@ import anaws.Proxy.ProxySubject.SensorNode;
 import java.util.InputMismatchException;
 import java.util.Map;
 import java.util.Scanner;
-import java.sql.Timestamp;
-import java.util.ArrayList;
 
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapServer;
-import org.eclipse.californium.core.WebLink;
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.server.resources.Resource;
 
@@ -120,10 +117,6 @@ public class ProxyObserver {
 
 		resourceList.put(resource.getURI(), resource);
 
-//		resource.setSensorData(requestValueCache(sensor, resourceName));
-		resource.setSensorData(new SensorData(new Registration(null, sensor, resourceName, false, null),
-				Math.random() * 10 + 30, 60, false));
-
 		Log.info("ProxyObserver", "Resource \"" + resource.getName() + "\" of sensor \"" + sensor.getUri()
 				+ "\" added to the resource list\n");
 	}
@@ -176,13 +169,15 @@ public class ProxyObserver {
 		}
 	}
 
-	public SensorData requestValueCache(SensorNode sensor, String resourceName) {
-		return proxySubject.getValue(sensor.getUri(), resourceName);
+	synchronized public SensorData requestValueCache(SensorNode sensor, String resourceName) {
+		SensorData data = proxySubject.getValue(sensor.getUri(), resourceName);
+		Log.debug("ProyObserver", "Requested cached valued received: " + data);
+		return data;
 	}
 
-	public void requestRegistration(SensorNode sensor, String resourceName, boolean critical) {
+	public boolean requestRegistration(SensorNode sensor, String resourceName, boolean critical) {
 		Log.debug("ProxyObserver", "Requesting registration to proxySubject");
-		proxySubject.newRegistration(sensor, resourceName, critical);
+		return proxySubject.newRegistration(sensor, resourceName, critical);
 	}
 
 	public SensorNode requestSensorNode(String sensorAddress) {
