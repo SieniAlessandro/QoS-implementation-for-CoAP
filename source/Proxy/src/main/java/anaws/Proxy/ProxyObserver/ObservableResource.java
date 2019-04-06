@@ -11,6 +11,7 @@ import org.eclipse.californium.core.coap.CoAP.Type;
 import org.eclipse.californium.core.server.resources.CoapExchange;
 import org.eclipse.californium.core.server.resources.ConcurrentCoapResource;
 
+import anaws.Proxy.Log;
 import anaws.Proxy.ProxySubject.ProxySubject;
 import anaws.Proxy.ProxySubject.SensorData;
 import anaws.Proxy.ProxySubject.SensorNode;

@@ -2,6 +2,7 @@ package anaws.Proxy.ProxyObserver;
 
 import java.util.HashMap;
 
+import anaws.Proxy.Log;
 import anaws.Proxy.ProxySubject.ProxySubject;
 import anaws.Proxy.ProxySubject.Registration;
 import anaws.Proxy.ProxySubject.SensorData;
@@ -123,7 +124,7 @@ public class ProxyObserver {
 		resource.setSensorData(new SensorData(new Registration(null, sensor, resourceName, false, null),
 				Math.random() * 10 + 30, 60, false));
 
-		Log.info("ProxyObserver, ""Resource \"" + resource.getName() + "\" of sensor \"" + sensor.getUri()
+		Log.info("ProxyObserver", "Resource \"" + resource.getName() + "\" of sensor \"" + sensor.getUri()
 				+ "\" added to the resource list\n");
 	}
 

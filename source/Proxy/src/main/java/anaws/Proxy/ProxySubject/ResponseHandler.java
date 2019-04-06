@@ -66,9 +66,15 @@ public class ResponseHandler implements CoapHandler {
 			System.out.println("Ricevuto nuovo valore: " + Value);
 			SensorData newData = new SensorData(this.registration,Value,maxAge,critic);
 			cache.insertData(newData);
-			
-			synchronized(registration) {
-				this.registration.notify();
+			if(this.registration.isFirstValue() == true) {
+				//In this case the only thing to do is to set firstValue at false
+				this.registration.firstValueReceived();				
+			}
+			else {
+				//Otherwise we must notify all the observers that a new value has arrived
+				synchronized(registration) {
+					this.registration.notify();
+				}
 			}
 		}
 		

@@ -36,19 +36,19 @@ public class ProxySubject{
 			this.newRegistration(sensor, "battery", false);
 		}
 	}
-	public void newRegistration(SensorNode sensor,String type,boolean critic){
+	public boolean newRegistration(SensorNode sensor,String type,boolean critic){
 		Log.info("ProxySubject", "Request for new registration");
 		Registration r = new Registration(this.cache,sensor,type,critic,coapClient);
 		int result = registrator.newRegistration(r);
 		if(result == 2) {
 			cache.updateRegistrations(r);
+			return true;
 		}
 		else if(result == -1){
 			this.proxyObserver.clearObservation(sensor, type);
-		} else if ( result == 1 ) {
-			cache.insertData(new SensorData(r, 0.0, 500, false));
-			proxyObserver.startNotificationListener(r);
+			return false;
 		}
+		return true;
 	} 
 	public SensorNode getSensorNode(String URI) {
 		return this.sensors.getSensor(URI);

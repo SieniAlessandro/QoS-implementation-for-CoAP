@@ -2,6 +2,7 @@ package anaws.Proxy.ProxyObserver;
 
 import java.sql.Timestamp;
 
+import anaws.Proxy.Log;
 import anaws.Proxy.ProxySubject.Registration;
 import anaws.Proxy.ProxySubject.SensorData;
 import anaws.Proxy.ProxySubject.SensorNode;
