@@ -1,8 +1,5 @@
 package anaws.Proxy.ProxySubject;
 
-
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.*;
 import org.eclipse.californium.core.*;
 
@@ -75,5 +72,9 @@ public class ProxySubject{
 	}
 	public SensorData getValue(String resource,String type){
 		return cache.getData(resource, type);
+	}
+	
+	public void removeRegistration(Registration _r) {
+		this.registrator.removeRegistration(_r);
 	}
 }

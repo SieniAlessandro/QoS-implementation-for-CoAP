@@ -1,19 +1,16 @@
 package anaws.Proxy.ProxyObserver;
 
-import java.sql.Timestamp;
 
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.Option;
 import org.eclipse.californium.core.coap.OptionNumberRegistry;
 import org.eclipse.californium.core.coap.OptionSet;
 import org.eclipse.californium.core.coap.Response;
-import org.eclipse.californium.core.coap.CoAP.ResponseCode;
 import org.eclipse.californium.core.coap.CoAP.Type;
 import org.eclipse.californium.core.server.resources.CoapExchange;
 import org.eclipse.californium.core.server.resources.ConcurrentCoapResource;
 
 import anaws.Proxy.Log;
-import anaws.Proxy.ProxySubject.ProxySubject;
 import anaws.Proxy.ProxySubject.SensorData;
 import anaws.Proxy.ProxySubject.SensorNode;
 
@@ -78,7 +75,7 @@ public class ObservableResource extends ConcurrentCoapResource {
 
 		if (observeField == 1) {
 			Log.info("ObservableResource", "Cancel observe request from " + exchange.getSourcePort()
-			+ " for the resource: " + exchange.advanced().getRequest().getURI());
+					+ " for the resource: " + exchange.advanced().getRequest().getURI());
 			return;
 		}
 		if (sensor.getState().equals(ServerState.UNVAVAILABLE)) {
@@ -102,13 +99,13 @@ public class ObservableResource extends ConcurrentCoapResource {
 		}
 
 		if (DEBUG)
-			Log.debug("ObservableResource", " original MID: "
-					+ server.getObserverState(observerID).getOriginalMID() + " currentMID: " + mid);
+			Log.debug("ObservableResource",
+					" original MID: " + server.getObserverState(observerID).getOriginalMID() + " currentMID: " + mid);
 
 		if (mid == server.getObserverState(observerID).getOriginalMID()) {
 			// This is a notification because the exchange has the same MID of the original
 			// request
-			sendNotification(exchange, sensor, false);
+			sendNotification(exchange, sensor);
 		} else {
 			// The observer is already present but this is not a notification then it is a
 			// request of reregistration
@@ -118,6 +115,7 @@ public class ObservableResource extends ConcurrentCoapResource {
 
 	private void handleRegistration(int priority, String observerID, CoapExchange exchange, SensorNode sensor) {
 		// Registration phase
+		Log.debug("ObservableResource", "Current SensorNode state: " + sensor.getState());
 		if (!server.getObserverState(observerID).isNegotiationState()) {
 			if (priority < 3 && sensor.getState().equals(ServerState.ONLY_CRITICAL)) {
 				// First part of the negotiation, where subject make its proposal
@@ -129,19 +127,19 @@ public class ObservableResource extends ConcurrentCoapResource {
 
 			} else {
 				Log.info("ObservableResource", "Accepting the request from " + exchange.getSourcePort()
-				+ " request without negotiation: " + exchange.getRequestOptions().toString());
+						+ " request without negotiation: " + exchange.getRequestOptions().toString());
 				server.getObserverState(observerID).setOriginalMID(exchange.advanced().getRequest().getMID());
 				if (DEBUG)
 					Log.debug("ObservableResource", "Current SensorData: " + this.data);
-				boolean registrationOk = server.requestRegistration(sensor, getName(),
-						priority > 2 ? true : false);
+				boolean registrationOk = server.requestRegistration(sensor, getName(), priority > 2 ? true : false);
 				if (registrationOk) {
 					// Request accepted without negotiation
 					Log.info("ObservableResource", "Registration done proxy - subject done!");
 					data = server.requestValueCache(sensor, getName());
-					sendNotification(exchange, sensor, true);
+					sendNotification(exchange, sensor);
 				} else {
-					// delete relation
+					Log.error("ObservableResource", "Registration Proxy-Subject failed ( No Negotiation )");
+					exchange.respond(CoAP.ResponseCode.NOT_FOUND);
 				}
 
 			}
@@ -152,25 +150,21 @@ public class ObservableResource extends ConcurrentCoapResource {
 
 			boolean registrationOk = server.requestRegistration(sensor, getName(), priority > 2 ? true : false);
 			if (registrationOk) {
-				// Request accepted without negotiation
 				Log.info("ObservableResource", "Negotiation ended ");
 				data = server.requestValueCache(sensor, getName());
-				sendNotification(exchange, sensor, true);			
+				sendNotification(exchange, sensor);
 			} else {
-				// delete relation
+				Log.error("ObservableResource", "Registration Proxy-Subject failed after a negotiation");
+				exchange.respond(CoAP.ResponseCode.NOT_FOUND);
 			}
-
 		}
 	}
 
-	private void sendNotification(CoapExchange exchange, SensorNode sensor, boolean first) {
+	private void sendNotification(CoapExchange exchange, SensorNode sensor) {
 		double value = data.getValue();
 		exchange.setMaxAge(data.getTime());
-		if (first)
-			exchange.respond(ResponseCode.CONTENT, Double.toString(value));
-		else 
-			exchange.respond(Double.toString(value));
-		Log.info("ObservableResource", "Notification sent to: "
-						+ exchange.getSourcePort() + " | notification: " + value + " | isCritical: " + data.getCritic() );
+		exchange.respond(Double.toString(value));
+		Log.info("ObservableResource", "Notification sent to: " + exchange.getSourcePort() + " | notification: " + value
+				+ " | isCritical: " + data.getCritic());
 	}
 }

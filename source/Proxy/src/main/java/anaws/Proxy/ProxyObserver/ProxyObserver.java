@@ -21,6 +21,7 @@ import org.eclipse.californium.core.server.ServerState;
 
 public class ProxyObserver {
 
+	private final boolean DEBUG = false;
 	private CoapServer proxyObserver;
 
 	private ProxySubject proxySubject;
@@ -28,14 +29,12 @@ public class ProxyObserver {
 	private Map<String, ObserverState> observers;
 	private static Scanner scanner;
 
-	private boolean CLI;
 	private boolean autocomplete;
 
-	public ProxyObserver(boolean CLI, boolean autocomplete) {
+	public ProxyObserver (boolean autocomplete) {
 		this.proxyObserver = new CoapServer();
 		this.observers = new HashMap<String, ObserverState>();
 		this.resourceList = new HashMap<String, ObservableResource>();
-		this.CLI = CLI;
 		this.autocomplete = autocomplete;
 
 		Log.info("ProxyObserver", "Coap Server Started");
@@ -169,21 +168,25 @@ public class ProxyObserver {
 		}
 	}
 
-	synchronized public SensorData requestValueCache(SensorNode sensor, String resourceName) {
+	public SensorData requestValueCache(SensorNode sensor, String resourceName) {
 		SensorData data = proxySubject.getValue(sensor.getUri(), resourceName);
-		Log.debug("ProyObserver", "Requested cached valued received: " + data);
+		if (DEBUG) Log.debug("ProyObserver", "Requested cached valued received: " + data);
 		return data;
 	}
 
 	public boolean requestRegistration(SensorNode sensor, String resourceName, boolean critical) {
-		Log.debug("ProxyObserver", "Requesting registration to proxySubject");
+		if (DEBUG) Log.debug("ProxyObserver", "Requesting registration to proxySubject");
 		return proxySubject.newRegistration(sensor, resourceName, critical);
 	}
 
 	public SensorNode requestSensorNode(String sensorAddress) {
 		return proxySubject.getSensorNode(sensorAddress);
 	}
-
+	
+	public void requestObserveCancel(Registration registration) {
+		if (DEBUG) Log.debug("ProxyObserver", "Requesting observe cancel to proxySubject");
+		proxySubject.removeRegistration(registration);
+	}
 
 	/*******************************
 	 * COMMAND LINE TESTING FUNCTIONS
@@ -302,7 +305,7 @@ public class ProxyObserver {
 	}
 
 	public static void main(String[] args) {
-		ProxyObserver server = new ProxyObserver(true, false);
+		ProxyObserver server = new ProxyObserver(false);
 		scanner = new Scanner(System.in);
 
 		System.out.println("Welcome to the ProxyObserver Command Line Interface");
@@ -347,5 +350,4 @@ public class ProxyObserver {
 			}
 		}
 	}
-
 }

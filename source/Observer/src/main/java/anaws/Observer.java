@@ -16,8 +16,6 @@ import org.eclipse.californium.core.network.config.NetworkConfig;
 
 public class Observer {
 
-	final private boolean DEBUG = true;
-
 	private static Scanner scanner;
 
 	private int portProxy;
@@ -25,6 +23,7 @@ public class Observer {
 	private int requestedPriority;
 	private boolean CLI;
 	private boolean autocomplete;
+	private boolean DEBUG;
 
 	private String ipv6Proxy;
 
@@ -32,16 +31,13 @@ public class Observer {
 	private ArrayList<WebLink> resourceList;
 	private HashMap<String, CoapObserveRelation> relations;
 
-	public Observer(String ipv6Proxy, int portProxy, int port) {
-		this(ipv6Proxy, portProxy, port, false, true);
-	}
-
-	public Observer(String ipv6Proxy, int portProxy, int port, boolean CLI, boolean autocomplete) {
+	public Observer(String ipv6Proxy, int portProxy, int port, boolean CLI, boolean autocomplete, boolean debug) {
 		this.observerCoap = new CoapClient();
 		this.ipv6Proxy = ipv6Proxy;
 		this.portProxy = portProxy;
 		this.CLI = CLI;
 		this.autocomplete = autocomplete;
+		this.DEBUG = debug;
 
 		this.resourceList = new ArrayList<WebLink>();
 		this.relations = new HashMap<String, CoapObserveRelation>();
@@ -135,35 +131,32 @@ public class Observer {
 
 		String URI = "coap://[" + this.ipv6Proxy + "]:" + this.portProxy + path;
 		observeRequest.setURI(URI);
-		if (DEBUG)
-			Log.debug("Observer", "Send Observe request: " + observeRequest.toString());
+		Log.info("Observer", "Request observation of " + path + " with priority " + getPriority(priority));
 		CoapObserveRelation relation = observerCoap.observeAndWait(observeRequest,
-				new ResponseHandler(this, priority, resourceName, URI, true));
+				new ResponseHandler(this, priority, path, URI, true, DEBUG));
 
 		if (relation.isCanceled()) {
-			if (DEBUG)
-				Log.debug("Observer", "Relation is canceled");
+			Log.info("Observer", "Relation has been canceled or the negotiation started");
 		} else
-			relations.put(resourceName, relation);
+			relations.put(path, relation);
 	}
 
 	public void resourceDiscovery() {
-		System.out.print("Discovery...\n");
+		Log.info("Observer", "Start Resource Discovery");
 		Set<WebLink> weblinks = observerCoap.discover();
 		resourceList.clear();
 		resourceList.addAll(weblinks);
-		System.out.println(resourceList.toString());
-
+		Log.info("Observer", "Resources found: " + resourceList.toString());
 	}
 
-	private void resourceCancellation(String resourceName) {
+	private void resourceCancellation(String path) {
 
-		CoapObserveRelation relation = relations.get(resourceName);
+		CoapObserveRelation relation = relations.get(path);
 		if (relation == null) {
-		Log.info("Observer", "Observe relation on " + resourceName + " not found");
+			Log.error("Observer", "Observe relation on " + path + " not found");
 			return;
 		}
-
+		Log.info("Observer", "Proactive cancel of " + path + " sent");
 		relation.proactiveCancel();
 	}
 
@@ -192,19 +185,17 @@ public class Observer {
 		requestedPriority = (int) Math.floor(Math.random() * 4 + 1);
 		String subjectAddress = "";
 		String resourceName = "";
+		String[] input;
 		int priority = 1;
 
 		if (!autocomplete) {
 			try {
 				System.out.print("Requesting an Observe Relations\nSelect a resource:\n");
-				for (int i = 0; i < resourceList.size(); i++) {
-					System.out.println(String.valueOf(i + 1) + ") " + resourceList.get(i));
-				}
-				int index = scanner.nextInt();
-				index -= 1;
-				String[] splitted = splitURI(resourceList.get(index).getURI());
-				subjectAddress = splitted[1];
-				resourceName = splitted[2];
+				input = getPathInput();
+				subjectAddress = input[0];
+				resourceName = input[1];
+				if ( subjectAddress == "" )
+					return;
 				System.out.print("Priority: ");
 				priority = getQoSBits(scanner.nextInt());
 			} catch (InputMismatchException e) {
@@ -223,28 +214,48 @@ public class Observer {
 			System.out.println("Resource not found: " + path);
 			return;
 		}
-		if (DEBUG)
-			System.out.println("Resource found: " + path + " is present into " + resourceList.toString());
 
 		resourceRegistration(resourceName, priority, path);
 	}
 
 	public void resourceCancellationCLI() {
+		String subjectAddress = "";
 		String resourceName = "";
+		String[] input;
 
-		if (!autocomplete) {
-			try {
-				System.out.print("Resource Cancellation\n");
-				System.out.print("Resource Name: ");
-				resourceName = scanner.next();
-			} catch (InputMismatchException e) {
-				System.out.println("Invalid input");
-				scanner.nextLine();
+		System.out.print("Resource Cancellation\nSelect a resource:\n");
+		input = getPathInput();
+		subjectAddress = input[0];
+		resourceName = input[1];
+		String path = "/" + subjectAddress + "/" + resourceName;
+		resourceCancellation(path);
+	}
+
+	private String[] getPathInput() {
+		String[] result = {"", ""};
+		try {
+			ArrayList<WebLink> observableResource = new ArrayList<WebLink>();
+			for ( WebLink w : resourceList )
+				if ( !w.toString().contains("well-known"))
+					observableResource.add(w);
+
+			for (int i = 0; i < observableResource.size(); i++) {
+				System.out.println(String.valueOf(i + 1) + ") " + observableResource.get(i));
 			}
-		} else
-			resourceName = "temperature";
-
-		resourceCancellation(resourceName);
+			int index = scanner.nextInt();
+			index -= 1;
+			if ( index < 0 || index >= observableResource.size() ) {
+				System.out.println("Invalid selected index, please select a value in the interval [1," + observableResource.size() + "]" );
+				return result;
+			}
+			String[] splitted = splitURI(observableResource.get(index).getURI());
+			result[0] = splitted[1];
+			result[1] = splitted[2];
+		} catch (InputMismatchException e) {
+			System.out.println("Invalid input");
+			scanner.nextLine();
+		}
+		return result;
 	}
 
 	public void printHelpMenu() {
@@ -260,6 +271,7 @@ public class Observer {
 
 	public void exit() {
 		clearRelations();
+		this.observerCoap.shutdown();
 		System.out.println("Exiting... Good bye!");
 		System.exit(0);
 	}
@@ -268,8 +280,9 @@ public class Observer {
 		scanner = new Scanner(System.in);
 		boolean CLI = Boolean.parseBoolean(args[3]);
 		boolean autocomplete = Boolean.parseBoolean(args[4]);
+		boolean DEBUG = Boolean.parseBoolean(args[5]);
 		Observer observerClient = new Observer(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]), CLI,
-				autocomplete);
+				autocomplete, DEBUG);
 
 		System.out.println("Welcome to the Observer's Command Line Interface");
 		observerClient.printHelpMenu();

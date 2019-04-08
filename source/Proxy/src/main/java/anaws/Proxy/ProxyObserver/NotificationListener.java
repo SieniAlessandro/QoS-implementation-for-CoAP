@@ -1,10 +1,7 @@
 package anaws.Proxy.ProxyObserver;
 
-import java.sql.Timestamp;
-
 import anaws.Proxy.Log;
 import anaws.Proxy.ProxySubject.Registration;
-import anaws.Proxy.ProxySubject.SensorData;
 import anaws.Proxy.ProxySubject.SensorNode;
 
 public class NotificationListener extends Thread {
@@ -20,7 +17,7 @@ public class NotificationListener extends Thread {
 	public void run() {
 		SensorNode sensor = registration.getSensorNode();
 		String resourceName = registration.getType();
-		Log.info("ProxyObserver", "Notification Listener of resource " + sensor.getUri() + "/" + resourceName + " started" );
+		Log.info("NotificationListener", "Notification Listener of resource " + sensor.getUri() + "/" + resourceName + " started" );
 		while (true) {
 			try {
 				synchronized (registration) {
@@ -29,8 +26,9 @@ public class NotificationListener extends Thread {
 
 				ObservableResource resource = proxyObserver.getResource(sensor, resourceName);
 				if (resource.getObserverCount() == 0) {
-					Log.info("ProxyObserver", "No Observe Relations on this resource");
-					continue;
+					Log.info("NotificationListener", "No Observe Relations on this resource");
+					proxyObserver.requestObserveCancel(registration);
+					break;
 				}
 				proxyObserver.resourceChanged(sensor, resourceName);
 

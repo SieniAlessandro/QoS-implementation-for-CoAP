@@ -1,7 +1,5 @@
 package anaws.Proxy.ProxySubject;
 
-import java.net.InetAddress;
-
 import org.eclipse.californium.core.*;
 import org.eclipse.californium.core.coap.*;
 import org.eclipse.californium.core.coap.CoAP.Code;
