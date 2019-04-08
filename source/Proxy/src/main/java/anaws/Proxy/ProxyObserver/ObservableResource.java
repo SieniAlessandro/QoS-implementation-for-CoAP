@@ -138,8 +138,7 @@ public class ObservableResource extends ConcurrentCoapResource {
 				if (registrationOk) {
 					// Request accepted without negotiation
 					Log.info("ObservableResource", "Registration done proxy - subject done!");
-					while( data == null)
-						data = server.requestValueCache(sensor, getName());
+					data = server.requestValueCache(sensor, getName());
 					sendNotification(exchange, sensor, true);
 				} else {
 					// delete relation
@@ -155,8 +154,7 @@ public class ObservableResource extends ConcurrentCoapResource {
 			if (registrationOk) {
 				// Request accepted without negotiation
 				Log.info("ObservableResource", "Negotiation ended ");
-				while( data == null)
-					data = server.requestValueCache(sensor, getName());
+				data = server.requestValueCache(sensor, getName());
 				sendNotification(exchange, sensor, true);			
 			} else {
 				// delete relation

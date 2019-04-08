@@ -31,12 +31,12 @@ public class CacheTable{
 			//In this case there isn't any value and so the new value is appended
 			System.out.println("Inserimento nuovo valore nella cache");
 			cache.add(data);
+			notifyAll();
 			return true;
 		}
 		//Otherwise the old value is updated 
 		System.out.println("Aggiornamento vecchio valore");
 		old.updateValue(data.getValue(),data.getTime(),data.getCritic());
-		//RIMBALZA(SENSORDATA) AMEDEO
 		return false;
 	}
 	synchronized private void removeData(SensorData data){
@@ -51,6 +51,16 @@ public class CacheTable{
 		return null;
 	}
 	synchronized public SensorData getData(String resource,String type) {
+		SensorData sd;
+		while((sd = searchData(resource,type)) == null)
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		return sd;
+	}
+	synchronized public SensorData searchData(String resource,String type) {
 		for (SensorData sd : cache) {
 			if(sd.getRegistration().getSensorNode().getUri().equals(resource) && sd.getRegistration().getType().contentEquals(type)){
 				if(sd.getTime() <= this.THRESHOLD)
@@ -59,8 +69,7 @@ public class CacheTable{
 					return sd;
 			}
 		}
-		return null;
-		
+		return null;		
 	}
 	synchronized public int countRegistration(Registration r){
 		int ret = 0;
