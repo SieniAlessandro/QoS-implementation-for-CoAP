@@ -6,10 +6,10 @@ import org.eclipse.californium.core.server.ServerState;
 
 public class SensorNode{
 
-	String IPaddress;
-	int Port;
-	double battery;
-	ServerState actualState;
+	volatile String IPaddress;
+	volatile int Port;
+	volatile double battery;
+	volatile ServerState actualState;
 	ArrayList<String> resources;
 	
 	public SensorNode(String address,int port){
@@ -36,7 +36,7 @@ public class SensorNode{
 	}
 	public ArrayList<String> getResources() {return this.resources;}
 	
-	public ServerState updateBattery(double newBatteryValue) {
+	synchronized public ServerState updateBattery(double newBatteryValue) {
 		System.out.println("Aggiornamento Valore Batteria");
 		battery = newBatteryValue;
 		if(battery <= 30)
@@ -49,7 +49,7 @@ public class SensorNode{
 	
 	public String getAddress() {return this.IPaddress;}
 	public int getPort() {return this.Port;}
-	public ServerState getState(){return actualState;}
+	synchronized public ServerState getState(){return actualState;}
 	public String getUri(){
 		return "["+IPaddress+"]:"+Integer.toString(Port);
 	}

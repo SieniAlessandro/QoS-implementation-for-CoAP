@@ -1,6 +1,7 @@
 package anaws.Proxy.ProxySubject;
 
 import java.util.ArrayList;
+import java.util.concurrent.*;
 
 public class SensorList {
 	ArrayList<SensorNode> sensors;
