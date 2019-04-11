@@ -25,15 +25,15 @@ public class Observer {
 	private boolean autocomplete;
 	private boolean DEBUG;
 
-	private String ipv6Proxy;
+	private String ipv4Proxy;
 
 	private CoapClient observerCoap;
 	private ArrayList<WebLink> resourceList;
 	private HashMap<String, CoapObserveRelation> relations;
 
-	public Observer(String ipv6Proxy, int portProxy, int port, boolean CLI, boolean autocomplete, boolean debug) {
+	public Observer(String ipv4Proxy, int portProxy, int port, boolean CLI, boolean autocomplete, boolean debug) {
 		this.observerCoap = new CoapClient();
-		this.ipv6Proxy = ipv6Proxy;
+		this.ipv4Proxy = ipv4Proxy;
 		this.portProxy = portProxy;
 		this.CLI = CLI;
 		this.autocomplete = autocomplete;
@@ -41,7 +41,7 @@ public class Observer {
 
 		this.resourceList = new ArrayList<WebLink>();
 		this.relations = new HashMap<String, CoapObserveRelation>();
-		this.observerCoap.setURI("coap://[" + this.ipv6Proxy + "]:" + this.portProxy);
+		this.observerCoap.setURI("coap://" + this.ipv4Proxy + ":" + this.portProxy);
 
 		this.id = port;
 
@@ -129,7 +129,8 @@ public class Observer {
 			System.out.println("Invalid Priority Level");
 		}
 
-		String URI = "coap://[" + this.ipv6Proxy + "]:" + this.portProxy + path;
+		String URI = "coap://" + this.ipv4Proxy + ":" + this.portProxy + path;
+		Log.info("sdad", URI);
 		observeRequest.setURI(URI);
 		Log.info("Observer", "Request observation of " + path + " with priority " + getPriority(priority));
 		CoapObserveRelation relation = observerCoap.observeAndWait(observeRequest,
