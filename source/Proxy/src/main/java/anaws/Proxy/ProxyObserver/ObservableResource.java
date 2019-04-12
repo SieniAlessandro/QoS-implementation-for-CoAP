@@ -1,6 +1,7 @@
 package anaws.Proxy.ProxyObserver;
 
 
+import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.Option;
 import org.eclipse.californium.core.coap.OptionNumberRegistry;
@@ -16,9 +17,9 @@ import anaws.Proxy.ProxySubject.SensorNode;
 
 import org.eclipse.californium.core.server.ServerState;
 
-public class ObservableResource extends ConcurrentCoapResource {
+public class ObservableResource extends CoapResource {
 
-	final private static int THREAD_POOL_SIZE = 2;
+//	final private static int THREAD_POOL_SIZE = 2;
 
 	final private boolean DEBUG = false;
 	final private int PROPOSAL = CoAP.QoSLevel.CRITICAL_HIGH_PRIORITY;
@@ -26,6 +27,8 @@ public class ObservableResource extends ConcurrentCoapResource {
 	private ProxyObserver server;
 	private SensorData data;
 	private String sensorAddress;
+	
+	private int seqnum;
 
 	public SensorData getSensorData() {
 		return data;
@@ -36,12 +39,14 @@ public class ObservableResource extends ConcurrentCoapResource {
 	}
 
 	public ObservableResource(String name, ProxyObserver server, String sensorAddress) {
-		super(name, THREAD_POOL_SIZE);
+//		super(name, THREAD_POOL_SIZE);
+		super(name);
 		this.setObservable(true);
 		this.setObserveType(Type.CON);
 		this.setVisible(true);
 		this.server = server;
 		this.sensorAddress = sensorAddress;
+		this.seqnum = 0;
 	}
 
 	public int getPriority(int priority) throws IllegalArgumentException {
@@ -162,9 +167,11 @@ public class ObservableResource extends ConcurrentCoapResource {
 
 	private void sendNotification(CoapExchange exchange, SensorNode sensor) {
 		double value = data.getValue();
+//		exchange.advanced().getResponse().setOptions( new OptionSet().addOption(new Option(OptionNumberRegistry.OBSERVE, seqnum)));
 		exchange.setMaxAge(data.getTime());
 		exchange.respond(Double.toString(value));
 		Log.info("ObservableResource", "Notification sent to: " + exchange.getSourcePort() + " | notification: " + value
 				+ " | isCritical: " + data.getCritic());
+		seqnum++;
 	}
 }

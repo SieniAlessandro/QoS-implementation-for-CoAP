@@ -46,14 +46,21 @@ public class Registrator{
 	}
 	synchronized private int RegistrationNeeded(Registration _r){
 		for (Registration r: reg){
-			if(r.equals(_r))
+			if(r.equals(_r)) {
+				Log.debug("Registrato", "Registration identical to another");
 				return 0;
+			}
 			else if(r.getSensorNode().toString().equals(_r.getSensorNode().toString())) {
 				if(r.getType() == _r.getType()) {
-					if((_r.isCritic() == false && r.isCritic() == true))
+					if((_r.isCritic() == false && r.isCritic() == true)) {
+						Log.debug("Registrator", "Registration equal except for the new critic");
 						return 2;
-					else if (r.isCritic() == _r.isCritic() || _r.isCritic() == true && _r.isCritic() == false)
+					}
+					else if (r.isCritic() == _r.isCritic() || _r.isCritic() == true && _r.isCritic() == false) {
+						Log.debug("Registrato", "Registrator equal and the new critic is not sufficient to re register");
 						return 0;
+						
+					}
 				}
 			}
 		}
@@ -72,13 +79,13 @@ public class Registrator{
 		if(reg.contains(_r)) {
 			reg.remove(_r);
 			_r.sendCancelation();
+			synchronized(_r) {
+				_r.notify();
+			}
 			Log.info("Registrator", "Registration requested removed");
 		}
 		else {
 			Log.info("Registrator", "Registration requested not found");
 		}
-		
-		
-
 	}
 }

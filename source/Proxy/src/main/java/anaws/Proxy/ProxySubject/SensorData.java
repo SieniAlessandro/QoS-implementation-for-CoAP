@@ -4,10 +4,10 @@ package anaws.Proxy.ProxySubject;
 
 public class SensorData{
 
-	double value;
-	long maxAge;
-	boolean critic;
-	Registration registration;
+	volatile double value;
+	volatile long maxAge;
+	volatile boolean critic;
+	volatile Registration registration;
 
 	public SensorData(Registration registration, double value,long maxAge,boolean isCritic){
 		this.registration = registration;

@@ -21,10 +21,10 @@ import org.eclipse.californium.core.server.ServerState;
 
 public class ProxyObserver {
 
-	private final boolean DEBUG = false;
+	private final boolean DEBUG = true;
 	private CoapServer proxyObserver;
 
-	private ProxySubject proxySubject;
+	private volatile ProxySubject proxySubject;
 	private Map<String, ObservableResource> resourceList;
 	private Map<String, ObserverState> observers;
 	private static Scanner scanner;
@@ -79,7 +79,7 @@ public class ProxyObserver {
 		SensorData data = requestValueCache(sensor, resourceName);
 		boolean isCritical = data.getCritic();
 		ObservableResource resource = getResource(sensor, resourceName);
-		Log.info("ProxyObserver", "" + sensor.getUri() + "/" + resourceName + " changed, isCritical: " + data.getCritic() +  ". Current observers: " + resource.getObserverCount());
+		Log.info("ProxyObserver", "" + sensor.getUri() + "/" + resourceName + " changed, isCritical: " + data.getCritic() + ". Value: " + data.getValue() +  ". Current observers: " + resource.getObserverCount());
 
 		updateResource(sensor, resourceName, data);
 		if (!isCritical)

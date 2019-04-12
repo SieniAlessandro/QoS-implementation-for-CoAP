@@ -13,7 +13,7 @@ public class Log {
     public static final String ANSI_WHITE = "\u001B[37m";
     
 	public static void debug(String module,String text) {
-		System.out.println(" [ "+new Timestamp(System.currentTimeMillis())+" ] "+" [ "+module+" ] "+" [ " + ANSI_CYAN + " DEBUG " + ANSI_RESET + "] "+text);
+		System.out.println(" [ "+new Timestamp(System.currentTimeMillis())+" ] "+" [ "+module+" ] "+" [ " + ANSI_YELLOW + " DEBUG " + ANSI_RESET + "] "+text);
 	}
 	public static void info(String module,String text) {
 		System.out.println(" [ "+new Timestamp(System.currentTimeMillis())+" ] "+ " [ "+module+" ] "+" [ " + ANSI_GREEN + " INFO " + ANSI_RESET + "] "+text);

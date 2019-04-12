@@ -21,7 +21,6 @@ public class Observer {
 	private int portProxy;
 	private int id;
 	private int requestedPriority;
-	private boolean CLI;
 	private boolean autocomplete;
 	private boolean DEBUG;
 
@@ -31,11 +30,10 @@ public class Observer {
 	private ArrayList<WebLink> resourceList;
 	private HashMap<String, CoapObserveRelation> relations;
 
-	public Observer(String ipv4Proxy, int portProxy, int port, boolean CLI, boolean autocomplete, boolean debug) {
+	public Observer(String ipv4Proxy, int portProxy, int port, boolean autocomplete, boolean debug) {
 		this.observerCoap = new CoapClient();
 		this.ipv4Proxy = ipv4Proxy;
 		this.portProxy = portProxy;
-		this.CLI = CLI;
 		this.autocomplete = autocomplete;
 		this.DEBUG = debug;
 
@@ -55,10 +53,6 @@ public class Observer {
 
 	public int getId() {
 		return id;
-	}
-
-	public boolean isCLI() {
-		return CLI;
 	}
 
 	public int getRequestedPriority() {
@@ -195,7 +189,7 @@ public class Observer {
 				input = getPathInput();
 				subjectAddress = input[0];
 				resourceName = input[1];
-				if ( subjectAddress == "" )
+				if (subjectAddress == "")
 					return;
 				System.out.print("Priority: ");
 				priority = getQoSBits(scanner.nextInt());
@@ -233,11 +227,11 @@ public class Observer {
 	}
 
 	private String[] getPathInput() {
-		String[] result = {"", ""};
+		String[] result = { "", "" };
 		try {
 			ArrayList<WebLink> observableResource = new ArrayList<WebLink>();
-			for ( WebLink w : resourceList )
-				if ( !w.toString().contains("well-known"))
+			for (WebLink w : resourceList)
+				if (!w.toString().contains("well-known"))
 					observableResource.add(w);
 
 			for (int i = 0; i < observableResource.size(); i++) {
@@ -245,8 +239,9 @@ public class Observer {
 			}
 			int index = scanner.nextInt();
 			index -= 1;
-			if ( index < 0 || index >= observableResource.size() ) {
-				System.out.println("Invalid selected index, please select a value in the interval [1," + observableResource.size() + "]" );
+			if (index < 0 || index >= observableResource.size()) {
+				System.out.println("Invalid selected index, please select a value in the interval [1,"
+						+ observableResource.size() + "]");
 				return result;
 			}
 			String[] splitted = splitURI(observableResource.get(index).getURI());
@@ -279,46 +274,42 @@ public class Observer {
 
 	public static void main(String[] args) {
 		scanner = new Scanner(System.in);
-		boolean CLI = Boolean.parseBoolean(args[3]);
-		boolean autocomplete = Boolean.parseBoolean(args[4]);
-		boolean DEBUG = Boolean.parseBoolean(args[5]);
-		Observer observerClient = new Observer(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]), CLI,
+		boolean autocomplete = Boolean.parseBoolean(args[3]);
+		boolean DEBUG = Boolean.parseBoolean(args[4]);
+		Observer observerClient = new Observer(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]),
 				autocomplete, DEBUG);
 
 		System.out.println("Welcome to the Observer's Command Line Interface");
 		observerClient.printHelpMenu();
-		if (observerClient.isCLI()) {
-			if (observerClient.autocomplete)
-				observerClient.resourceRegistrationCLI();
-			while (true) {
-				try {
-					System.out.print("Observer # " + Integer.parseInt(args[2]) + "> ");
-					switch (scanner.nextInt()) {
-					case 1:
-						observerClient.printHelpMenu();
-						break;
-					case 2:
-						observerClient.resourceRegistrationCLI();
-						break;
-					case 3:
-						observerClient.resourceCancellationCLI();
-						break;
-					case 4:
-						observerClient.resourceDiscovery();
-						break;
-					case 5:
-						observerClient.exit();
-						break;
-					default:
-						continue;
-					}
-				} catch (InputMismatchException e) {
-					System.out.println("Invalid command");
-					scanner.nextLine();
-				}
-			}
-		} else {
+		if (observerClient.autocomplete)
 			observerClient.resourceRegistrationCLI();
+		while (true) {
+			try {
+				System.out.print("Observer # " + Integer.parseInt(args[2]) + "> ");
+				switch (scanner.nextInt()) {
+				case 1:
+					observerClient.printHelpMenu();
+					System.out.print("Observer # " + Integer.parseInt(args[2]) + "> ");
+					break;
+				case 2:
+					observerClient.resourceRegistrationCLI();
+					break;
+				case 3:
+					observerClient.resourceCancellationCLI();
+					break;
+				case 4:
+					observerClient.resourceDiscovery();
+					break;
+				case 5:
+					observerClient.exit();
+					break;
+				default:
+					continue;
+				}
+			} catch (InputMismatchException e) {
+				System.out.println("Invalid command");
+				scanner.nextLine();
+			}
 		}
 	}
 

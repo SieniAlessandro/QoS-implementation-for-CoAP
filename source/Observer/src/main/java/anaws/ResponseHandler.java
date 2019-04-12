@@ -1,5 +1,9 @@
 package anaws;
 
+import java.sql.Timestamp;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.eclipse.californium.core.CoapHandler;
 import org.eclipse.californium.core.CoapObserveRelation;
 import org.eclipse.californium.core.CoapResponse;
@@ -19,7 +23,8 @@ public class ResponseHandler implements CoapHandler {
 	private String URI;
 	private boolean acceptProposal;
 
-	public ResponseHandler(Observer observer, int priority, String path, String URI, boolean acceptProposal, boolean debug) {
+	public ResponseHandler(Observer observer, int priority, String path, String URI, boolean acceptProposal,
+			boolean debug) {
 		this.observer = observer;
 		this.priority = priority;
 		this.path = path;
@@ -43,7 +48,7 @@ public class ResponseHandler implements CoapHandler {
 			onError();
 			return;
 		}
-		
+
 		if (response.getCode().equals(CoAP.ResponseCode.NOT_FOUND)) {
 			Log.error("Observer " + observer.getId(),
 					"Proxy couldn't establish an observe relation with the subject: " + response.getCode());
@@ -62,11 +67,14 @@ public class ResponseHandler implements CoapHandler {
 		// notification
 		if (response.getCode().equals(CoAP.ResponseCode.CONTENT)) {
 			// Observe relation accepted without negotiation or a notification arrived
-			Log.info("Observer " + observer.getId(), "New notification of " + path + " with value: " + response.getResponseText());
-			if (DEBUG) Log.debug("Response Handler", response.advanced().toString());
+			Log.info("Observer " + observer.getId(),
+					"New notification of " + path + " with value: " + response.getResponseText());
+			if (DEBUG)
+				Log.debug("Response Handler", response.advanced().toString());
 			return;
 		} else if (response.getCode().equals(CoAP.ResponseCode.NOT_ACCEPTABLE) && acceptProposal) {
-			Log.info("Observer " + observer.getId(), "Negotiation started, subject proposes the following priority: " + response.getOptions());
+			Log.info("Observer " + observer.getId(),
+					"Negotiation started, subject proposes the following priority: " + response.getOptions());
 			// Subject started the negotiation, observer need to accept it
 			Request observeRequest = new Request(Code.GET);
 			observeRequest.setObserve();
@@ -86,5 +94,26 @@ public class ResponseHandler implements CoapHandler {
 	public void onError() {
 		observer.getRelations().remove(path);
 	}
+	
+//	private void writeCSVData(String path, double value, String resourceName, ) {
+//		// timestamp, ipSensore, valore ricevuto, nome risorsa, critico, observeDellaNotifica
+//		String ipSensor = path.replace("[", "");
+//		ipSensor = ipSensor.replace("]", "").split(":")[0];
+//		String[] data = { new Timestamp(System.currentTimeMillis()).toString(), ipSensor,   
+//	}
+//
+//	private String escapeSpecialCharacters(String data) {
+//	    String escapedData = data.replaceAll("\\R", " ");
+//	    if (data.contains(",") || data.contains("\"") || data.contains("'")) {
+//	        data = data.replace("\"", "\"\"");
+//	        escapedData = "\"" + data + "\"";
+//	    }
+//	    return escapedData;
+//	}
+//	
+//	private String convertToCSV(String[] data) {
+//		return Stream.of(data).map(this::escapeSpecialCharacters).collect(Collectors.joining(","));
+//	}
 
+	
 }

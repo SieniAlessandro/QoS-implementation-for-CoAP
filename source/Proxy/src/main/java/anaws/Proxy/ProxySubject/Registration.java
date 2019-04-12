@@ -18,6 +18,7 @@ public class Registration{
 	CoapObserveRelation coapRelation;
 	ProxyObserver observer;
 	boolean firstValue;
+	boolean cancellata;
 	
 	public Registration(CacheTable _cache,SensorNode _sensor,String _type,boolean _critic,ProxyObserver observer,CoapClient coap){
 		this.cache = _cache; 
@@ -27,6 +28,7 @@ public class Registration{
 		this.coapClient = new CoapClient();
 		this.observer = observer;
 		this.firstValue = true;
+		this.cancellata = false;
 	}
 	public Registration(CacheTable _cache,SensorNode _sensor,String _type,boolean _critic,CoapClient coap){
 		this.cache = _cache; 
@@ -35,7 +37,7 @@ public class Registration{
 		critic = _critic;
 		this.coapClient = coap;
 		this.firstValue = true;
-
+		this.cancellata = false;
 	}
 	public boolean register() {
 		return this.resourceRegistration(this.sensor.getAddress(),this.sensor.getPort(),(this.critic == true)?CoAP.QoSLevel.CRITICAL_HIGH_PRIORITY:CoAP.QoSLevel.NON_CRITICAL_LOW_PRIORITY, this.type);
@@ -72,6 +74,8 @@ public class Registration{
 	public boolean isCanceled() {
 		return coapRelation.isCanceled();
 	}
+	
+	
 	public SensorNode getSensorNode() { return sensor; }
 	public String getType() { return type; }
 	public boolean isCritic() { return critic; }
@@ -86,7 +90,14 @@ public class Registration{
     	if(obj == null || obj.getClass()!= this.getClass())
       	return false;
     	Registration s = (Registration) obj;
-    	return (this.sensor.equals(s.sensor) && this.type.equals(s.getType()) && this.critic == s.isCritic());
-  	}	
+    	return (this.sensor.equals(s.sensor) && this.type.equals(s.getType()));
+  	}
+	public void setCanceled() {
+		this.cancellata = true;
+	}	
+	
+	public boolean isCancellata() {
+		return this.cancellata;
+	}
 
 }

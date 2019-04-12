@@ -14,7 +14,7 @@ public class ProxySubject{
 	
 	ProxyObserver proxyObserver;
 	Registrator registrator;
-	CacheTable cache;
+	volatile CacheTable cache;
 	CoapClient coapClient;
 	SensorList sensors;
 	
@@ -25,7 +25,7 @@ public class ProxySubject{
 		this.coapClient = new CoapClient();
 		this.sensors = new SensorList();
 		new Updater(this.cache, this.registrator).start();
-		for (int i = 2; i <= this.NUMBER_SENSORS+1;i++)
+		for (int i = 1; i <= this.NUMBER_SENSORS;i++)
 			prepareResources("fd00::c30c:0:0:"+i,5683);
 		this.sensors.printSensors();
 		// Registration for the battery information
@@ -41,6 +41,7 @@ public class ProxySubject{
 			proxyObserver.startNotificationListener(r);
 		} else if(result == 2) {
 			cache.updateRegistrations(r);
+			proxyObserver.startNotificationListener(r);
 		}
 		else if(result == -1){
 			this.proxyObserver.clearObservation(sensor, type);

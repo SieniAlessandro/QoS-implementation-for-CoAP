@@ -52,9 +52,9 @@ public class ResponseHandler implements CoapHandler {
 				critic = false;
 				Value = Double.valueOf(Message);
 			}
-			System.out.println("Ricevuto nuovo valore: " + Value);
+			Log.info("ResponseHandler", "Ricevuto nuovo valore: " + Value );
 			SensorData newData = new SensorData(this.registration,Value,maxAge,critic);
-			cache.insertData(newData);
+			boolean res = cache.insertData(newData);
 			if(this.registration.isFirstValue() == true) {
 				//In this case the only thing to do is to set firstValue at false
 				this.registration.firstValueReceived();				
@@ -65,6 +65,8 @@ public class ResponseHandler implements CoapHandler {
 					this.registration.notify();
 				}
 			}
+			Log.info("ResponseHandler", "Inserito nuovo valore: " + cache.getData(this.registration.getSensorNode().getUri(), this.registration.getType() ).getValue() + " ritorno inserimento: " + res );
+
 		}
 		
 	}
