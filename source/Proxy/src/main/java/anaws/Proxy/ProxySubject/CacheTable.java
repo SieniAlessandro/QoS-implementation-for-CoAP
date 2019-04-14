@@ -44,7 +44,7 @@ public class CacheTable{
 	}
 	synchronized public SensorData findSensorData(Registration r){
 		for(SensorData c : cache){
-			if(c.getRegistration().equals(r))
+			if(c.getRegistration().isAssociated(r))
 				return c;
 		}
 		return null;

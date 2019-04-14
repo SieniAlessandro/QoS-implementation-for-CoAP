@@ -73,6 +73,10 @@ public class Registration{
 	public boolean isFirstValue() {return this.firstValue;}
 	public void firstValueReceived() { this.firstValue = false;}
 
+	public boolean isAssociated(Registration registration) {
+		return (this.sensor.equals(registration.sensor) && this.type.equals(registration.getType()));
+	}
+	
 	@Override
 	public boolean equals(Object obj)
   	{
@@ -81,7 +85,7 @@ public class Registration{
     	if(obj == null || obj.getClass()!= this.getClass())
       	return false;
     	Registration s = (Registration) obj;
-    	return (this.sensor.equals(s.sensor) && this.type.equals(s.getType()));
+    	return (this.sensor.equals(s.sensor) && this.type.equals(s.getType()) && this.critic == s.isCritic());
   	}
 	public void setCanceled() {
 		this.cancellata = true;
