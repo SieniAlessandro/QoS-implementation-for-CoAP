@@ -55,6 +55,14 @@ public class ResponseHandler implements CoapHandler {
 			onError();
 			return;
 		}
+		
+		if (response.getCode().equals(CoAP.ResponseCode.FORBIDDEN)) {
+			Log.error("Observer " + observer.getId(),
+					"Observe Relation has been canceled because the subject cannot handle it anymore, please ask for only critical notification: " + response.getCode());
+			onError();
+			return;
+		}
+		
 
 		if (!response.getOptions().hasObserve()) {
 			Log.error("Observer " + observer.getId(), "No observe option found ");
@@ -95,11 +103,11 @@ public class ResponseHandler implements CoapHandler {
 		observer.getRelations().remove(path);
 	}
 	
-//	private void writeCSVData(String path, double value, String resourceName, ) {
+//	private void writeCSVData(String path, double value, String resourceName ) {
 //		// timestamp, ipSensore, valore ricevuto, nome risorsa, critico, observeDellaNotifica
 //		String ipSensor = path.replace("[", "");
 //		ipSensor = ipSensor.replace("]", "").split(":")[0];
-//		String[] data = { new Timestamp(System.currentTimeMillis()).toString(), ipSensor,   
+//		String[] data = { new Timestamp(System.currentTimeMillis()).toString(), ipSensor, value, 
 //	}
 //
 //	private String escapeSpecialCharacters(String data) {
@@ -115,5 +123,4 @@ public class ResponseHandler implements CoapHandler {
 //		return Stream.of(data).map(this::escapeSpecialCharacters).collect(Collectors.joining(","));
 //	}
 
-	
 }

@@ -30,15 +30,6 @@ public class Registration{
 		this.firstValue = true;
 		this.cancellata = false;
 	}
-	public Registration(CacheTable _cache,SensorNode _sensor,String _type,boolean _critic,CoapClient coap){
-		this.cache = _cache; 
-		this.sensor = _sensor;
-		this.type = _type;
-		critic = _critic;
-		this.coapClient = coap;
-		this.firstValue = true;
-		this.cancellata = false;
-	}
 	public boolean register() {
 		return this.resourceRegistration(this.sensor.getAddress(),this.sensor.getPort(),(this.critic == true)?CoAP.QoSLevel.CRITICAL_HIGH_PRIORITY:CoAP.QoSLevel.NON_CRITICAL_LOW_PRIORITY, this.type);
 	}	

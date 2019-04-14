@@ -25,7 +25,7 @@ public class ProxySubject{
 		this.coapClient = new CoapClient();
 		this.sensors = new SensorList();
 		new Updater(this.cache, this.registrator).start();
-		for (int i = 1; i <= this.NUMBER_SENSORS;i++)
+		for (int i = 2; i <= this.NUMBER_SENSORS+1;i++)
 			prepareResources("fd00::c30c:0:0:"+i,5683);
 		this.sensors.printSensors();
 		// Registration for the battery information
@@ -35,13 +35,13 @@ public class ProxySubject{
 	}
 	public boolean newRegistration(SensorNode sensor,String type,boolean critic){
 		Log.info("ProxySubject", "Request for new registration");
-		Registration r = new Registration(this.cache,sensor,type,critic,coapClient);
+		Registration r = new Registration(this.cache,sensor,type,critic, proxyObserver, coapClient);
 		int result = registrator.newRegistration(r);
 		if ( result == 1 ) {
-			proxyObserver.startNotificationListener(r);
+			Log.info("PorxySubject", "New registration done");
 		} else if(result == 2) {
 			cache.updateRegistrations(r);
-			proxyObserver.startNotificationListener(r);
+			Log.info("PorxySubject", "Registration updated");
 		}
 		else if(result == -1){
 			this.proxyObserver.clearObservation(sensor, type);
@@ -60,13 +60,12 @@ public class ProxySubject{
 		a.addAll((Set<WebLink>)coapClient.discover());
 		boolean first = true;
 		for (WebLink x : a) {
-			if(x.getURI().contains("/sensors/")) {
-				String resourceName = x.getURI().substring(9);
-				s.addResource(x.getURI().substring(9));
-				if(!x.getURI().contains("battery")) {
-					proxyObserver.addResource(s, resourceName, first);
-					first = false;
-				}
+			String uri = x.getURI();
+			String resourceName = uri.substring(9);
+			if(uri.contains("/sensors/") && !uri.contains("battery") ) {
+				s.addResource(resourceName);
+				proxyObserver.addResource(s, resourceName, first);
+				first = false;
 			}
 		}
 		this.sensors.addSensor(s);

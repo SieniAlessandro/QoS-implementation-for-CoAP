@@ -7,7 +7,7 @@ public class Proxy
 {
     public static void main( String[] args )
     {
-    	ProxyObserver proxyObserver = new ProxyObserver(false);
+    	ProxyObserver proxyObserver = new ProxyObserver();
     	
     	ProxySubject proxySubject = new ProxySubject(proxyObserver);
     	proxyObserver.addProxySubject(proxySubject);

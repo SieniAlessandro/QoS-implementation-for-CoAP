@@ -124,7 +124,6 @@ public class Observer {
 		}
 
 		String URI = "coap://" + this.ipv4Proxy + ":" + this.portProxy + path;
-		Log.info("sdad", URI);
 		observeRequest.setURI(URI);
 		Log.info("Observer", "Request observation of " + path + " with priority " + getPriority(priority));
 		CoapObserveRelation relation = observerCoap.observeAndWait(observeRequest,

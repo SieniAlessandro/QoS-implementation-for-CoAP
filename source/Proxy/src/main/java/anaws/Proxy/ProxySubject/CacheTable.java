@@ -4,13 +4,12 @@ import java.util.*;
 
 import anaws.Proxy.Log;
 
-
 public class CacheTable{
 	private static final long THRESHOLD = 0;
 	ArrayList<SensorData> cache;
 	public CacheTable(){
 		cache = new ArrayList<SensorData>();
-		System.out.println("CacheTable: Creata tabella cache");
+		Log.info("CacheTable", "Cache Table created");
 	}
 	synchronized public ArrayList<Registration> updateTime(int time){
 		ArrayList<Registration> toDelete = new ArrayList<Registration>();
@@ -27,20 +26,15 @@ public class CacheTable{
 		return toDelete;
 	}
 	synchronized public boolean insertData(SensorData data){
-		Log.debug("CacheTable","New value to be inserted:  " + data.getValue());
 		SensorData old = findSensorData(data.getRegistration());
 		// Checking if there is an old data with the same type and coming from the same sensor
 		if(old == null){
 			//In this case there isn't any value and so the new value is appended
-			//System.out.println("Inserimento nuovo valore nella cache");
-			Log.debug("CacheTable", "New value inserted");
 			cache.add(data);
 			notifyAll();
 			return true;
 		}
 		//Otherwise the old value is updated 
-		//System.out.println("Aggiornamento vecchio valore");
-		Log.debug("CacheTable", "Updating old value");
 		old.updateValue(data.getValue(),data.getTime(),data.getCritic());
 		return false;
 	}
@@ -64,15 +58,9 @@ public class CacheTable{
 				e.printStackTrace();
 			}
 		}
-//		Log.debug("CacheTable", "VALORE APPENA LETTO IN CACHE: " + sd.getValue());
 		return sd;
 	}
 	synchronized public SensorData searchData(String resource,String type) {
-		int i = 0;
-		for (SensorData sd : cache) {
-			Log.debug("CacheTable", i + ") VALORE APPENA LETTO IN CACHE: " + sd.getValue());
-			i++;
-		}
 		for (SensorData sd : cache) {
 			if(sd.getRegistration().getSensorNode().getUri().equals(resource) && sd.getRegistration().getType().contentEquals(type)){
 				if(sd.getTime() <= this.THRESHOLD)

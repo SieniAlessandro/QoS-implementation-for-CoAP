@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 import org.eclipse.californium.core.server.ServerState;
 
+import anaws.Proxy.Log;
+import anaws.Proxy.ProxyObserver.ProxyObserver;
+
 public class SensorNode{
 
 	volatile String IPaddress;
@@ -32,17 +35,28 @@ public class SensorNode{
 			if(s.equals(resource))
 				return;
 		}
+		Log.debug("SensorNode", "Adding resource: " + resource);
 		this.resources.add(resource);
 	}
 	public ArrayList<String> getResources() {return this.resources;}
 	
-	synchronized public ServerState updateBattery(double newBatteryValue) {
-		System.out.println("Aggiornamento Valore Batteria");
+	synchronized public ServerState updateBattery(double newBatteryValue, ProxyObserver po) {
 		battery = newBatteryValue;
-		if(battery <= 30)
-			actualState = ServerState.ONLY_CRITICAL;
-		else if(battery <= 0) 
-			actualState = ServerState.UNVAVAILABLE;
+		if(battery <= 30)  {
+			if(battery <= 0) {
+				Log.info("SensorNode", "Sensor Dead");
+				actualState = ServerState.UNVAVAILABLE;
+			} else {
+				actualState = ServerState.ONLY_CRITICAL;
+				Log.info("SensorNode", "Battery Under Threshold");
+
+			}			
+			for (String resource: resources) {
+				Log.debug("SensorNode", "Sensor resource found: " + resource);
+				if ( !resource.equals("battery"))
+					po.clearObservationAfterStateChanged(getUri(), resource, actualState);
+			}
+		}
 		return actualState;
 
 	}

@@ -99,7 +99,7 @@ public class ObservableResource extends CoapResource {
 			if (DEBUG)
 				Log.debug("ObservableResource", "Observer " + observerID + " not present, added to the list ");
 			server.addObserver(observerID, new ObserverState(mid, false));
-			handleRegistration(priority, observerID, exchange, sensor);
+			handleRegistration(observeField, observerID, exchange, sensor);
 			return;
 		}
 
@@ -110,19 +110,19 @@ public class ObservableResource extends CoapResource {
 		if (mid == server.getObserverState(observerID).getOriginalMID()) {
 			// This is a notification because the exchange has the same MID of the original
 			// request
-			sendNotification(exchange, sensor);
+			sendNotification(exchange, sensor, -1);
 		} else {
 			// The observer is already present but this is not a notification then it is a
 			// request of reregistration
-			handleRegistration(priority, observerID, exchange, sensor);
+			handleRegistration(observeField, observerID, exchange, sensor);
 		}
 	}
 
-	private void handleRegistration(int priority, String observerID, CoapExchange exchange, SensorNode sensor) {
+	private void handleRegistration(int observeField, String observerID, CoapExchange exchange, SensorNode sensor) {
 		// Registration phase
-		Log.debug("ObservableResource", "Current SensorNode state: " + sensor.getState());
+		Log.debug("ObservableResource", "Request: " + exchange.advanced().getRequest().toString());
 		if (!server.getObserverState(observerID).isNegotiationState()) {
-			if (priority < 3 && sensor.getState().equals(ServerState.ONLY_CRITICAL)) {
+			if (getPriority(observeField) < 3 && sensor.getState().equals(ServerState.ONLY_CRITICAL)) {
 				// First part of the negotiation, where subject make its proposal
 				Response response = new Response(CoAP.ResponseCode.NOT_ACCEPTABLE);
 				response.setOptions(new OptionSet().addOption(new Option(OptionNumberRegistry.OBSERVE, PROPOSAL)));
@@ -136,12 +136,12 @@ public class ObservableResource extends CoapResource {
 				server.getObserverState(observerID).setOriginalMID(exchange.advanced().getRequest().getMID());
 				if (DEBUG)
 					Log.debug("ObservableResource", "Current SensorData: " + this.data);
-				boolean registrationOk = server.requestRegistration(sensor, getName(), priority > 2 ? true : false);
+				boolean registrationOk = server.requestRegistration(sensor, getName(), getPriority(observeField) > 2 ? true : false);
 				if (registrationOk) {
 					// Request accepted without negotiation
 					Log.info("ObservableResource", "Registration done proxy - subject done!");
 					data = server.requestValueCache(sensor, getName());
-					sendNotification(exchange, sensor);
+					sendNotification(exchange, sensor, observeField);
 				} else {
 					Log.error("ObservableResource", "Registration Proxy-Subject failed ( No Negotiation )");
 					exchange.respond(CoAP.ResponseCode.NOT_FOUND);
@@ -153,11 +153,11 @@ public class ObservableResource extends CoapResource {
 			server.getObserverState(observerID).setNegotiationState(false);
 			server.getObserverState(observerID).setOriginalMID(exchange.advanced().getRequest().getMID());
 
-			boolean registrationOk = server.requestRegistration(sensor, getName(), priority > 2 ? true : false);
+			boolean registrationOk = server.requestRegistration(sensor, getName(), getPriority(observeField) > 2 ? true : false);
 			if (registrationOk) {
 				Log.info("ObservableResource", "Negotiation ended ");
 				data = server.requestValueCache(sensor, getName());
-				sendNotification(exchange, sensor);
+				sendNotification(exchange, sensor, observeField);
 			} else {
 				Log.error("ObservableResource", "Registration Proxy-Subject failed after a negotiation");
 				exchange.respond(CoAP.ResponseCode.NOT_FOUND);
@@ -165,13 +165,19 @@ public class ObservableResource extends CoapResource {
 		}
 	}
 
-	private void sendNotification(CoapExchange exchange, SensorNode sensor) {
+	private void sendNotification(CoapExchange exchange, SensorNode sensor, int observeField) {
 		double value = data.getValue();
-//		exchange.advanced().getResponse().setOptions( new OptionSet().addOption(new Option(OptionNumberRegistry.OBSERVE, seqnum)));
+		Response response = new Response(CoAP.ResponseCode.CONTENT);
+		response.setPayload(Double.toString(value));
 		exchange.setMaxAge(data.getTime());
-		exchange.respond(Double.toString(value));
+		if (observeField >= 0) {
+			// Seqnumber only if this is a notification, not the confirmation of the registration
+			response.setOptions( new OptionSet().addOption(new Option(OptionNumberRegistry.OBSERVE, seqnum)));
+			seqnum++;
+		}
+		exchange.respond(response);
+		Log.debug("ObservableResource", "Response: " + response.toString());
 		Log.info("ObservableResource", "Notification sent to: " + exchange.getSourcePort() + " | notification: " + value
 				+ " | isCritical: " + data.getCritic());
-		seqnum++;
 	}
 }
