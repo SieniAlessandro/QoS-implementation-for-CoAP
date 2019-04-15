@@ -9,7 +9,6 @@ import org.eclipse.californium.core.coap.OptionSet;
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.californium.core.coap.CoAP.Type;
 import org.eclipse.californium.core.server.resources.CoapExchange;
-import org.eclipse.californium.core.server.resources.ConcurrentCoapResource;
 
 import anaws.Proxy.Log;
 import anaws.Proxy.ProxySubject.SensorData;
@@ -18,8 +17,6 @@ import anaws.Proxy.ProxySubject.SensorNode;
 import org.eclipse.californium.core.server.ServerState;
 
 public class ObservableResource extends CoapResource {
-
-//	final private static int THREAD_POOL_SIZE = 2;
 
 	final private boolean DEBUG = false;
 	final private int PROPOSAL = CoAP.QoSLevel.CRITICAL_HIGH_PRIORITY;
@@ -39,7 +36,6 @@ public class ObservableResource extends CoapResource {
 	}
 
 	public ObservableResource(String name, ProxyObserver server, String sensorAddress) {
-//		super(name, THREAD_POOL_SIZE);
 		super(name);
 		this.setObservable(true);
 		this.setObserveType(Type.CON);
@@ -157,7 +153,7 @@ public class ObservableResource extends CoapResource {
 			if (registrationOk) {
 				Log.info("ObservableResource", "Negotiation ended ");
 				data = server.requestValueCache(sensor, getName());
-				sendNotification(exchange, sensor, observeField);
+				sendNotification(exchange, sensor, -1);
 			} else {
 				Log.error("ObservableResource", "Registration Proxy-Subject failed after a negotiation");
 				exchange.respond(CoAP.ResponseCode.NOT_FOUND);
@@ -170,14 +166,23 @@ public class ObservableResource extends CoapResource {
 		Response response = new Response(CoAP.ResponseCode.CONTENT);
 		response.setPayload(Double.toString(value));
 		exchange.setMaxAge(data.getTime());
-		if (observeField >= 0) {
-			// Seqnumber only if this is a notification, not the confirmation of the registration
-			response.setOptions( new OptionSet().addOption(new Option(OptionNumberRegistry.OBSERVE, seqnum)));
-			seqnum++;
+
+		if (observeField < 0) {
+			Log.debug("ObservableResource", "Allow the notification order");
+			exchange.respond(response);
+		} else {
+			// This is a registration response, respond with the same observe number ;
+			Log.debug("ObservableResource", "Overwrite notification order with the same observe number of the registration: " + observeField);
+			exchange.respond(response, observeField);
 		}
-		exchange.respond(response);
+		
 		Log.debug("ObservableResource", "Response: " + response.toString());
 		Log.info("ObservableResource", "Notification sent to: " + exchange.getSourcePort() + " | notification: " + value
 				+ " | isCritical: " + data.getCritic());
 	}
 }
+
+
+// TODO rispondere alla registrazione con lo stesso campo observe ricevuto!
+//		implementare nell'observer la possibilità di accettare o meno la proposta del server
+//		implementare scrittura file CSV

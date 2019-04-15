@@ -1,9 +1,5 @@
 package anaws;
 
-import java.sql.Timestamp;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.eclipse.californium.core.CoapHandler;
 import org.eclipse.californium.core.CoapObserveRelation;
 import org.eclipse.californium.core.CoapResponse;
@@ -91,7 +87,7 @@ public class ResponseHandler implements CoapHandler {
 			observeRequest.setURI(URI);
 			observer.setRequestedPriority(responsePriority);
 			Log.info("Observer " + observer.getId(), "Accepting the subject's proposal " + observeRequest.toString());
-			CoapObserveRelation relation = observer.getCoapClient().observe(observeRequest,
+			CoapObserveRelation relation = observer.getCoapClient().observeAndWaitNegotiation(observeRequest,
 					new ResponseHandler(observer, priority, path, URI, acceptProposal, DEBUG));
 			if (relation != null && !relation.isCanceled()) {
 				observer.getRelations().put(path, relation);

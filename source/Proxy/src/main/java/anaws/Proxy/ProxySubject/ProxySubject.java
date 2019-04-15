@@ -38,10 +38,10 @@ public class ProxySubject{
 		Registration r = new Registration(this.cache,sensor,type,critic, proxyObserver, coapClient);
 		int result = registrator.newRegistration(r);
 		if ( result == 1 ) {
-			Log.info("PorxySubject", "New registration done");
+			Log.info("ProxySubject", "New registration done");
 		} else if(result == 2) {
 			cache.updateRegistrations(r);
-			Log.info("PorxySubject", "Registration updated");
+			Log.info("ProxySubject", "Registration updated");
 		}
 		else if(result == -1){
 			this.proxyObserver.clearObservation(sensor, type);

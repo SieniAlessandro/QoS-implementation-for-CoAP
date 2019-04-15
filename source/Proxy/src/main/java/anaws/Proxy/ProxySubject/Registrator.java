@@ -39,28 +39,23 @@ public class Registrator{
 		}
 		else{
 			Log.info("Registrator", "New registration not needed");
-			//System.out.println("Registrator: Registrazione non necessaria");
 			return 0;
 		}
-
 	}
-	synchronized private int RegistrationNeeded(Registration _r){
+	synchronized private int RegistrationNeeded(Registration newRegistration){
 		for (Registration r: reg){
-			if(r.equals(_r)) {
-				Log.debug("Registrato", "Registration identical to another");
+			if(r.equals(newRegistration)) {
+				Log.debug("Registrator", "Registration identical to another");
 				return 0;
-			}
-			else if(r.getSensorNode().toString().equals(_r.getSensorNode().toString())) {
-				if(r.getType() == _r.getType()) {
-					if((_r.isCritic() == false && r.isCritic() == true)) {
-						Log.debug("Registrator", "Registration equal except for the new critic");
-						return 2;
-					}
-					else if (r.isCritic() == _r.isCritic() || _r.isCritic() == true && _r.isCritic() == false) {
-						Log.debug("Registrato", "Registrator equal and the new critic is not sufficient to re register");
-						return 0;
-						
-					}
+			} else if(r.getSensorNode().toString().equals(newRegistration.getSensorNode().toString()) && r.getType() == newRegistration.getType()) {
+				Log.debug("Registrator", "Evaluating the new registration: " + newRegistration.isCritic() + " " + r.isCritic() );
+				if( newRegistration.isCritic() == false && r.isCritic() == true ) {
+					Log.debug("Registrator", "Registration equal except for the new critic");
+					return 2;
+				}
+				else if (r.isCritic() == newRegistration.isCritic() || (newRegistration.isCritic() == true && r.isCritic() == false ) ) {
+					Log.debug("Registrator", "Registrator equal and the new critic is not sufficient to re register");
+					return 0;
 				}
 			}
 		}
