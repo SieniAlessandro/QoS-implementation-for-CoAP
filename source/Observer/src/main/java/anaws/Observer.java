@@ -92,7 +92,7 @@ public class Observer {
 		return hex;
 	}
 
-	private int getPriority(int priority) throws IllegalArgumentException {
+	public int getPriority(int priority) throws IllegalArgumentException {
 		int dec;
 		switch (priority) {
 		case CoAP.QoSLevel.NON_CRITICAL_LOW_PRIORITY:
@@ -113,7 +113,7 @@ public class Observer {
 		return dec;
 	}
 
-	private void resourceRegistration(String resourceName, int priority, String path) {
+	private void resourceRegistration(String resourceName, int priority, String path, boolean acceptProposal) {
 		Request observeRequest = new Request(Code.GET);
 		try {
 			// Set the priority level using the first 2 bits of the observe option value
@@ -127,7 +127,7 @@ public class Observer {
 		observeRequest.setURI(URI);
 		Log.info("Observer", "Request observation of " + path + " with priority " + getPriority(priority));
 		CoapObserveRelation relation = observerCoap.observeAndWaitNegotiation(observeRequest,
-				new ResponseHandler(this, priority, path, URI, true, DEBUG));
+				new ResponseHandler(this, priority, path, URI, acceptProposal, DEBUG));
 
 		if (relation.isCanceled()) {
 			Log.info("Observer", "Relation has been canceled or the negotiation started");
@@ -181,6 +181,7 @@ public class Observer {
 		String resourceName = "";
 		String[] input;
 		int priority = 1;
+		boolean acceptProposal = true;
 
 		if (!autocomplete) {
 			try {
@@ -192,6 +193,8 @@ public class Observer {
 					return;
 				System.out.print("Priority: ");
 				priority = getQoSBits(scanner.nextInt());
+				System.out.print("Do you accept any proposal? (y/n) ");
+				acceptProposal = scanner.next().equals('n')? false : true;
 			} catch (InputMismatchException e) {
 				System.out.println("Invalid Input");
 				scanner.nextLine();
@@ -209,7 +212,7 @@ public class Observer {
 			return;
 		}
 
-		resourceRegistration(resourceName, priority, path);
+		resourceRegistration(resourceName, priority, path, acceptProposal);
 	}
 
 	public void resourceCancellationCLI() {

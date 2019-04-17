@@ -1,0 +1,11 @@
+\chapter{Observer}
+	\section {Descrizione}
+	\section {Implementazione}
+		\subsection {Modifiche a Californium lato Client}
+			Al fine di implementare le modifiche effettuate al protocollo CoAP, è stato necessario modificare anche la libreria Californium. In seguito verranno elencati i cambiamenti al codice della libreria, indicando il nome del file con un link alla repository con il codice originale e la motivazione di tale modifica. I file fanno riferimento alla package core di Californium:
+			\subsubsection{CoapClient}
+				Con l'introduzione della negoziazione del livello di priorità è necessario effettuare ulteriori controlli alla risposta ricevuta. Nel caso in cui la negoziazione è stata avviata, la risposta avrà come \textit{ResponseCode} \textbf{NOT\_ACCEPTABLE} e la CoapObserveRelation appena creata viene cancellata. Se la registrazione viene accettata senza negoziazione, allora bisogna controllare che il campo \textit{Observe} della risposta coincida con quello della richiesta. In ogni caso, dopo la ricezione della risposta, l'ordine delle notifiche deve essere resettato, in quanto la risposta alla registrazione può contenere nel campo Observe il valore della priorità, il quale può essere maggiore dell'attuale numero di notifica (vedere meccanismo di riordinamento delle notifiche.\newline
+				\lstinputlisting[language=Java, firstline=1148, lastline=1177, caption={CoapClient, \href{https://tinyurl.com/y25fegl8}{codice originale}},captionpos=b]{../Codice/Java/CoapClient.java}
+			\subsubsection{CoapObserveRelation}
+				Per resettare il gestore dell'ordine delle notifiche, è sufficiente ridefinire l'oggetto.\newline
+				\lstinputlisting[language=Java, firstline=286, lastline=290, caption={CoapObserveRelation, \href{https://tinyurl.com/y4ockh22}{codice originale}},captionpos=b]{../Codice/Java/CoapObserveRelation.java}

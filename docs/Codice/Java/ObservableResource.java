@@ -25,6 +25,8 @@ public class ObservableResource extends CoapResource {
 	private SensorData data;
 	private String sensorAddress;
 	
+	private int seqnum;
+
 	public SensorData getSensorData() {
 		return data;
 	}
@@ -40,6 +42,7 @@ public class ObservableResource extends CoapResource {
 		this.setVisible(true);
 		this.server = server;
 		this.sensorAddress = sensorAddress;
+		this.seqnum = 0;
 	}
 
 	public int getPriority(int priority) throws IllegalArgumentException {
@@ -80,15 +83,26 @@ public class ObservableResource extends CoapResource {
 			System.out.println("Subject is unavailable");
 			return;
 		}
+
+		int priority = getPriority(observeField);
+		if (DEBUG)
+			Log.debug("ObservableResource", "handleGET request with priority: " + priority);
+
 		// store observer information if the endpoint is not already present
-		String observerID = exchange.getSourceAddress() + ":" + exchange.getSourcePort() + "/" + getName();
+		String observerID = exchange.getSourceAddress() + ":" + exchange.getSourcePort();
 		int mid = exchange.advanced().getRequest().getMID();
 		if (!server.isObserverPresent(observerID)) {
+			if (DEBUG)
+				Log.debug("ObservableResource", "Observer " + observerID + " not present, added to the list ");
 			server.addObserver(observerID, new ObserverState(mid, false));
 			handleRegistration(observeField, observerID, exchange, sensor);
 			return;
 		}
-		
+
+		if (DEBUG)
+			Log.debug("ObservableResource",
+					" original MID: " + server.getObserverState(observerID).getOriginalMID() + " currentMID: " + mid);
+
 		if (mid == server.getObserverState(observerID).getOriginalMID()) {
 			// This is a notification because the exchange has the same MID of the original
 			// request
@@ -104,7 +118,7 @@ public class ObservableResource extends CoapResource {
 		// Registration phase
 		Log.debug("ObservableResource", "Request: " + exchange.advanced().getRequest().toString());
 		if (!server.getObserverState(observerID).isNegotiationState()) {
-			if (getPriority(observeField) < 3 && sensor.getState().equals(ServerState.ONLY_CRITICAL) ) {
+			if (getPriority(observeField) < 3 && sensor.getState().equals(ServerState.ONLY_CRITICAL)) {
 				// First part of the negotiation, where subject make its proposal
 				Response response = new Response(CoAP.ResponseCode.NOT_ACCEPTABLE);
 				response.setOptions(new OptionSet().addOption(new Option(OptionNumberRegistry.OBSERVE, PROPOSAL)));
@@ -116,7 +130,8 @@ public class ObservableResource extends CoapResource {
 				Log.info("ObservableResource", "Accepting the request from " + exchange.getSourcePort()
 						+ " request without negotiation: " + exchange.getRequestOptions().toString());
 				server.getObserverState(observerID).setOriginalMID(exchange.advanced().getRequest().getMID());
-
+				if (DEBUG)
+					Log.debug("ObservableResource", "Current SensorData: " + this.data);
 				boolean registrationOk = server.requestRegistration(sensor, getName(), getPriority(observeField) > 2 ? true : false);
 				if (registrationOk) {
 					// Request accepted without negotiation
@@ -127,10 +142,10 @@ public class ObservableResource extends CoapResource {
 					Log.error("ObservableResource", "Registration Proxy-Subject failed ( No Negotiation )");
 					exchange.respond(CoAP.ResponseCode.NOT_FOUND);
 				}
+
 			}
 		} else {
 			// This is the second part of a negotiation
-			Log.info("ObservableResource", "Second Part Negotiation ");
 			server.getObserverState(observerID).setNegotiationState(false);
 			server.getObserverState(observerID).setOriginalMID(exchange.advanced().getRequest().getMID());
 
@@ -153,10 +168,11 @@ public class ObservableResource extends CoapResource {
 		exchange.setMaxAge(data.getTime());
 
 		if (observeField < 0) {
-//			exchange.respond(response, data.getObserve());
-			exchange.respond(response);
+			Log.debug("ObservableResource", "Allow the notification order");
+			exchange.respond(response, data.getObserve());
 		} else {
 			// This is a registration response, respond with the same observe number ;
+			Log.debug("ObservableResource", "Overwrite notification order with the same observe number of the registration: " + observeField);
 			exchange.respond(response, observeField);
 		}
 		

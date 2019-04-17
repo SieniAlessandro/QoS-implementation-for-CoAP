@@ -1,5 +1,7 @@
 \chapter{Modulo ProxyObserver}
 	\section {Descrizione}
+		Questa modulo permette la gestione della comunicazione tra il \textit{Proxy} e l'\textit{Observer} fungendo da CoapServer in ascolto sulla porta di default di CoAP 5683. La classe mantiene le informazioni relative allo stato degli osservatori e le risorse attualmente disponibili sui sensori visibili dagli osservatori. Quest'ultimi possono effettuare delle richieste di osservazioni di una risorsa attualmente disponibile sul Proxy il quale gestisce la richiesta tramite il metodo \textit{ObservableResource.handleGet(CoapExchange exchange)} che si occupa della negoziazione e degli invii delle notifiche. \newline
+		Inoltre, fornisce i metodi per l'interazione con il modulo ProxySubject per l'aggiunta e la rimozione di risorse, notificare il cambio del valore della risorsa sul sensore ed eliminare le relazioni opportune dopo che lo stato di un sensore è cambiato.
 	\section {Implementazione}
 		\subsection {Modifiche a Californium lato Server}
 			Al fine di implementare le modifiche effettuate al protocollo CoAP, è stato necessario modificare anche la libreria Californium. In seguito verranno elencati i cambiamenti al codice della libreria, indicando il nome del file con un link alla repository con il codice originale e la motivazione di tale modifica. I file fanno riferimento alla package core di Californium:
@@ -30,7 +32,7 @@
 				\lstinputlisting[language=Java, firstline=3, lastline=5, caption={ServerState},captionpos=b]{../Codice/Java/ServerState.java}
 
 			\subsubsection{CoapResource}
-				\paragraph{Aggiornamento relazioni dopo il cambio stato del sensore}
+				\paragraph{Aggiornamento relazioni dopo il cambio stato del sensore}\label{cambioStatoSensore}
 				Quando avviene un cambio di stato di un sensore, è necessario controllare che le relazioni già stabilite siano consistenti con il nuovo stato. Pertanto quando lo stato diventa \textbf{ONLY\_CRITICAL}, le relazioni con livello \textit{CoAP.QoSLevel.NON\_CRITICAL\_MEDIUM\_PRIORITY} e \textit{CoAP.QoSLevel.NON\_CRITICAL\_LOW\_PRIORITY} vengono cancellate, mentre se si passa ad \textbf{UNAVAILABLE}, tutte le relazioni di quella risorsa vengono cancellate. \'E stata quindi aggiunta una funzione per cancellare solo le relazioni con un livello non critico di priorità. \newline
 				\lstinputlisting[language=Java, firstline=557, lastline=567, caption={CoapResource clearAndNotifyNonCriticalObserveRelations, \href{https://tinyurl.com/y264lheh}{codice originale}},captionpos=b]{../Codice/Java/CoapResource.java}
 				\paragraph{Notifica basata su priorità}
@@ -39,3 +41,62 @@
 				\lstinputlisting[language=Java, firstline=809, lastline=831, caption={CoapResource addObserveRelation(...), \href{https://tinyurl.com/y264lheh}{codice originale}},captionpos=b]{../Codice/Java/CoapResource.java}
 				\lstinputlisting[language=Java, firstline=840, lastline=852, caption={CoapResource removeObserveRelation(...), \href{https://tinyurl.com/y264lheh}{codice originale}},captionpos=b]{../Codice/Java/CoapResource.java}
 				\lstinputlisting[language=Java, firstline=915, lastline=925, caption={CoapResource notifyObserverRelations(...), \href{https://tinyurl.com/y264lheh}{codice originale}},captionpos=b]{../Codice/Java/CoapResource.java}
+
+			\subsubsection{server.resources.CoapExchange}
+				Il server può esprimere la sua volontà di avviare la registrazione rispondendo con un diverso valore del campo \textit{QoS} della richiesta. Se invece accetta subito la relazione di osservazione allora risponde con lo stesso valore della richiesta. A tal fine, è stata ridefinita la funzione \textit{CoapExchange.respond(Response response)} aggiungendo il parametro \textit{observeNumber}. Quest'ultimo sovrascrive il valore del campo \textit{Observe} che Califonium inserisce come numero per evitare riordinamento delle notifiche.\newline
+				\lstinputlisting[language=Java, firstline=378, lastline=399, caption={server.resources.CoapExchange, \href{https://tinyurl.com/y2tffp7k}{codice originale}},captionpos=b]{../Codice/Java/CoapExchange.java}
+
+		\subsection {class ProxyObserver}
+			\subsubsection{Aggiunta delle Risorse}
+				 L'aggiunta delle risorse è effettuata dal modulo \textit{ProxySubject} che effettua la discovery delle risorse e le aggiunge al modulo ProxyObserver tramite la funzione \ref{addResource}
+				\lstinputlisting[label={addResource}, language=Java, firstline=90, lastline=11, caption={ProxyObserver.addResource},captionpos=b]{../Codice/Java/ProxyObserver.java}
+
+			\subsubsection{Cambio del valore della risorsa}
+				Una volta che il ProxyObserver crea delle relazioni con gli osservatori, deve notificare questi ultimi ogni volta che il valore della risorsa del sensore varia. Quando il ProxySubject riceve il nuovo valore, allora può notificare questo cambiamento al ProxyObserver tramite la funzione \ref{resourceChanged}
+				\lstinputlisting[label={resourceChanged}, language=Java, firstline=75, lastline=88, caption={ProxyObserver.resourceChanged},captionpos=b]{../Codice/Java/ProxyObserver.java}
+
+			\subsubsection{Filtro Relazioni Critiche}
+				Nel caso in cui la notifica abbia un valore non critico, questo deve essere inviato solo a quegli osservatori che hanno richiesto un livello di QoS relativo a tutti gli eventi, critici o non critici. Per effettuare questa distizione tra le varie relazioni, si usa l'\textit{ObserveRelationFilter} implementato dalla classe \ref{CriticalRelationFilter}
+				\lstinputlisting[label={CriticalRelationFilter}, language=Java, firstline=7, lastline=13, caption={CriticalRelationFilter},captionpos=b]{../Codice/Java/CriticalRelationFilter.java}
+
+			\subsubsection{Cambio dello stato del sensore}
+				Per avviare l'aggiornamento delle relazioni descritto in \ref{cambioStatoSensore}, il ProxySubject notifica il ProxyObserver di questo cambio tramite la funzione \ref{clearObservationAfterStateChanged}, in modo tale che possa eliminare le relazioni non più gestibili.
+				\lstinputlisting[label={clearObservationAfterStateChanged}, language=Java, firstline=151, lastline=161, caption={clearObservationAfterStateChanged},captionpos=b]{../Codice/Java/ProxyObserver.java}
+
+			\subsubsection{Chiamate alle funzioni del ProxySubject}
+				Il ProxyObserver può chiamare delle funzioni del ProxySubject per:
+				\begin{itemize}
+					\item Ottenere il nuovo valore della risorsa \ref{requestValueCache}
+					\item Richiedere che il ProxySubject effettui una richiesta di osservazione su un sensore se necessario \ref{requestRegistration}
+					\item Ottenere le informazioni relative ad un determinato sensore \ref{requestSensorNode}
+					\item Richiedere la cancellazione di una relazione tra ProxySubject ed un sensore \ref{requestObserveCancel}
+				\end{itemize}
+
+				\lstinputlisting[label={requestValueCache}, language=Java, firstline=163, lastline=166, caption={requestValueCache},captionpos=b]{../Codice/Java/ProxyObserver.java}
+				\lstinputlisting[label={requestRegistration}, language=Java, firstline=168, lastline=170, caption={requestRegistration},captionpos=b]{../Codice/Java/ProxyObserver.java}
+				\lstinputlisting[label={requestSensorNode}, language=Java, firstline=172, lastline=174, caption={requestSensorNode},captionpos=b]{../Codice/Java/ProxyObserver.java}
+				\lstinputlisting[label={requestObserveCancel}, language=Java, firstline=176, lastline=178, caption={requestObserveCancel},captionpos=b]{../Codice/Java/ProxyObserver.java}
+		\subsection { class ObservableResource extends CoapResource}
+			\subsubsection{handleGET}
+				Questa funzione viene chiamata in 2 casi distinti:
+				\begin{enumerate}
+					\item il CoapServer riceve una richiesta di tipo \textbf{GET} da parte di un osservatore per costruire una relazione di osservazione;
+					\item è stata chiamata la funzione \textit{changed()} della risorsa e si avvia il meccanismo di notifica dell'osservatore;
+				\end{enumerate}
+				Per questo motivo è necessario distinguere la gestione della registrazione dall'invio di una notifica nella stessa funzione. \newline
+				Innanzitutto, la funzione controlla che non si tratti di una richiesta di cancellazione ( campo \textit{Observe}=1 ), caso in cui viene gestito tutto internamente da Califonium, quindi non bisogna fare nulla, oppure che il sensore non sia attualmente attivo. \newline
+				Se è si tratta di una richiesta di registrazione, le informazioni relative a quella richiesta vengono salvate. Di queste il \textit{MessageID} della richiesta viene usato per distinguere le notifiche dalla seconda parte della negoziazione. Infatti, nel caso in cui la funzione viene richiamata per effettuare un invio della notifica, il \textit{CoapExchange} conterrà il MessageID della prima richiesta, mentre ciò non succede negli altri casi.
+
+			\subsubsection{handleRegistration}
+				Questa funzione è chiamata per gestire la richiesta di registrazione oppure per completare la negoziazione tra Proxy e osservatore. I due casi sono distinti grazie ad una variabile della classe \textit{ObserveState} che viene settata solo se è stata avviata la negoziazione durante la registrazione. Analizzando ogni caso, si ha:
+			  \begin{itemize}
+			  	\item Se si tratta della gestione della registrazione, bisogna verificare che il sensore sia capace di gestire una registrazione del genere:
+					 \begin{itemize}
+						 \item Richiesti tutti i valori ma il sensore può mandare solo i valori critici: allora la negoziazione viene avviata rispondendo con \textbf{ResponseCode.NOT\_ACCEPTABLE} e un valore di QoS gestibile dal sensore nel campo opportuno.
+						 \item altrimenti accetta la registrazione, richiede al ProxySubject la registrazione con il sensore, se necessaria, tramite la funzione \ref{requestRegistration} e risponde con una notifica che contiene lo stesso valore di QoS della richiesta, indicando all'osservatore che la richiesta è stata accettata.
+					 \end{itemize}
+					\item Se invece si tratta della seconda parte della negoziazione, esegue le stesse operazioni del caso precedente per accettare la registrazione.
+			  \end{itemize}
+
+			\subsubsection{sendNotification}
+				Questo metodo invia una notifica sfruttando il \textit{CoapExchange} della richiesta. In particolare, prepara la risposta usando i valori ottenuti tramite la funzione \ref{requestValueCache}, mentre il campo \textit{Observe} è usato come numero di sequenza se si tratta di una notifica, oppure contiene lo stesso livello di \textit{QoS} della richiesta se si sta accettando una registrazione senza avviare la negoziazione.

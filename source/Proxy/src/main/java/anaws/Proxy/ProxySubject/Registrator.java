@@ -45,16 +45,12 @@ public class Registrator{
 	synchronized private int RegistrationNeeded(Registration newRegistration){
 		for (Registration r: reg){
 			if(r.equals(newRegistration)) {
-				Log.debug("Registrator", "Registration identical to another");
 				return 0;
 			} else if(r.getSensorNode().toString().equals(newRegistration.getSensorNode().toString()) && r.getType() == newRegistration.getType()) {
-				Log.debug("Registrator", "Evaluating the new registration: " + newRegistration.isCritic() + " " + r.isCritic() );
 				if( newRegistration.isCritic() == false && r.isCritic() == true ) {
-					Log.debug("Registrator", "Registration equal except for the new critic");
 					return 2;
 				}
 				else if (r.isCritic() == newRegistration.isCritic() || (newRegistration.isCritic() == true && r.isCritic() == false ) ) {
-					Log.debug("Registrator", "Registrator equal and the new critic is not sufficient to re register");
 					return 0;
 				}
 			}

@@ -79,18 +79,19 @@ public class ResponseHandler implements CoapHandler {
 		} else if (response.getCode().equals(CoAP.ResponseCode.NOT_ACCEPTABLE) && acceptProposal) {
 			Log.info("Observer " + observer.getId(),
 					"Negotiation started, subject proposes the following priority: " + response.getOptions());
-			// Subject started the negotiation, observer need to accept it
+			// Subject started the negotiation, observer need to accept it			
 			Request observeRequest = new Request(Code.GET);
 			observeRequest.setObserve();
 			observeRequest
 					.setOptions(new OptionSet().addOption(new Option(OptionNumberRegistry.OBSERVE, responsePriority)));
 			observeRequest.setURI(URI);
 			observer.setRequestedPriority(responsePriority);
+			CoapObserveRelation relation = observer.getCoapClient().observe(observeRequest, this);
 			Log.info("Observer " + observer.getId(), "Accepting the subject's proposal " + observeRequest.toString());
-			CoapObserveRelation relation = observer.getCoapClient().observeAndWaitNegotiation(observeRequest,
-					new ResponseHandler(observer, priority, path, URI, acceptProposal, DEBUG));
 			if (relation != null && !relation.isCanceled()) {
 				observer.getRelations().put(path, relation);
+			} else {
+				Log.info("ResponseHandler", "Negoziazione fallita");
 			}
 		}
 	}

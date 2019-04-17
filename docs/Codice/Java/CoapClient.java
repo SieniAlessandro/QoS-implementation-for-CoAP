@@ -1136,10 +1136,38 @@ public class CoapClient {
 			// relation should remove this listener when the request is cancelled
 			relation.setNotificationListener(notificationListener);
 			CoapResponse response = synchronous(request, outEndpoint);
+			if (response == null || !response.advanced().getOptions().hasObserve() ) {
+				relation.setCanceled(true);
+			}
+			return relation;
+		} else {
+			throw new IllegalArgumentException("please make sure that the request has observe option set.");
+		}
+	}
+	
+	public CoapObserveRelation observeAndWaitNegotiation(Request request, CoapHandler handler) {
+
+		if (request.getOptions().hasObserve()) {
+			assignClientUriIfEmpty(request);
+			Endpoint outEndpoint = getEffectiveEndpoint(request);
+			CoapObserveRelation relation = new CoapObserveRelation(request, outEndpoint);
+			// add message observer to get the response.
+			ObserveMessageObserverImpl messageObserver = new ObserveMessageObserverImpl(handler, request.isMulticast(),
+					relation);
+			request.addMessageObserver(messageObserver);
+			// add notification listener to all notification
+			NotificationListener notificationListener = new Adapter(messageObserver, request);
+			outEndpoint.addNotificationListener(notificationListener);
+			// relation should remove this listener when the request is cancelled
+			relation.setNotificationListener(notificationListener);
+			CoapResponse response = synchronous(request, outEndpoint);
 			// CHANGE_START
+			relation.resetOrder();
 			if (response == null || !response.advanced().getOptions().hasObserve()
-					|| response.getCode().equals(CoAP.ResponseCode.NOT_ACCEPTABLE)) {
-			// CHANGE_END
+					|| response.getCode().equals(CoAP.ResponseCode.NOT_ACCEPTABLE) // Negotiation started
+					|| (int) response.getOptions().getObserve() != (int) request.getOptions().getObserve() // Requested observe # doesn't match the response's one
+					) {
+				// CHANGE_END
 				relation.setCanceled(true);
 			}
 			return relation;
