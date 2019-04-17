@@ -8,16 +8,19 @@ public class SensorData{
 	volatile long maxAge;
 	volatile boolean critic;
 	volatile Registration registration;
+	volatile long observe;
 
-	public SensorData(Registration registration, double value,long maxAge,boolean isCritic){
+	public SensorData(Registration registration, double value,long maxAge,long observe,boolean isCritic){
 		this.registration = registration;
 		this.value = value;
 		this.maxAge = maxAge;
 		this.critic = isCritic;
+		this.observe = observe;
 	}
-	synchronized public void updateValue(double value,long l,boolean isCritic){
+	synchronized public void updateValue(double value,long maxAge,long observe,boolean isCritic){
 		this.value = value;
-		this.maxAge = l;
+		this.maxAge = maxAge;
+		this.observe = observe;
 		this.critic = isCritic;
 	}
 	synchronized public boolean updateTime(long time){
@@ -32,6 +35,8 @@ public class SensorData{
 	synchronized public long getTime(){ return this.maxAge; }
 
 	synchronized public boolean getCritic(){ return this.critic; }
+	
+	synchronized public long getObserve() {return this.observe;}
 
 	synchronized public Registration getRegistration(){ return this.registration;}
 	
@@ -40,6 +45,6 @@ public class SensorData{
 	}
 	public String toString() {
 		return "Value: "+value+" | Coming from: "+registration.getSensorNode().getUri()+" | Type: "+registration.getType()
-	 +" | with MaxAge: "+maxAge+" is critic: "+this.critic;
+	 +" | with MaxAge: "+maxAge+" | with observer: "+ this.observe+" is critic: "+this.critic;
 	}
 }

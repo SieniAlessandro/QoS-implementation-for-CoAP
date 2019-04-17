@@ -35,7 +35,7 @@ public class CacheTable{
 			return true;
 		}
 		//Otherwise the old value is updated 
-		old.updateValue(data.getValue(),data.getTime(),data.getCritic());
+		old.updateValue(data.getValue(),data.getTime(),data.getObserve(),data.getCritic());
 		return false;
 	}
 	synchronized private void removeData(SensorData data){
