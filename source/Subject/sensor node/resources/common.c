@@ -27,5 +27,5 @@ print_local_addresses(void)
 void stampa(int value, char* resourceName, uint32_t dataLevel){
   dataLevel = (dataLevel == 0) ? 0 : 1;
   print_local_addresses();
-  printf(",%d,%s,%lu\n", value, resourceName, dataLevel);// asctime(localtime(timestamp)));
+  printf(",%d,%s,%lu,", value, resourceName, dataLevel);// asctime(localtime(timestamp)));
 }

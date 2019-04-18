@@ -92,7 +92,6 @@ get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_s
    * This would be a TODO in the corresponding files in contiki/apps/erbium/!
    */
   //printf("CALLED THE GET HANDLER\n");
-  stampa(temperature_old, "temperature", dataLevel);
 
   uint32_t requestLevel;
   coap_get_header_observe(request, &requestLevel);
@@ -122,6 +121,7 @@ get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_s
       snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "%d", temperature_old);
 
     REST.set_response_payload(response, (uint8_t *)buffer, strlen((char *)buffer));
+
   } else if(accept == REST.type.APPLICATION_JSON) {
     REST.set_header_content_type(response, REST.type.APPLICATION_JSON);
     if(dataLevel == CRITICAL)
@@ -141,6 +141,12 @@ get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_s
 
   REST.set_header_max_age(response, variable_max_age);
   battery = reduceBattery(TRANSMITTING_DRAIN);
+
+  uint32_t observe;
+  coap_get_header_observe(response, &observe);
+  //REST.get_header_observe(response, &observe);
+  stampa(temperature_old, "temperature", dataLevel);
+
   /* The REST.subscription_handler() will be called for observable resources by the REST framework. */
 }
 
