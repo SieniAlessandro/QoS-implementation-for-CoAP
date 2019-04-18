@@ -77,7 +77,7 @@ public class ResponseHandler implements CoapHandler {
 			// Logging to file the received notification
 			
 			String ret = (priority == CoAP.QoSLevel.CRITICAL_HIGHEST_PRIORITY || priority == CoAP.QoSLevel.CRITICAL_HIGH_PRIORITY) ? "1":"0";
-			String record = path.substring(1, path.lastIndexOf('/'))+","+response.getResponseText()+","+path.substring(path.lastIndexOf('/')+1)+","+ret+","+response.getOptions().getObserve();
+			String record = path.substring(1, path.lastIndexOf(':'))+","+response.getResponseText()+","+path.substring(path.lastIndexOf('/')+1)+","+ret+","+response.getOptions().getObserve();
 			Log.LogOnFile("ObserverLog.csv", record);
 			
 			
