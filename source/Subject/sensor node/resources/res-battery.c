@@ -62,7 +62,7 @@ PERIODIC_RESOURCE(res_battery,
          NULL,
          NULL,
          NULL,
-         5*CLOCK_SECOND,
+         CLOCK_SECOND,
          periodic_handler);
 
 static int32_t interval_counter = INTERVAL_MAX;
@@ -79,6 +79,7 @@ get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_s
   if(accept == -1 || accept == REST.type.TEXT_PLAIN) {
     REST.set_header_content_type(response, REST.type.TEXT_PLAIN);
     snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "%lu", battery);
+    //printf("DEBUG:\tSENDING THE BATTERY\n");
 
     REST.set_response_payload(response, (uint8_t *)buffer, strlen((char *)buffer));
   } else if(accept == REST.type.APPLICATION_JSON) {
@@ -113,8 +114,8 @@ periodic_handler()
     abort();
   }
 
-  if(battery/10 <= thresholdLevel || interval_counter >= INTERVAL_MAX) {
-     thresholdLevel /= 2;
+  if(battery/10 < thresholdLevel || interval_counter >= INTERVAL_MAX) {
+     thresholdLevel--;
      interval_counter = 0;
     /* Notify the registered observers which will trigger the res_get_handler to create the response. */
     REST.notify_subscribers(&res_battery);

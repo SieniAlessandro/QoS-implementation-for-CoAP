@@ -1,72 +1,15 @@
 #define SUBSCRIBER
 
 #include "common.h"
-/*
-#include "contiki.h"
-#include "lib/random.h"
-#include "sys/ctimer.h"
-#include "net/ip/uip.h"
-#include "net/ipv6/uip-ds6.h"
-#include "net/ip/uip-udp-packet.h"
-#include "sys/ctimer.h"
-#ifdef WITH_COMPOWER
-#include "powertrace.h"
-#endif
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-#include "contiki-net.h"
-
-#include "rest-engine.h"
-
-#include "net/ipv6/uip-ds6-route.h"
-
-
-#define UDP_CLIENT_PORT 8765
-#define UDP_SERVER_PORT 5678
-
-#define UDP_EXAMPLE_ID  190
-
-#define DEBUG DEBUG_FULL
-#include "net/ip/uip-debug.h"
-
-#ifndef PERIOD
-#define PERIOD 60
-#endif
-
-#define START_INTERVAL    (15 * CLOCK_SECOND)
-#define SEND_INTERVAL   (PERIOD * CLOCK_SECOND)
-#define SEND_TIME   (random_rand() % (SEND_INTERVAL))
-#define MAX_PAYLOAD_LEN   30
-
-static struct uip_udp_conn *client_conn;
-static uip_ipaddr_t server_ipaddr;
-
-#undef PRINTF
-#undef PRINT6ADDR
-#undef PRINTLLADDR
-#undef DEBUG
-#define DEBUG 0
-#if DEBUG
-#define PRINTF(...) printf(__VA_ARGS__)
-#define PRINT6ADDR(addr) PRINTF("[%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]", ((uint8_t *)addr)[0], ((uint8_t *)addr)[1], ((uint8_t *)addr)[2], ((uint8_t *)addr)[3], ((uint8_t *)addr)[4], ((uint8_t *)addr)[5], ((uint8_t *)addr)[6], ((uint8_t *)addr)[7], ((uint8_t *)addr)[8], ((uint8_t *)addr)[9], ((uint8_t *)addr)[10], ((uint8_t *)addr)[11], ((uint8_t *)addr)[12], ((uint8_t *)addr)[13], ((uint8_t *)addr)[14], ((uint8_t *)addr)[15])
-#define PRINTLLADDR(lladdr) PRINTF("[%02x:%02x:%02x:%02x:%02x:%02x]",(lladdr)->addr[0], (lladdr)->addr[1], (lladdr)->addr[2], (lladdr)->addr[3],(lladdr)->addr[4], (lladdr)->addr[5])
-#else
-#define PRINTF(...)
-#define PRINT6ADDR(addr)
-#define PRINTLLADDR(addr)
-#endif
-*/
-
-//#if PLATFORM_HAS_TEMPERATURE
 #include "dev/temperature-sensor.h"
 extern resource_t res_temperature;
-//#endif
-//#if PLATFORM_HAS_BATTERY
+
 #include "dev/battery-sensor.h"
 extern resource_t res_battery;
-//#endif
+
+//For debug purposes
+extern resource_t res_hello;
 
 static struct uip_udp_conn *client_conn;
 static uip_ipaddr_t server_ipaddr;
@@ -262,7 +205,11 @@ PROCESS_THREAD(rest_server, ev, data)
   rest_activate_resource(&res_temperature, "sensors/temperature");
   SENSORS_ACTIVATE(temperature_sensor);
 
-  printf("timestamp,indirizzoIP,valore,nomeRisorsa,critico\n");
+
+  //For debug purposes
+  rest_activate_resource(&res_hello, "debug/hello");
+
+  printf("timestamp,indirizzoIP,valore,nomeRisorsa,critico,observe\n");
   
   while(1){
     PROCESS_WAIT_EVENT();

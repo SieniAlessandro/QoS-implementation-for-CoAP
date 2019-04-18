@@ -80,7 +80,7 @@ PERIODIC_RESOURCE(res_temperature,
          NULL,
          NULL,
          NULL,
-         5*CLOCK_SECOND,
+         2*CLOCK_SECOND,
          periodic_handler);
 
 static void
@@ -107,6 +107,9 @@ get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_s
     }
     //printf("requestLevel received: %lu. requestedLevel changed:%u\n", requestLevel,requestedLevel);
   }
+
+  if(requestLevel == 1)
+      return;
   
   unsigned int accept = -1;
   REST.get_header_accept(request, &accept);
@@ -156,8 +159,9 @@ periodic_handler()
   //Formula to get the real temperature//
   // USE THIS FOR THE REAL SENSOR NODE//
   //int temperature = (temperature_sensor.value(0)/10-396)/10;
+  //int temperature = (temperature_sensor.value(0);
   // USED ONLY FOR THE SIMULATIONS ON COOJA //
-  int temperature = TEMPERATURE_VALUES[interval_counter];
+  int temperature = TEMPERATURE_VALUES[interval_counter%60];
   ++interval_counter;
 
   battery = reduceBattery(SENSING_DRAIN);

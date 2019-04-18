@@ -1,0 +1,44 @@
+19:57.456911   CC        ./resources/res-temperature.c
+19:57.597931   LD        subscriber0.z1
+19:57.713117 msp430-objcopy subscriber0.z1 -O ihex subscriber0.ihex
+19:57.732551 cp subscriber0.ihex tmpimage.ihex
+19:57.737412 /dev/ttyUSB0
+19:57.737706 make z1-reset z1-upload
+19:57.739892 make[1]: Entering directory '/home/user/contiki/examples/unipi/ProjectAnaws'
+19:58.068314 make -k -j 20 z1-reset-sequence
+19:58.071778 make[2]: Entering directory '/home/user/contiki/examples/unipi/ProjectAnaws'
+19:58.409269 /home/user/contiki/tools/zolertia/z1-bsl-nopic --z1 -c /dev/ttyUSB0 -r
+19:59.123253 Done
+19:59.123811 make[2]: Leaving directory '/home/user/contiki/examples/unipi/ProjectAnaws'
+19:59.124593 make -j 20 z1-upload-sequence
+19:59.128485 make[2]: Entering directory '/home/user/contiki/examples/unipi/ProjectAnaws'
+19:59.472273 +++++ Erasing /dev/ttyUSB0
+20:02.513251 +++++ Programming /dev/ttyUSB0
+20:22.353013 +++++ Resetting /dev/ttyUSB0
+20:22.836536 Done
+20:22.837168 make[2]: Leaving directory '/home/user/contiki/examples/unipi/ProjectAnaws'
+20:22.837824 make[1]: Leaving directory '/home/user/contiki/examples/unipi/ProjectAnaws'
+20:22.865398 /home/user/contiki/tools/sky/serialdump-linux -b115200 /dev/ttyUSB0
+20:23.569233 Rime started with address 193.12.0.0.0.0.0.1
+20:23.580507 MAC c1:0c:00:00:00:00:00:01 Ref ID: 3446
+20:23.580795 Contiki-3.x-2945-g40b6217 started. Node id is set to 1.
+20:23.586700 nullmac nullrdc, channel check rate 128 Hz, radio channel 21
+20:23.599596 Tentative link-local IPv6 address fe80:0000:0000:0000:c30c:0000:0000:0001
+20:23.599886 Starting 'UDP client process' 'Erbium Server'
+20:23.604403 timestamp,indirizzoIP,valore,nomeRisorsa,critico
+20:33.578333 Rime started with address 193.12.0.0.0.0.0.1
+20:33.589597 MAC c1:0c:00:00:00:00:00:01 Ref ID: 3446
+20:33.589862 Contiki-3.x-2945-g40b6217 started. Node id is set to 1.
+20:33.595677 nullmac nullrdc, channel check rate 128 Hz, radio channel 21
+20:33.608216 Tentative link-local IPv6 address fe80:0000:0000:0000:c30c:0000:0000:0001
+20:33.608526 Starting 'UDP client process' 'Erbium Server'
+20:33.613028 timestamp,indirizzoIP,valore,nomeRisorsa,critico
+20:54.300407 ,fd00::c30c:0:0:1,34,temperature,1
+20:55.618931 ,fd00::c30c:0:0:1,-38,temperature,0
+20:57.620435 ,fd00::c30c:0:0:1,-10,temperature,0
+20:57.689683 ,fd00::c30c:0:0:1,-10,temperature,0
+21:02.606949 ,fd00::c30c:0:0:1,38,temperature,1
+21:03.619105 ,fd00::c30c:0:0:1,-34,temperature,0
+21:05.619696 ,fd00::c30c:0:0:1,-6,temperature,0
+21:07.618382 ,fd00::c30c:0:0:1,22,temperature,0
+21:08.840269 ,fd00::c30c:0:0:1,22,temperature,0
