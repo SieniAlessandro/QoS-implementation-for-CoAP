@@ -1,6 +1,12 @@
 package anaws.Proxy;
 
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 public class Log {
     public static final String ANSI_RESET = "\u001B[0m";
@@ -20,5 +26,27 @@ public class Log {
 	}
 	public static void error(String module,String text) {
 		System.out.println(" [ "+new Timestamp(System.currentTimeMillis())+" ] "+" [ "+module+" ] "+" [ " + ANSI_RED + " ERROR " + ANSI_RESET + "] "+text);
+	}
+	public static void LogOnFile(String Filename, String value) {
+		File file = new File(Filename);
+		value = LocalDateTime.now().getMinute()+":"+LocalDateTime.now().getSecond()+","+value;
+		try {
+			if(file.exists()) {
+				//If file Exists append to those file
+				BufferedWriter writer = new BufferedWriter(new FileWriter(file,true));
+				writer.newLine();
+				writer.write(value);
+				writer.close();
+			}else {
+				//Otherwise create new file and write the record
+				file.createNewFile();
+				BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+				writer.write("Time,IPAddress,Value,Type,Critic,Observe");
+				writer.newLine();
+				writer.write(value);
+				writer.close();
+			}
+		
+		}catch(IOException ex) {ex.printStackTrace();}
 	}
 }

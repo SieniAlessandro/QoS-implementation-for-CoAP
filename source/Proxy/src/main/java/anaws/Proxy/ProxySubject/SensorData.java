@@ -40,6 +40,11 @@ public class SensorData{
 
 	synchronized public Registration getRegistration(){ return this.registration;}
 	
+	synchronized public String getExportLog() {
+		String ret = (this.critic == true) ? "1" : "0";
+		return this.registration.getSensorNode().getAddress()+","+this.value+","+this.registration.getType()+","+ret+","+this.observe;
+	}
+	
 	public void changeRegistration(Registration r) {
 		this.registration = r;
 	}

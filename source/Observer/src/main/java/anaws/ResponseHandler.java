@@ -73,6 +73,14 @@ public class ResponseHandler implements CoapHandler {
 			// Observe relation accepted without negotiation or a notification arrived
 			Log.info("Observer " + observer.getId(),
 					"New notification of " + path + " with value: " + response.getResponseText());
+			
+			// Logging to file the received notification
+			
+			String ret = (priority == CoAP.QoSLevel.CRITICAL_HIGHEST_PRIORITY || priority == CoAP.QoSLevel.CRITICAL_HIGH_PRIORITY) ? "1":"0";
+			String record = path.substring(1, path.lastIndexOf('/'))+","+response.getResponseText()+","+path.substring(path.lastIndexOf('/')+1)+","+ret+","+response.getOptions().getObserve();
+			Log.LogOnFile("ObserverLog.csv", record);
+			
+			
 			if (DEBUG)
 				Log.debug("Response Handler", response.advanced().toString());
 			return;
@@ -104,7 +112,7 @@ public class ResponseHandler implements CoapHandler {
 //		// timestamp, ipSensore, valore ricevuto, nome risorsa, critico, observeDellaNotifica
 //		String ipSensor = path.replace("[", "");
 //		ipSensor = ipSensor.replace("]", "").split(":")[0];
-//		String[] data = { new Timestamp(System.currentTimeMillis()).toString(), ipSensor, value, 
+//		//String[] data = { new Timestamp(System.currentTimeMillis()).toString(), ipSensor, value, 
 //	}
 //
 //	private String escapeSpecialCharacters(String data) {

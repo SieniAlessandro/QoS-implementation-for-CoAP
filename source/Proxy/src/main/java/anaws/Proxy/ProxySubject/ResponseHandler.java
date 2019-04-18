@@ -53,7 +53,8 @@ public class ResponseHandler implements CoapHandler {
 			}
 			Log.info("ResponseHandler", "Ricevuto nuovo valore: " + Value );
 			SensorData newData = new SensorData(this.registration,Value,maxAge,response.getOptions().getObserve(),critic);
-			Log.info("Repsponse Handler", "Inserted data:" +newData.toString());
+			//Log.info("Repsponse Handler", "Inserted data:" +newData.toString());
+			Log.LogOnFile("LogProxy.csv", newData.getExportLog());
 			cache.insertData(newData);
 			if(this.registration.isFirstValue() == true) {
 				//In this case the only thing to do is to set firstValue at false
@@ -71,7 +72,6 @@ public class ResponseHandler implements CoapHandler {
 				proxyObserver.resourceChanged(sensor, resourceName);
 			}
 		}
-		
 	}
 	
 	public void onError() {
