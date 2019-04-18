@@ -7,16 +7,45 @@
 			\item Richiedi la cancellazione di una relazione
 			\item Avvia la discovery delle risorse
 		\end{enumerate}
-	\section {Implementazione}
-		\subsection {Modifiche a Californium lato Client}
+	\section {Modifiche a Californium lato Client}
 			Al fine di implementare le modifiche effettuate al protocollo CoAP, è stato necessario modificare anche la libreria Californium. In seguito verranno elencati i cambiamenti al codice della libreria, indicando il nome del file con un link alla repository con il codice originale e la motivazione di tale modifica. I file fanno riferimento alla package core di Californium:
-			\subsubsection{CoapClient}
+
+			\subsection{CoapClient}
 				Con l'introduzione della negoziazione del livello di priorità è necessario effettuare ulteriori controlli alla risposta ricevuta. Nel caso in cui la negoziazione è stata avviata, la risposta avrà come \textit{ResponseCode} \textbf{NOT\_ACCEPTABLE} e la CoapObserveRelation appena creata viene cancellata. Se la registrazione viene accettata senza negoziazione, allora bisogna controllare che il campo \textit{Observe} della risposta coincida con quello della richiesta. In ogni caso, dopo la ricezione della risposta, l'ordine delle notifiche deve essere resettato, in quanto la risposta alla registrazione può contenere nel campo Observe il valore della priorità, il quale può essere maggiore dell'attuale numero di notifica (vedere meccanismo di riordinamento delle notifiche.\newline
 				\lstinputlisting[label={observeAndWaitNegotiation}, language=Java, firstline=1148, lastline=1177, caption={CoapClient, \href{https://tinyurl.com/y25fegl8}{codice originale}},captionpos=b]{../Codice/Java/CoapClient.java}
-			\subsubsection{CoapObserveRelation}
+
+			\subsection{CoapObserveRelation}
 				Per resettare il gestore dell'ordine delle notifiche, è sufficiente ridefinire l'oggetto.\newline
 				\lstinputlisting[language=Java, firstline=286, lastline=290, caption={CoapObserveRelation, \href{https://tinyurl.com/y4ockh22}{codice originale}},captionpos=b]{../Codice/Java/CoapObserveRelation.java}
+
+	\section{Implementazione}
 		\subsection{classe Observer}
 			Questa classe utilizza un \textit{CoapClient} per effettuare le richeste verso il Proxy. Inoltre, mantiene le informazioni relative alle risorse trovate durante la discovery e una lista delle relazioni attualmente attive.
+			\subsubsection{resourceDiscovery}
+			Effettua la discovery delle risorse disponibili sul Proxy al quale viene inviata una richiesta di tipo \textbf{GET} sulla risorsa \textit{<well-known>} che contiene la lista delle risorse presenti.
+			\lstinputlisting[language=Java, firstline=138, lastline=144, caption={ResourceDiscovery},captionpos=b]{../Codice/Java/Observer.java}
+
 			\subsubsection{resourceRegistration}
-				Prepara una richiesta di tipo \textbf{GET} contenente nel campo \textit{Observe} il valore specificato dall'utente e la invia utilizzando la funzione \ref{observeAndWaitNegotiation}
+				Prepara una richiesta di tipo \textbf{GET} contenente nel campo \textit{Observe} il valore specificato dall'utente e la invia utilizzando la funzione \ref{observeAndWaitNegotiation}. Nel caso in cui la \textit{CoapObserveRelation} venga costruita con successo, allora questa viene mantenuta in una lista in modo da poter essere usata in seguito per la cancellazione della relazione.
+				\lstinputlisting[language=Java, firstline=116, lastline=136, caption={ResourceRegistration},captionpos=b]{../Codice/Java/Observer.java}
+
+			\subsubsection{resourceCancellation}
+				Effettua la richiesta di cancellazione di una relazione inviando al Proxy una richiesta \textbf{GET} sulla risorsa di cui non si vuole più ricevere le notifiche, specificando nel campo \textit{Observe} il valore 1.
+				\lstinputlisting[language=Java, firstline=146, lastline=155, caption={ResourceCancellation},captionpos=b]{../Codice/Java/Observer.java}
+
+		\subsection{classe ResponseHandler implements CoapHandler}
+			Questa classe implementa l'interfaccia \textit{CoapHandler} che gestisce le risposte ricevute in seguito all'invio di una richiesta. In particolare, ad ogni risposta ricevuta, la funzione \textit{onLoad(CoapResponse response)} viene eseguita.
+			\subsubsection{onLoad}
+				Inizialmente la funziona effetta dei controlli sulla correttezza della risposta:
+				\begin{itemize}
+					\item response = \textit{null}: la risposta è vuota e viene scartata
+					\item \textbf{ResponseCode.FORBIDDEN}: la relazione è stata interrotta dal server in seguito ad un cambio di stato da \textbf{AVAILABLE} a \textbf{ONLY\_CRITICAL}
+					\item \textbf{ResponseCode.SERVICE\_UNAVAILABLE}: la relazione è stata interrotta dal server in seguito ad un cambio di stato da 						\textbf{ONLY\_CRITICAL} a \textbf{UNAVAILABLE}
+					\item \textbf{ResponseCode.NOT\_FOUND}: se viene richiesta una risorsa al Proxy, ma quest'ultimo non conclude con successo la registrazione con il sensore
+					\item risposta senza opzione \textit{Observe}: la risposta non è valida e viene scartata
+				\end{itemize}
+				In seguito controlla se la risposta contiene una notifica oppure sia l'inizio di una negoziazione:
+				\begin{itemize}
+					\item \textbf{ResponseCode.CONTENT}: la risposta contiene il nuovo valore della risorsa che viene stampa a video
+					\item \textbf{ResponseCode.NOT\_ACCEPTABLE}: la negoziazione è stata avviata, allora se l'accettazione delle proposte è abilitata, viene preparata un'altra richiesta \textbf{GET} contenente nel campo \textit{Observe} il valore proposto dal Proxy, inviata tramite una semplice \textit{observe(CoapRequest, CoapHandler)} a cui si passa la stessa istanza di questa classe come CoapHandler.
+				\end{itemize}

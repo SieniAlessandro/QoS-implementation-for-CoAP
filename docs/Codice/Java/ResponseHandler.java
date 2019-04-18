@@ -73,21 +73,12 @@ public class ResponseHandler implements CoapHandler {
 			// Observe relation accepted without negotiation or a notification arrived
 			Log.info("Observer " + observer.getId(),
 					"New notification of " + path + " with value: " + response.getResponseText());
-			
-			// Logging to file the received notification
-			
-			String ret = (priority == CoAP.QoSLevel.CRITICAL_HIGHEST_PRIORITY || priority == CoAP.QoSLevel.CRITICAL_HIGH_PRIORITY) ? "1":"0";
-			String record = path.substring(1, path.lastIndexOf('/'))+","+response.getResponseText()+","+path.substring(path.lastIndexOf('/')+1)+","+ret+","+response.getOptions().getObserve();
-			Log.LogOnFile("ObserverLog.csv", record);
-			
-			
 			if (DEBUG)
 				Log.debug("Response Handler", response.advanced().toString());
 			return;
 		} else if (response.getCode().equals(CoAP.ResponseCode.NOT_ACCEPTABLE) && acceptProposal) {
 			Log.info("Observer " + observer.getId(),
 					"Negotiation started, subject proposes the following priority: " + response.getOptions());
-			priority = responsePriority;
 			// Subject started the negotiation, observer need to accept it			
 			Request observeRequest = new Request(Code.GET);
 			observeRequest.setObserve();
@@ -108,4 +99,25 @@ public class ResponseHandler implements CoapHandler {
 	public void onError() {
 		observer.getRelations().remove(path);
 	}
+	
+//	private void writeCSVData(String path, double value, String resourceName ) {
+//		// timestamp, ipSensore, valore ricevuto, nome risorsa, critico, observeDellaNotifica
+//		String ipSensor = path.replace("[", "");
+//		ipSensor = ipSensor.replace("]", "").split(":")[0];
+//		String[] data = { new Timestamp(System.currentTimeMillis()).toString(), ipSensor, value, 
+//	}
+//
+//	private String escapeSpecialCharacters(String data) {
+//	    String escapedData = data.replaceAll("\\R", " ");
+//	    if (data.contains(",") || data.contains("\"") || data.contains("'")) {
+//	        data = data.replace("\"", "\"\"");
+//	        escapedData = "\"" + data + "\"";
+//	    }
+//	    return escapedData;
+//	}
+//	
+//	private String convertToCSV(String[] data) {
+//		return Stream.of(data).map(this::escapeSpecialCharacters).collect(Collectors.joining(","));
+//	}
+
 }

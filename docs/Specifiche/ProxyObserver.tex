@@ -2,27 +2,26 @@
 	\section {Descrizione}
 		Questa modulo permette la gestione della comunicazione tra il \textit{Proxy} e l'\textit{Observer} fungendo da CoapServer in ascolto sulla porta di default di CoAP 5683. La classe mantiene le informazioni relative allo stato degli osservatori e le risorse attualmente disponibili sui sensori visibili dagli osservatori. Quest'ultimi possono effettuare delle richieste di osservazioni di una risorsa attualmente disponibile sul Proxy il quale gestisce la richiesta tramite il metodo \textit{ObservableResource.handleGet(CoapExchange exchange)} che si occupa della negoziazione e degli invii delle notifiche. \newline
 		Inoltre, fornisce i metodi per l'interazione con il modulo ProxySubject per l'aggiunta e la rimozione di risorse, notificare il cambio del valore della risorsa sul sensore ed eliminare le relazioni opportune dopo che lo stato di un sensore è cambiato.
-	\section {Implementazione}
-		\subsection {Modifiche a Californium lato Server}
+	\section {Modifiche a Californium lato Server}
 			Al fine di implementare le modifiche effettuate al protocollo CoAP, è stato necessario modificare anche la libreria Californium. In seguito verranno elencati i cambiamenti al codice della libreria, indicando il nome del file con un link alla repository con il codice originale e la motivazione di tale modifica. I file fanno riferimento alla package core di Californium:
-			\subsubsection{coap.CoAP}
+			\subsection{coap.CoAP}
 				Il livello di priorità viene indicato usando i primi 2 bit, rinominato campo \textit{QoS} del campo Observe del pacchetto CoAP ( 3 bytes ).  Questa classe fornisce i valori che questo campo può assumere\newline
 				\lstinputlisting[language=Java, firstline=663, lastline=673, caption={coap.CoAP.QoSLevel, \href{https://tinyurl.com/y46rbbg6}{codice originale}},captionpos=b]{../Codice/Java/CoAP.java}
 
-			\subsubsection{coap.Request}
+			\subsection{coap.Request}
 				Nel protocollo standard una Observe Request Registration può avere solo il valore 0 nel campo \textit{Observe}. Nel caso considerato invece i valori possono essere 4, corrispondenti ai 4 livelli di priorità. Questa funzione deve ritorna \textit{True} se 	contiene uno di questi valori. \newline
 				\lstinputlisting[language=Java, firstline=636, lastline=643, caption={coap.Request, \href{https://tinyurl.com/y2lhtgo4}{codice originale} },captionpos=b]{../Codice/Java/Request.java}
 
-			\subsubsection{observe.ObserveRelation}
-			Una ObserveRelation mantiene le informazioni relative alla relazione tra un observer e la risorsa osservata. \'E stato aggiunto un 	campo alla classe per mantenere il livello di priorità di quella relazione, i suoi get e set e una funzione per comparare 2 relazioni in base a questo campo. Quest'ultima servirà nel meccanismo di notifica degli observer basato su priorità. \newline
-				\lstinputlisting[language=Java, firstline=61, lastline=63, caption={observe.ObserveRelation QoS, \href{https://tinyurl.com/y3rf5qgl}{codice originale}},captionpos=b]{../Codice/Java/ObserveRelation.java}
-				\lstinputlisting[language=Java, firstline=130, lastline=147, caption={observe.ObserveRelation funzioni QoS, \href{https://tinyurl.com/y3rf5qgl}{codice originale}},captionpos=b]{../Codice/Java/ObserveRelation.java}
+			\subsection{observe.ObserveRelation}
+				Una ObserveRelation mantiene le informazioni relative alla relazione tra un observer e la risorsa osservata. \'E stato aggiunto un 	campo alla classe per mantenere il livello di priorità di quella relazione, i suoi get e set e una funzione per comparare 2 relazioni in base a questo campo. Quest'ultima servirà nel meccanismo di notifica degli observer basato su priorità. \newline
+					\lstinputlisting[language=Java, firstline=61, lastline=63, caption={observe.ObserveRelation QoS, \href{https://tinyurl.com/y3rf5qgl}{codice originale}},captionpos=b]{../Codice/Java/ObserveRelation.java}
+					\lstinputlisting[language=Java, firstline=130, lastline=147, caption={observe.ObserveRelation funzioni QoS, \href{https://tinyurl.com/y3rf5qgl}{codice originale}},captionpos=b]{../Codice/Java/ObserveRelation.java}
 
-			\subsubsection{server.ServerMessageDeliverer}
+			\subsection{server.ServerMessageDeliverer}
 				Quando una \textit{ObserveRelation} viene creata in seguito alla ricezione di una richiesta con l’opzione Observe, il campo \textit{QoS} della relazione viene settato con il valore del campo Observe della richiesta. \newline
 				\lstinputlisting[language=Java, firstline=153, lastline=165, caption={server.ServerMessageDeliverer checkForObserveOption(...), \href{https://tinyurl.com/y3tom2xy}{codice originale}},captionpos=b]{../Codice/Java/ServerMessageDeliverer.java}
 
-			\subsubsection{server.ServerState}
+			\subsection{server.ServerState}
 				Enumerato che definisce i 3 stati del nodo sensore:
 				\begin{enumerate}
 					\item \textbf{UNAVAILABLE}: il nodo sensore non è attivo, qualsiasi richiesta relativa a quel sensore è rigettata.
@@ -31,22 +30,24 @@
 				\end{enumerate}
 				\lstinputlisting[language=Java, firstline=3, lastline=5, caption={ServerState},captionpos=b]{../Codice/Java/ServerState.java}
 
-			\subsubsection{CoapResource}
-				\paragraph{Aggiornamento relazioni dopo il cambio stato del sensore}\label{cambioStatoSensore}
+			\subsection{CoapResource}
+				\subsubsection{Aggiornamento relazioni dopo il cambio stato del sensore}\label{cambioStatoSensore}
 				Quando avviene un cambio di stato di un sensore, è necessario controllare che le relazioni già stabilite siano consistenti con il nuovo stato. Pertanto quando lo stato diventa \textbf{ONLY\_CRITICAL}, le relazioni con livello \textit{CoAP.QoSLevel.NON\_CRITICAL\_MEDIUM\_PRIORITY} e \textit{CoAP.QoSLevel.NON\_CRITICAL\_LOW\_PRIORITY} vengono cancellate, mentre se si passa ad \textbf{UNAVAILABLE}, tutte le relazioni di quella risorsa vengono cancellate. \'E stata quindi aggiunta una funzione per cancellare solo le relazioni con un livello non critico di priorità. \newline
 				\lstinputlisting[language=Java, firstline=557, lastline=567, caption={CoapResource clearAndNotifyNonCriticalObserveRelations, \href{https://tinyurl.com/y264lheh}{codice originale}},captionpos=b]{../Codice/Java/CoapResource.java}
-				\paragraph{Notifica basata su priorità}
+				\subsubsection{Notifica basata su priorità}
 				È stata aggiunta una lista \textit{sortedObservers} di ObserveRelation ordinata in base al campo \textit{QoS} di un ObserveRelation in modo decrescente. L’ordinamento è effettuato all’inserimento di una nuova relazione nel \textit{ObserveRelationContainer observeRelations}. Questa nuova lista è impiegata per effettuare l’invio delle notifiche in ordine di priorità: l'invio delle notifiche è effettuato scansionando in modo sequenziale questa lista, partendo dal primo elemento ( priorità maggiore ), fino all'ultimo elemento ( priorità minore ). Per mantenere la lista consistente con l’ObserveRelationContainer, alla rimozione di un elemento da quest’ultimo, si rimuove lo stesso dalla sortedObservers.\newline
 				\lstinputlisting[language=Java, firstline=176, lastline=179, caption={CoapResource sortedObservers, \href{https://tinyurl.com/y264lheh}{codice originale}},captionpos=b]{../Codice/Java/CoapResource.java}
 				\lstinputlisting[language=Java, firstline=809, lastline=831, caption={CoapResource addObserveRelation(...), \href{https://tinyurl.com/y264lheh}{codice originale}},captionpos=b]{../Codice/Java/CoapResource.java}
 				\lstinputlisting[language=Java, firstline=840, lastline=852, caption={CoapResource removeObserveRelation(...), \href{https://tinyurl.com/y264lheh}{codice originale}},captionpos=b]{../Codice/Java/CoapResource.java}
 				\lstinputlisting[language=Java, firstline=915, lastline=925, caption={CoapResource notifyObserverRelations(...), \href{https://tinyurl.com/y264lheh}{codice originale}},captionpos=b]{../Codice/Java/CoapResource.java}
 
-			\subsubsection{server.resources.CoapExchange}
+			\subsection{server.resources.CoapExchange}
 				Il server può esprimere la sua volontà di avviare la registrazione rispondendo con un diverso valore del campo \textit{QoS} della richiesta. Se invece accetta subito la relazione di osservazione allora risponde con lo stesso valore della richiesta. A tal fine, è stata ridefinita la funzione \textit{CoapExchange.respond(Response response)} aggiungendo il parametro \textit{observeNumber}. Quest'ultimo sovrascrive il valore del campo \textit{Observe} che Califonium inserisce come numero per evitare riordinamento delle notifiche.\newline
 				\lstinputlisting[language=Java, firstline=378, lastline=399, caption={server.resources.CoapExchange, \href{https://tinyurl.com/y2tffp7k}{codice originale}},captionpos=b]{../Codice/Java/CoapExchange.java}
 
+	\section{Implementazione}
 		\subsection {class ProxyObserver}
+			Classe che fornisce i metodi chiamati dal ProxySubject e la gestione delle risorse esposte agli osservatori.
 			\subsubsection{Aggiunta delle Risorse}
 				 L'aggiunta delle risorse è effettuata dal modulo \textit{ProxySubject} che effettua la discovery delle risorse e le aggiunge al modulo ProxyObserver tramite la funzione \ref{addResource}
 				\lstinputlisting[label={addResource}, language=Java, firstline=90, lastline=11, caption={ProxyObserver.addResource},captionpos=b]{../Codice/Java/ProxyObserver.java}
@@ -76,7 +77,9 @@
 				\lstinputlisting[label={requestRegistration}, language=Java, firstline=168, lastline=170, caption={requestRegistration},captionpos=b]{../Codice/Java/ProxyObserver.java}
 				\lstinputlisting[label={requestSensorNode}, language=Java, firstline=172, lastline=174, caption={requestSensorNode},captionpos=b]{../Codice/Java/ProxyObserver.java}
 				\lstinputlisting[label={requestObserveCancel}, language=Java, firstline=176, lastline=178, caption={requestObserveCancel},captionpos=b]{../Codice/Java/ProxyObserver.java}
+				
 		\subsection { class ObservableResource extends CoapResource}
+			Questa classe estende una CoapResource standard e ridefinisce i metodo necessari per la gestione delle richieste.
 			\subsubsection{handleGET}
 				Questa funzione viene chiamata in 2 casi distinti:
 				\begin{enumerate}

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7000 64-bit) (preloaded format=pdflatex 2019.3.28)  17 APR 2019 20:26
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7000 64-bit) (preloaded format=pdflatex 2019.3.28)  18 APR 2019 11:55
 entering extended mode
 **"./Progetto Observe Extension Of CoAP with QoS.tex"
 ("Progetto Observe Extension Of CoAP with QoS.tex"
@@ -1000,7 +1000,7 @@ Capitolo 2.
 sty"
 File: lstlang1.sty 2019/02/27 1.8b listings language file
 )
-Underfull \hbox (badness 10000) in paragraph at lines 9--10
+Underfull \hbox (badness 10000) in paragraph at lines 8--9
 
  []
 
@@ -1010,14 +1010,14 @@ Underfull \hbox (badness 10000) in paragraph at lines 9--10
 
 ]
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
-nput line 10.
+nput line 9.
  (../Codice/Java/CoAP.java)
-Underfull \hbox (badness 10000) in paragraph at lines 13--14
+Underfull \hbox (badness 10000) in paragraph at lines 12--13
 
  []
 
 (../Codice/Java/Request.java)
-Underfull \hbox (badness 10000) in paragraph at lines 17--18
+Underfull \hbox (badness 10000) in paragraph at lines 16--17
 
  []
 
@@ -1027,27 +1027,33 @@ LaTeX Font Info:    External font `lmex10' loaded for size
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <5> on input line 145.
 )
-Underfull \hbox (badness 10000) in paragraph at lines 22--23
+Underfull \hbox (badness 10000) in paragraph at lines 21--22
 
  []
 
 (../Codice/Java/ServerMessageDeliverer.java [11])
 (../Codice/Java/ServerState.java)
-Underfull \hbox (badness 10000) in paragraph at lines 36--37
+Overfull \hbox (58.88899pt too wide) in paragraph at lines 35--36
+\T1/lmr/bx/n/10.95 LY_CRITICAL\T1/lmr/m/n/10.95 (-20) , le re-la-zio-ni con li-
+vel-lo \T1/lmr/m/it/10.95 (-20) CoAP.QoSLevel.NON_CRITICAL_MEDIUM_PRIORITY
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 35--36
 
  []
 
 [12] (../Codice/Java/CoapResource.java)
-Underfull \hbox (badness 10000) in paragraph at lines 39--40
+Underfull \hbox (badness 10000) in paragraph at lines 38--39
 
  []
 
 (../Codice/Java/CoapResource.java
 LaTeX Font Info:    Font shape `OMS/lmr/m/n' in size <9> not available
 (Font)              Font shape `OMS/lmsy/m/n' tried instead on input line 177.
- [13]) (../Codice/Java/CoapResource.java)
-(../Codice/Java/CoapResource.java [14]) (../Codice/Java/CoapResource.java)
-Underfull \hbox (badness 10000) in paragraph at lines 46--47
+) (../Codice/Java/CoapResource.java [13])
+(../Codice/Java/CoapResource.java) (../Codice/Java/CoapResource.java [14])
+Underfull \hbox (badness 10000) in paragraph at lines 45--46
 
  []
 
@@ -1057,7 +1063,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 46--47
 [17]) (../Codice/Java/ProxyObserver.java) (../Codice/Java/ProxyObserver.java)
 (../Codice/Java/ProxyObserver.java) (../Codice/Java/ProxyObserver.java)
 [18]
-Overfull \hbox (32.13281pt too wide) in paragraph at lines 95--96
+Overfull \hbox (32.13281pt too wide) in paragraph at lines 98--99
 \T1/lmr/m/n/10.95 (-20) go-zia-zio-ne vie-ne av-via-ta ri-spon-den-do con \T1/l
 mr/bx/n/10.95 Re-spon-se-Co-de.NOT_ACCEPTABLE
  []
@@ -1077,28 +1083,29 @@ Underfull \hbox (badness 10000) in paragraph at lines 14--15
 
 
 ] (../Codice/Java/CoapClient.java [22])
-Underfull \hbox (badness 10000) in paragraph at lines 17--18
+Underfull \hbox (badness 10000) in paragraph at lines 18--19
 
  []
 
-(../Codice/Java/CoapObserveRelation.java)) [23]
+(../Codice/Java/CoapObserveRelation.java) (../Codice/Java/Observer.java)
+[23] (../Codice/Java/Observer.java) (../Codice/Java/Observer.java [24])
+[25]) [26]
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 79.
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 79.
-
-("Progetto Observe Extension Of CoAP with QoS.aux" (specifiche.aux)
+ ("Progetto Observe Extension Of CoAP with QoS.aux" (specifiche.aux)
 (ProxyObserver.aux) (Observer.aux))
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 79.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 79.
 Package rerunfilecheck Info: File `"Progetto Observe Extension Of CoAP with QoS
 ".out' has not changed.
-(rerunfilecheck)             Checksum: 83E351543C1F9AED5853CB98BEAEB303;1308.
+(rerunfilecheck)             Checksum: ACC578DC1920D1B807D41311B6CAEC3B;1474.
  ) 
 Here is how much of TeX's memory you used:
- 24353 strings out of 492945
- 454032 string characters out of 3126252
- 855958 words of memory out of 3000000
- 27490 multiletter control sequences out of 15000+200000
- 624758 words of font info for 131 fonts, out of 3000000 for 9000
+ 24452 strings out of 492945
+ 455879 string characters out of 3126252
+ 850832 words of memory out of 3000000
+ 27531 multiletter control sequences out of 15000+200000
+ 624841 words of font info for 132 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  45i,6n,63p,899b,2335s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Users/nabow/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/lm/lm-maths
@@ -1114,10 +1121,10 @@ nts/type1/public/lm/lmri10.pfb><C:/Users/nabow/AppData/Local/Programs/MiKTeX 2.
 9/fonts/type1/public/lm/lmro10.pfb><C:/Users/nabow/AppData/Local/Programs/MiKTe
 X 2.9/fonts/type1/public/lm/lmsy10.pfb><C:/Users/nabow/AppData/Local/Programs/M
 iKTeX 2.9/fonts/type1/public/lm/lmsy9.pfb>
-Output written on "Progetto Observe Extension Of CoAP with QoS.pdf" (25 pages, 
-371826 bytes).
+Output written on "Progetto Observe Extension Of CoAP with QoS.pdf" (28 pages, 
+392279 bytes).
 PDF statistics:
- 631 PDF objects out of 1000 (max. 8388607)
- 323 named destinations out of 1000 (max. 500000)
- 31897 words of extra memory for PDF output out of 35830 (max. 10000000)
+ 709 PDF objects out of 1000 (max. 8388607)
+ 373 named destinations out of 1000 (max. 500000)
+ 31913 words of extra memory for PDF output out of 35830 (max. 10000000)
 
