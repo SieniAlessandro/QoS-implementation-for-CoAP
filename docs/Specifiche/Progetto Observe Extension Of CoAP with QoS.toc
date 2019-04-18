@@ -47,3 +47,5 @@
 \contentsline {subsection}{\numberline {3.2.1}Modifiche a Californium lato Client}{21}{subsection.3.2.1}% 
 \contentsline {subsubsection}{\numberline {3.2.1.1}CoapClient}{21}{subsubsection.3.2.1.1}% 
 \contentsline {subsubsection}{\numberline {3.2.1.2}CoapObserveRelation}{23}{subsubsection.3.2.1.2}% 
+\contentsline {subsection}{\numberline {3.2.2}classe Observer}{23}{subsection.3.2.2}% 
+\contentsline {subsubsection}{\numberline {3.2.2.1}resourceRegistration}{23}{subsubsection.3.2.2.1}% 

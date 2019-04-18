@@ -153,8 +153,8 @@ public class ObservableResource extends CoapResource {
 		exchange.setMaxAge(data.getTime());
 
 		if (observeField < 0) {
-//			exchange.respond(response, data.getObserve());
-			exchange.respond(response);
+			exchange.respond(response, (int) data.getObserve());
+//			exchange.respond(response);
 		} else {
 			// This is a registration response, respond with the same observe number ;
 			exchange.respond(response, observeField);
