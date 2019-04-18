@@ -207,7 +207,7 @@ PROCESS_THREAD(rest_server, ev, data)
 
 
   //For debug purposes
-  rest_activate_resource(&res_hello, "debug/hello");
+  rest_activate_resource(&res_hello, "sensors/hello");
 
   printf("timestamp,indirizzoIP,valore,nomeRisorsa,critico,observe\n");
   
