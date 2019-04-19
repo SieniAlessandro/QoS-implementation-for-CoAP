@@ -2,6 +2,7 @@
 
 #include "common.h"
 
+/*DEFINING THE RESOURCE THOSE ARE PRESENT IN THE SENSOR NODE*/
 #include "dev/temperature-sensor.h"
 extern resource_t res_temperature;
 
@@ -16,8 +17,9 @@ static uip_ipaddr_t server_ipaddr;
 
 
 /*---------------------------------------------------------------------------*/
-
+//Necessary to establish and mantain the connection with the border-router
 PROCESS(udp_client_process, "UDP client process");
+//The rest server
 PROCESS(rest_server, "Erbium Server");
 
 AUTOSTART_PROCESSES(&udp_client_process, &rest_server);
@@ -38,30 +40,7 @@ tcpip_handler(void)
   }
 }
 
-/*---------------------------------------------------------------------------*/
-static void
-print_local_addresses(void)
-{
-  int i;
-  uint8_t state;
-
-  PRINTF("Client IPv6 addresses: ");
-  for(i = 0; i < UIP_DS6_ADDR_NB; i++) {
-    state = uip_ds6_if.addr_list[i].state;
-    if(uip_ds6_if.addr_list[i].isused &&
-       (state == ADDR_TENTATIVE || state == ADDR_PREFERRED)) {
-      PRINT6ADDR(&uip_ds6_if.addr_list[i].ipaddr);
-      PRINTF("\n");
-      if (state == ADDR_TENTATIVE) {
-  uip_ds6_if.addr_list[i].state = ADDR_PREFERRED;
-      }
-    }
-  }
-}
-/*---------------------------------------------------------------------------*/
-static void
-set_global_address(void)
-{
+static void set_global_address(void){
   uip_ipaddr_t ipaddr;
 
   uip_ip6addr(&ipaddr, UIP_DS6_DEFAULT_PREFIX, 0, 0, 0, 0, 0, 0, 0);
@@ -89,8 +68,8 @@ set_global_address(void)
 
 }
 /*---------------------------------------------------------------------------*/
-PROCESS_THREAD(udp_client_process, ev, data)
-{
+PROCESS_THREAD(udp_client_process, ev, data){
+
   static struct etimer periodic;
 #if WITH_COMPOWER
   static int print = 0;
@@ -101,11 +80,6 @@ PROCESS_THREAD(udp_client_process, ev, data)
   PROCESS_PAUSE();
 
   set_global_address();
-
-  PRINTF("UDP client process started nbr:%d routes:%d\n",
-         NBR_TABLE_CONF_MAX_NEIGHBORS, UIP_CONF_MAX_ROUTES);
-
-  print_local_addresses();
 
   /* new connection with remote host */
   client_conn = udp_new(NULL, UIP_HTONS(UDP_SERVER_PORT), NULL); 
@@ -120,15 +94,6 @@ PROCESS_THREAD(udp_client_process, ev, data)
   PRINTF(" local/remote port %u/%u\n",
   UIP_HTONS(client_conn->lport), UIP_HTONS(client_conn->rport));
 
-  /* initialize serial line */
-  //uart1_set_input(serial_line_input_byte);
-  //serial_line_init();
-
-
-#if WITH_COMPOWER
-  powertrace_sniff(POWERTRACE_ON);
-#endif
-
   etimer_set(&periodic, SEND_INTERVAL);
   while(1) {
     PROCESS_YIELD();
@@ -139,17 +104,6 @@ PROCESS_THREAD(udp_client_process, ev, data)
 
     if(etimer_expired(&periodic)) {
       etimer_reset(&periodic);
-      //ctimer_set(&backoff_timer, SEND_TIME, send_packet, NULL);
-
-#if WITH_COMPOWER
-      if (print == 0) {
-  powertrace_print("#P");
-      }
-      if (++print == 3) {
-  print = 0;
-      }
-#endif
-
     }
   }
 
@@ -172,23 +126,19 @@ PROCESS_THREAD(rest_server, ev, data)
   rest_activate_resource(&res_battery, "sensors/battery");  
   SENSORS_ACTIVATE(battery_sensor);  
   
-  
   rest_activate_resource(&res_temperature, "sensors/temperature");
   SENSORS_ACTIVATE(temperature_sensor);
 
-
-  //For debug purposes
+  //Resource used only for debug purposes
   rest_activate_resource(&res_hello, "sensors/hello");
 
-//  printf("timestamp,indirizzoIP,valore,nomeRisorsa,critico,observe\n");
+  //Used only for Testing phase
   printf("Time,IPAddress,Value,Type,Critic,Observe\n");
 
   while(1){
     PROCESS_WAIT_EVENT();
-      //if(ev == BATTERY_END_EVENT){
-      //  printf("The battery is terminated!\n");
-      //}
-  } /* while (1) */
+    //If we want we can put here a button event to recharge the battery
+  }
 
   PROCESS_END();
 }

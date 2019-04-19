@@ -54,12 +54,9 @@
   PROJECT ANAWS CONSTANTS
 ******************************************************/
 
-#define MIN_MAX_AGE 255
+#define CRITICAL_MAX_AGE 255
 #define CRITICAL 0x800000
 #define NON_CRITICAL 0
-
-#define BATTERY_END_EVENT 7
-
 
 #define INITIAL_BATTERY 1000
 #define SENSING_DRAIN 1

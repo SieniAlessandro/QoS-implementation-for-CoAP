@@ -43,10 +43,8 @@ static void periodic_handler();
 static void res_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset);
 
 /*
- * A handler function named [resource name]_handler must be implemented for each RESOURCE.
- * A buffer for the response payload is provided through the buffer pointer. Simple resources can ignore
- * preferred_size and offset, but must respect the REST_MAX_CHUNK_SIZE limit for the buffer.
- * If a smaller block size is requested for CoAP, the REST framework automatically splits the data.
+ * Resource used only for debug purposes, it only sends a periodic message to the observer every 10 seconds 
+ *
  */
 PERIODIC_RESOURCE(res_hello,
          "title=\"Hello world: ?len=0..\";rt=\"Hello\";obs",
@@ -62,7 +60,7 @@ res_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferr
 {
   const char *len = NULL;
   /* Some data that has the length up to REST_MAX_CHUNK_SIZE. For more, see the chunk resource. */
-  char const *const message = "1234567891011ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxy";
+  char const *const message = "123456789101";
   int length = 12; /*           |<-------->| */
 
   /* The query string can be retrieved by rest_get_query() or parsed for its key-value pairs. */

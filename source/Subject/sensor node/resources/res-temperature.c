@@ -42,20 +42,6 @@
 #include "../common.h"
 #include "dev/temperature-sensor.h"
 
-/*
-#include "contiki.h"
-
-
-#include <limits.h>
-#include <stdlib.h>
-#include <string.h>
-#include "rest-engine.h"
-#include "er-coap.h"
-//#if PLATFORM_HAS_TEMPERATURE
-#include "dev/temperature-sensor.h"
-*/
-static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset);
-static void periodic_handler(void);
 
 #define MAX_AGE      60
 #define INTERVAL_MAX (MAX_AGE - 1)
@@ -63,17 +49,20 @@ static void periodic_handler(void);
 #define CRITICAL_CHANGE 1
 #define CRITICAL_THRESHOLD 30 //TO DEFINE
 
+
+static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset);
+static void periodic_handler(void);
+
+//Used to handle the variable max_age
 static uint32_t variable_max_age = MAX_AGE;
+//Used to know when we are near to the end of the validity of the previous data
 static int32_t interval_counter = INTERVAL_MAX;
 
 static int temperature_old = INT_MIN;
-static uint32_t dataLevel = CRITICAL; //0 if not critical, 0x800000
-static uint8_t requestedLevel = 0; //0 all, 1 only criticals
-//Contains the ID of the requested:
-//If it is 0 it means that no request had been made
-//static uint32_t numReq = 0;
+static uint32_t dataLevel = CRITICAL; //NON_CRITICAL, CRITICAL
+static uint8_t requestedLevel = 0; //NON_CRITICAL all, CRITICAL only criticals
 
-
+//Initialization of the resource temperature as an observable resource, with a periodic handler function
 PERIODIC_RESOURCE(res_temperature,
          "title=\"Temperature\";rt=\"Temperature\";obs",
          get_handler,
@@ -83,30 +72,22 @@ PERIODIC_RESOURCE(res_temperature,
          2*CLOCK_SECOND,
          periodic_handler);
 
-static void
-get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
-{
-  /*
-   * For minimal complexity, request query and options should be ignored for GET on observable resources.
-   * Otherwise the requests must be stored with the observer list and passed by REST.notify_subscribers().
-   * This would be a TODO in the corresponding files in contiki/apps/erbium/!
-   */
-  //printf("CALLED THE GET HANDLER\n");
+static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset){
 
   uint32_t requestLevel;
   coap_get_header_observe(request, &requestLevel);
 
+  //Only for the first request we check the observe field to see the type of messages requested
   if(requestLevel == 0 || requestLevel == CRITICAL){
     coap_set_header_observe(request, 0);
     if(requestLevel == CRITICAL){
-      //printf("RICHIESTI SOLO VALORI CRITICI\n");
       requestedLevel = 1;
     }else{
       requestedLevel = 0;
     }
-    //printf("requestLevel received: %lu. requestedLevel changed:%u\n", requestLevel,requestedLevel);
   }
 
+  //If we receive a message with the field observer equal to 1, we know that the registration has been canceled
   if(requestLevel == 1)
       return;
   
@@ -122,7 +103,9 @@ get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_s
 
     REST.set_response_payload(response, (uint8_t *)buffer, strlen((char *)buffer));
 
-  } else if(accept == REST.type.APPLICATION_JSON) {
+  }
+  /* CODE NECESSARY ONLY IF JSON MESSAGES ARE IMPLEMENTED IN THE PROXY
+   else if(accept == REST.type.APPLICATION_JSON) {
     REST.set_header_content_type(response, REST.type.APPLICATION_JSON);
     if(dataLevel == CRITICAL)
       snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "{'temperature':%d!}", temperature_old);
@@ -133,32 +116,32 @@ get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_s
     //DO NOT WORK
 
     REST.set_response_payload(response, buffer, strlen((char *)buffer));
-  } else {
+  }*/ 
+  else {
     REST.set_response_status(response, REST.status.NOT_ACCEPTABLE);
     const char *msg = "Supporting content-types text/plain and application/json";
     REST.set_response_payload(response, msg, strlen(msg));
   }
 
+  //Change the default Max Age to the variable max age computed in the periodic handler
   REST.set_header_max_age(response, variable_max_age);
+  //Reduce the battery to simulate the consumption of sending a message
   battery = reduceBattery(TRANSMITTING_DRAIN);
 
-  uint32_t observe;
-  coap_get_header_observe(response, &observe);
-  //REST.get_header_observe(response, &observe);
+  //Call the log function - TESTING PHASE
   stampa(temperature_old, "temperature", dataLevel);
 
   /* The REST.subscription_handler() will be called for observable resources by the REST framework. */
 }
 
 
+//Vectors of temperature values, used to simulate the temperature
 int TEMPERATURE_VALUES[60] = {10,38,-34,-6,22,50,-22,6,34,-38,-10,18,46,-26,2,30,58,-14,14,42,-30,-2,26,54,-18,10,38,-34,-6,22,50,-22,6,34,-38,-10,18,46,-26,2,30,58,-14,14,42,-30,-2,26,54,-18,10,38,-34,-6,22,50,-22,6,34,-38};
 /*
  * Additionally, a handler function named [resource name]_handler must be implemented for each PERIODIC_RESOURCE.
  * It will be called by the REST manager process with the defined period.
  */
-static void
-periodic_handler()
-{
+static void periodic_handler(){
   if(battery <= 0)
     return;
 
@@ -166,23 +149,31 @@ periodic_handler()
   // USE THIS FOR THE REAL SENSOR NODE//
   //int temperature = (temperature_sensor.value(0)/10-396)/10;
   //int temperature = (temperature_sensor.value(0);
+
+
   // USED ONLY FOR THE SIMULATIONS ON COOJA //
   int temperature = TEMPERATURE_VALUES[interval_counter%60];
-  ++interval_counter;
 
+  ++interval_counter;
+  //Used to simulate the drain of performing the sensing
   battery = reduceBattery(SENSING_DRAIN);
 
-
+  //If the old data is not anymore valid
   if(interval_counter+1 >= variable_max_age) {
-     interval_counter = 0;
-     if(temperature >= CRITICAL)
+      //Reset the counter
+      interval_counter = 0;
+      //Chek if the value is a critical one, without watching the old value
+      if(temperature >= CRITICAL)
         dataLevel = CRITICAL;
-     else
+      else
+        //If the value is not critical and the observer has requested all the values, we know that is a NON_CRITICAL value
         if(requestedLevel == 0)
           dataLevel = NON_CRITICAL;
         else
+          //Otherwise we do not set any type of level and nothing will be send to the observer
           dataLevel = -1;
   }else{
+    //The old packet is still valid, so we must see if the new value is different from the previous one
     if(temperature >= CRITICAL_THRESHOLD && abs(temperature - temperature_old) >= CRITICAL_CHANGE){
       dataLevel = CRITICAL;
     }else{
@@ -196,21 +187,22 @@ periodic_handler()
     }
   }
 
-
+  //If there is a dataLevel it means that a new valid data has been sensed so it must be sent
   if(dataLevel != -1){
+    //We put the recorded old value as the new one
     temperature_old = temperature;
-    /* Notify the registered observers which will trigger the res_get_handler to create the response. */
+    //We check if there are any spurios non critical data detected, that should not be sent, maybe because of the change of the
+    //level of the battery
     if(requestedLevel == 1 && dataLevel == NON_CRITICAL){
-      //printf("Data non critical detected, but not requested. RequestedLevel:%u. DataLevel: %lu\n", requestedLevel, dataLevel);
       return;
     }
 
     //HANDLING THE MAX AGE
     if(dataLevel == CRITICAL){
-      variable_max_age = MIN_MAX_AGE;
+      variable_max_age = CRITICAL_MAX_AGE;
     }else{
       if(dataLevel == NON_CRITICAL){
-        if(variable_max_age == MIN_MAX_AGE)
+        if(variable_max_age == CRITICAL_MAX_AGE)
           variable_max_age = 10;
         else{
           variable_max_age += 10;
@@ -219,7 +211,7 @@ periodic_handler()
         }
       }
     }
+    /* Notify the registered observers which will trigger the res_get_handler to create the response. */
     REST.notify_subscribers(&res_temperature);
   }
 }
-//#endif /* PLATFORM_HAS_TEMPERATURE */
