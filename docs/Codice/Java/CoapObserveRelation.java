@@ -65,7 +65,10 @@ public class CoapObserveRelation {
 
 	/** The endpoint. */
 	private final Endpoint endpoint;
-
+	// CHANGE_START
+	private AtomicBoolean responseReceived;
+	private AtomicBoolean isMainWaiting;
+	// CHANGE_END
 	/**
 	 * Indicates, that an observe request is pending.
 	 * 
@@ -108,12 +111,31 @@ public class CoapObserveRelation {
 	 * @param request the request
 	 * @param endpoint the endpoint
 	 */
+	//CHANGE_START
 	protected CoapObserveRelation(Request request, Endpoint endpoint) {
 		this.request = request;
 		this.endpoint = endpoint;
 		this.orderer = new ObserveNotificationOrderer();
+		this.responseReceived = new AtomicBoolean(false);
+		this.isMainWaiting = new AtomicBoolean(false);
 	}
-
+	
+	protected void setResponseReceived() {
+		this.responseReceived.set(true);
+	}
+	
+	protected boolean getResponseReceived() {
+		return this.responseReceived.get();
+	}
+	
+	protected void setMainWaiting( boolean state) {
+		this.isMainWaiting.set(state);
+	}
+	
+	protected boolean getMainWaiting() {
+		return this.isMainWaiting.get();
+	}
+	// CHANGE_END
 	/**
 	 * Refreshes the Observe relationship with a new GET request with same token
 	 * and options. The method also resets the notification orderer, since the
@@ -285,7 +307,7 @@ public class CoapObserveRelation {
 	}
 	// CHANGE_START
 	protected void resetOrder() {
-		this.orderer = new ObserveNotificationOrderer();
+		this.orderer.resetNumber();
 	}
 	// CHANGE_END
 	private void setReregistrationHandle(ScheduledFuture<?> reregistrationHandle) {

@@ -46,6 +46,7 @@ package org.eclipse.californium.core;
 
 import java.io.IOException;
 import java.net.URI;
+import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -1061,7 +1062,7 @@ public class CoapClient {
 			throw new RuntimeException(e);
 		}
 	}
-
+	
 	/*
 	 * Sets the specified Accept option of the request.
 	 *
@@ -1145,7 +1146,7 @@ public class CoapClient {
 		}
 	}
 	
-	public CoapObserveRelation observeAndWaitNegotiation(Request request, CoapHandler handler) {
+	public CoapObserveRelation observeAndWaitNegotiation(Request request, CoapHandler handler) throws InterruptedException {
 
 		if (request.getOptions().hasObserve()) {
 			assignClientUriIfEmpty(request);
@@ -1162,7 +1163,16 @@ public class CoapClient {
 			relation.setNotificationListener(notificationListener);
 			CoapResponse response = synchronous(request, outEndpoint);
 			// CHANGE_START
-			relation.resetOrder();
+			synchronized(relation) {
+				if ( !relation.getResponseReceived() ) {
+					relation.setMainWaiting(true);
+					relation.wait();
+					relation.setMainWaiting(false);
+				}
+			}
+			if (!response.getCode().equals(CoAP.ResponseCode.NOT_ACCEPTABLE))
+				relation.resetOrder();
+			
 			if (response == null || !response.advanced().getOptions().hasObserve()
 					|| response.getCode().equals(CoAP.ResponseCode.NOT_ACCEPTABLE) // Negotiation started
 					|| (int) response.getOptions().getObserve() != (int) request.getOptions().getObserve() // Requested observe # doesn't match the response's one
@@ -1490,6 +1500,12 @@ public class CoapClient {
 		protected void deliver(CoapResponse response) {
 			synchronized (relation) {
 				if (relation.onResponse(response)) {
+					// CHANGE_START
+					relation.setResponseReceived();
+					if ( relation.getMainWaiting() ) {
+						relation.notify();
+					}
+					// CHANGE_END
 					handler.onLoad(response);
 				} else {
 					LOGGER.debug("dropping old notification: {}", response.advanced());

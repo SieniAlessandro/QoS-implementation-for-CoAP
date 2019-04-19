@@ -10,13 +10,31 @@
 	\section {Modifiche a Californium lato Client}
 			Al fine di implementare le modifiche effettuate al protocollo CoAP, è stato necessario modificare anche la libreria Californium. In seguito verranno elencati i cambiamenti al codice della libreria, indicando il nome del file con un link alla repository con il codice originale e la motivazione di tale modifica. I file fanno riferimento alla package core di Californium:
 
-			\subsection{CoapClient}
-				Con l'introduzione della negoziazione del livello di priorità è necessario effettuare ulteriori controlli alla risposta ricevuta. Nel caso in cui la negoziazione è stata avviata, la risposta avrà come \textit{ResponseCode} \textbf{NOT\_ACCEPTABLE} e la CoapObserveRelation appena creata viene cancellata. Se la registrazione viene accettata senza negoziazione, allora bisogna controllare che il campo \textit{Observe} della risposta coincida con quello della richiesta. In ogni caso, dopo la ricezione della risposta, l'ordine delle notifiche deve essere resettato, in quanto la risposta alla registrazione può contenere nel campo Observe il valore della priorità, il quale può essere maggiore dell'attuale numero di notifica (vedere meccanismo di riordinamento delle notifiche.\newline
-				\lstinputlisting[label={observeAndWaitNegotiation}, language=Java, firstline=1148, lastline=1177, caption={CoapClient, \href{https://tinyurl.com/y25fegl8}{codice originale}},captionpos=b]{../Codice/Java/CoapClient.java}
+			\subsection{CoapClient}\label{CoapClient}
+				Con l'introduzione della negoziazione del livello di priorità è necessario effettuare ulteriori controlli alla risposta ricevuta, riga 28 di \ref{observeAndWaitNegotiation}. Nel caso in cui la negoziazione è stata avviata, la risposta avrà come \textit{ResponseCode} \textbf{NOT\_ACCEPTABLE} e la CoapObserveRelation appena creata viene cancellata. Se la registrazione viene accettata senza negoziazione, allora bisogna controllare che il campo \textit{Observe} della risposta coincida con quello della richiesta.\newline
+				\lstinputlisting[label={observeAndWaitNegotiation}, language=Java, firstline=1149, lastline=1187, caption={CoapClient, \href{https://tinyurl.com/y25fegl8}{codice originale}},captionpos=b]{../Codice/Java/CoapClient.java}
+
+				Dopo la prima notifica ricevuta, il contatore, usato per mantenere ordinate le notifiche, viene settato con il valore del campo \textit{Observe} appena ricevuto e la prossima notifica deve avere un valore superiore a quest'ultimo per essere considerata fresca ed essere accettata. Se la registrazione è accettata subito, il contatore ottiene uno dei 4 valori del campo \textit{QoSLevel} e difficilmente la prossima notifica ha un numero di superiore a questi. Pertanto il contatore deve essere resettato in modo tale che la prossima notifica non venga scartata.
+				Quando si riceve la risposta possono attivarsi 2 thread:
+				\begin{itemize}
+					\item MainThread che continua l'esecuzione della observeAndWaitNegotiation subito dopo della \textit{synchronous}, in cui viene effettuato il reset del contatore
+					\item Coap.Endopoint-UDP che fornisce la risposta all'Handler della risposta stessa, il quale prima controlla che la notifica sia fresca e scrive nel contatore il valore attuale del campo \textit{Observe}.
+				\end{itemize}
+				\'E necessario garantire che i 2 thread vengano eseguiti nel seguente ordine:
+				\begin{enumerate}
+					\item Coap.Endpoint-UDP scrive nel contatore il valore del campo \textit{Observe}
+					\item MainThread resetta il contatore
+				\end{enumerate}
+				Per garantire ciò, il MainThread attende tramite una \textit{wait} (riga 21 di \ref{observeAndWaitNegotiation}) sulla \textit{CoapObserveRelation} che la risposta è stata gestita dal Coap.Endpoint che esegue una \textit{notify} sullo stesso oggetto dopo che la freschezza della notifica è stata controlla nella funzione \textit{deliver} \ref{deliver}. Inoltre, l'attesa è effettuata solo se la risposta non è stata ancora gestita, mentra la \textit{notify} è effettuata solo se il MainThread è in attesa. Questi controlli sono effettuati tramite delle nuove variabili introdotti nella \textit{CoapObserveRelation} indicate in \ref{CoapObserveRelationBoolean}
+				\lstinputlisting[label={deliver}, language=Java, firstline=1493, lastline=1515, caption={deliver, \href{https://tinyurl.com/y6gvpzrm}{codice originale}},captionpos=b]{../Codice/Java/CoapClient.java}
+
 
 			\subsection{CoapObserveRelation}
-				Per resettare il gestore dell'ordine delle notifiche, è sufficiente ridefinire l'oggetto.\newline
-				\lstinputlisting[language=Java, firstline=286, lastline=290, caption={CoapObserveRelation, \href{https://tinyurl.com/y4ockh22}{codice originale}},captionpos=b]{../Codice/Java/CoapObserveRelation.java}
+				Variabili usate nel meccanismo di \textit{wait} e \textit{notify} spiegato in \ref{CoapClient}. \newline
+				\lstinputlisting[label={CoapObserveRelationBoolean}, language=Java, firstline=68, lastline=71, caption={CoapObserveRelation, \href{https://tinyurl.com/y4ockh22}{codice originale}},captionpos=b]{../Codice/Java/CoapObserveRelation.java}
+				\lstinputlisting[language=Java, firstline=114, lastline=138, caption={CoapObserveRelation, \href{https://tinyurl.com/y4ockh22}{codice originale}},captionpos=b]{../Codice/Java/CoapObserveRelation.java}
+				Per resettare il gestore dell'ordine delle notifiche il contatore viene settato a 0.\newline
+				\lstinputlisting[language=Java, firstline=308, lastline=312, caption={CoapObserveRelation, \href{https://tinyurl.com/y4ockh22}{codice originale}},captionpos=b]{../Codice/Java/CoapObserveRelation.java}
 
 	\section{Implementazione}
 		\subsection{classe Observer}

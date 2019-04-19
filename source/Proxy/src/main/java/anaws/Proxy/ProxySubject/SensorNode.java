@@ -35,7 +35,6 @@ public class SensorNode{
 			if(s.equals(resource))
 				return;
 		}
-		Log.debug("SensorNode", "Adding resource: " + resource);
 		this.resources.add(resource);
 	}
 	public ArrayList<String> getResources() {return this.resources;}
@@ -49,10 +48,8 @@ public class SensorNode{
 			} else {
 				actualState = ServerState.ONLY_CRITICAL;
 				Log.info("SensorNode", "Battery Under Threshold");
-
 			}			
 			for (String resource: resources) {
-				Log.debug("SensorNode", "Sensor resource found: " + resource);
 				if ( !resource.equals("battery"))
 					po.clearObservationAfterStateChanged(getUri(), resource, actualState);
 			}

@@ -41,6 +41,10 @@ public class ProxyObserver {
 	public void addObserver(String key, ObserverState state) {
 		observers.put(key, state);
 	}
+	
+	public void removeObserver(String key) {
+		observers.remove(key);
+	}
 
 	public ObserverState getObserverState(String key) {
 		return observers.get(key);

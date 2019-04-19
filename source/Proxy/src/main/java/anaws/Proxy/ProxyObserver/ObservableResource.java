@@ -70,10 +70,12 @@ public class ObservableResource extends CoapResource {
 		int observeField = exchange.getRequestOptions().getObserve();
 
 		SensorNode sensor = server.requestSensorNode(sensorAddress);
+		String observerID = exchange.getSourceAddress() + ":" + exchange.getSourcePort() + "/" + getName();
 
 		if (observeField == 1) {
 			Log.info("ObservableResource", "Cancel observe request from " + exchange.getSourcePort()
 					+ " for the resource: " + exchange.advanced().getRequest().getURI());
+			server.removeObserver(observerID);
 			return;
 		}
 		if (sensor.getState().equals(ServerState.UNVAVAILABLE)) {
@@ -81,14 +83,13 @@ public class ObservableResource extends CoapResource {
 			return;
 		}
 		// store observer information if the endpoint is not already present
-		String observerID = exchange.getSourceAddress() + ":" + exchange.getSourcePort() + "/" + getName();
 		int mid = exchange.advanced().getRequest().getMID();
 		if (!server.isObserverPresent(observerID)) {
 			server.addObserver(observerID, new ObserverState(mid, false));
 			handleRegistration(observeField, observerID, exchange, sensor);
 			return;
 		}
-		
+
 		if (mid == server.getObserverState(observerID).getOriginalMID()) {
 			// This is a notification because the exchange has the same MID of the original
 			// request
@@ -102,7 +103,7 @@ public class ObservableResource extends CoapResource {
 
 	private void handleRegistration(int observeField, String observerID, CoapExchange exchange, SensorNode sensor) {
 		// Registration phase
-		Log.debug("ObservableResource", "Request: " + exchange.advanced().getRequest().toString());
+//		Log.debug("ObservableResource", "Request: " + exchange.advanced().getRequest().toString());
 		if (!server.getObserverState(observerID).isNegotiationState()) {
 			if (getPriority(observeField) < 3 && sensor.getState().equals(ServerState.ONLY_CRITICAL) ) {
 				// First part of the negotiation, where subject make its proposal
@@ -160,8 +161,8 @@ public class ObservableResource extends CoapResource {
 			exchange.respond(response, observeField);
 		}
 		
-		Log.debug("ObservableResource", "Response: " + response.toString());
-		Log.info("ObservableResource", "Notification sent to: " + exchange.getSourcePort() + " | notification: " + value
+//		Log.debug("ObservableResource", "Response: " + response.toString());
+		Log.info(getPath()+getName(), "Notification sent to: " + exchange.getSourcePort() + " | notification: " + value
 				+ " | isCritical: " + data.getCritic());
 	}
 }

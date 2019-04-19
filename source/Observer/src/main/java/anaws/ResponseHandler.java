@@ -30,7 +30,7 @@ public class ResponseHandler implements CoapHandler {
 	}
 
 	public void onLoad(CoapResponse response) {
-		System.out.println("---------------------------------------");
+		System.out.println("\n---------------------------------------");
 
 		// Registration failed because response doesn't have the observe option
 		if (response == null) {

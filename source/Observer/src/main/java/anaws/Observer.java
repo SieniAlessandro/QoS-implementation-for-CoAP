@@ -113,7 +113,11 @@ public class Observer {
 		return dec;
 	}
 
-	private void resourceRegistration(String resourceName, int priority, String path, boolean acceptProposal) {
+	private void resourceRegistration( int priority, String path, boolean acceptProposal) throws InterruptedException {
+		if ( relations.containsKey(path)) {
+			Log.error("Observer", "Relation " + path + " already established" );
+			return;
+		}
 		Request observeRequest = new Request(Code.GET);
 		try {
 			// Set the priority level using the first 2 bits of the observe option value
@@ -152,6 +156,7 @@ public class Observer {
 		}
 		Log.info("Observer", "Proactive cancel of " + path + " sent");
 		relation.proactiveCancel();
+		relations.remove(path);
 	}
 
 	private String getRandomURI() {
@@ -168,9 +173,10 @@ public class Observer {
 
 	/*******************************
 	 * COMMAND LINE TESTING FUNCTIONS
+	 * @throws InterruptedException 
 	 *******************************/
 
-	public void resourceRegistrationCLI() {
+	public void resourceRegistrationCLI() throws InterruptedException {
 		if (resourceList.isEmpty()) {
 			System.out.println("No resource available, please run discovery first");
 			return;
@@ -212,7 +218,7 @@ public class Observer {
 			return;
 		}
 
-		resourceRegistration(resourceName, priority, path, acceptProposal);
+		resourceRegistration(priority, path, acceptProposal);
 	}
 
 	public void resourceCancellationCLI() {
@@ -258,7 +264,7 @@ public class Observer {
 
 	public void printHelpMenu() {
 		String commandList = "1) Print Help Menu\n" + "2) Resource registration\n" + "3) Resource cancellation\n"
-				+ "4) Request the list of resources\n" + "5) Exit\n";
+				+ "4) Request the list of resources\n" + "5) Exit\n" + "6) Clear Screen\n";
 		System.out.println("List of commands:\n" + commandList);
 	}
 
@@ -274,7 +280,7 @@ public class Observer {
 		System.exit(0);
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		scanner = new Scanner(System.in);
 		boolean autocomplete = Boolean.parseBoolean(args[3]);
 		boolean DEBUG = Boolean.parseBoolean(args[4]);
@@ -305,6 +311,9 @@ public class Observer {
 				case 5:
 					observerClient.exit();
 					break;
+				case 6: 
+					System.out.print("\033[H\033[2J");  
+				    System.out.flush();  
 				default:
 					continue;
 				}
