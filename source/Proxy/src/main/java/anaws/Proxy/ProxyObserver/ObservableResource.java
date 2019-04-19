@@ -151,15 +151,6 @@ public class ObservableResource extends CoapResource {
 		double value = data.getValue();
 		Response response = new Response(CoAP.ResponseCode.CONTENT);
 		
-		//MODIFICA AGGIUNTA IN POST
-		/*
-		String payload = "";
-		if(data.getCritic() == true) {
-			payload = Double.toString(value)+"!";
-		}
-		else
-			payload = Double.toString(value);
-		
 		//response.setPayload(Double.toString(value));*/
 		response.setPayload((data.getCritic() == true)?Double.toString(value)+"!":Double.toString(value));
 		exchange.setMaxAge(data.getTime());
