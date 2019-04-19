@@ -150,7 +150,18 @@ public class ObservableResource extends CoapResource {
 	private void sendNotification(CoapExchange exchange, SensorNode sensor, int observeField) {
 		double value = data.getValue();
 		Response response = new Response(CoAP.ResponseCode.CONTENT);
-		response.setPayload(Double.toString(value));
+		
+		//MODIFICA AGGIUNTA IN POST
+		/*
+		String payload = "";
+		if(data.getCritic() == true) {
+			payload = Double.toString(value)+"!";
+		}
+		else
+			payload = Double.toString(value);
+		
+		//response.setPayload(Double.toString(value));*/
+		response.setPayload((data.getCritic() == true)?Double.toString(value)+"!":Double.toString(value));
 		exchange.setMaxAge(data.getTime());
 
 		if (observeField < 0) {
