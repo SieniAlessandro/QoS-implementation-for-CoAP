@@ -23,7 +23,6 @@ public class ResponseHandler implements CoapHandler {
 	public void onLoad(CoapResponse response) {
 		
 		System.out.println("---------------------------------------");
-		Log.debug("ResponseHadler", "Ricevuto: " + response.advanced().toString());
 		if ( response.getCode().equals(CoAP.ResponseCode.SERVICE_UNAVAILABLE) ) {
 			Log.error("ResponseHandler", "resource unreachable");
 			return;

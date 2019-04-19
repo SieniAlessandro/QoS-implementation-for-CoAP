@@ -45,11 +45,11 @@
 \contentsline {section}{\numberline {3.1}Descrizione}{21}{section.3.1}% 
 \contentsline {section}{\numberline {3.2}Modifiche a Californium lato Client}{21}{section.3.2}% 
 \contentsline {subsection}{\numberline {3.2.1}CoapClient}{21}{subsection.3.2.1}% 
-\contentsline {subsection}{\numberline {3.2.2}CoapObserveRelation}{23}{subsection.3.2.2}% 
-\contentsline {section}{\numberline {3.3}Implementazione}{23}{section.3.3}% 
-\contentsline {subsection}{\numberline {3.3.1}classe Observer}{23}{subsection.3.3.1}% 
-\contentsline {subsubsection}{\numberline {3.3.1.1}resourceDiscovery}{23}{subsubsection.3.3.1.1}% 
-\contentsline {subsubsection}{\numberline {3.3.1.2}resourceRegistration}{24}{subsubsection.3.3.1.2}% 
-\contentsline {subsubsection}{\numberline {3.3.1.3}resourceCancellation}{24}{subsubsection.3.3.1.3}% 
-\contentsline {subsection}{\numberline {3.3.2}classe ResponseHandler implements CoapHandler}{25}{subsection.3.3.2}% 
-\contentsline {subsubsection}{\numberline {3.3.2.1}onLoad}{25}{subsubsection.3.3.2.1}% 
+\contentsline {subsection}{\numberline {3.2.2}CoapObserveRelation}{24}{subsection.3.2.2}% 
+\contentsline {section}{\numberline {3.3}Implementazione}{25}{section.3.3}% 
+\contentsline {subsection}{\numberline {3.3.1}classe Observer}{25}{subsection.3.3.1}% 
+\contentsline {subsubsection}{\numberline {3.3.1.1}resourceDiscovery}{26}{subsubsection.3.3.1.1}% 
+\contentsline {subsubsection}{\numberline {3.3.1.2}resourceRegistration}{26}{subsubsection.3.3.1.2}% 
+\contentsline {subsubsection}{\numberline {3.3.1.3}resourceCancellation}{27}{subsubsection.3.3.1.3}% 
+\contentsline {subsection}{\numberline {3.3.2}classe ResponseHandler implements CoapHandler}{27}{subsection.3.3.2}% 
+\contentsline {subsubsection}{\numberline {3.3.2.1}onLoad}{27}{subsubsection.3.3.2.1}% 
