@@ -1,6 +1,6 @@
 \chapter{Modulo ProxyObserver}
 	\section {Descrizione}
-		Questa modulo permette la gestione della comunicazione tra il \textit{Proxy} e l'\textit{Observer} fungendo da CoapServer in ascolto sulla porta di default di CoAP 5683. La classe mantiene le informazioni relative allo stato degli osservatori e le risorse attualmente disponibili sui sensori visibili dagli osservatori. Quest'ultimi possono effettuare delle richieste di osservazioni di una risorsa attualmente disponibile sul Proxy il quale gestisce la richiesta tramite il metodo \textit{ObservableResource.handleGet(CoapExchange exchange)} che si occupa della negoziazione e degli invii delle notifiche. \newline
+		Questo modulo permette la gestione della comunicazione tra il \textit{Proxy} e l'\textit{Observer} fungendo da CoapServer in ascolto sulla porta di default di CoAP 5683. La classe mantiene le informazioni relative allo stato degli osservatori e le risorse attualmente disponibili sui sensori visibili dagli osservatori. Quest'ultimi possono effettuare delle richieste di osservazione di una risorsa attualmente disponibile sul Proxy il quale gestisce la richiesta tramite il metodo \textit{ObservableResource.handleGet(CoapExchange exchange)} che si occupa della negoziazione e degli invii delle notifiche. \newline
 		Inoltre, fornisce i metodi per l'interazione con il modulo ProxySubject per l'aggiunta e la rimozione di risorse, notificare il cambio del valore della risorsa sul sensore ed eliminare le relazioni opportune dopo che lo stato di un sensore è cambiato.
 	\section {Modifiche a Californium lato Server}
 			Al fine di implementare le modifiche effettuate al protocollo CoAP, è stato necessario modificare anche la libreria Californium. In seguito verranno elencati i cambiamenti al codice della libreria, indicando il nome del file con un link alla repository con il codice originale e la motivazione di tale modifica. I file fanno riferimento alla package core di Californium:
@@ -77,7 +77,7 @@
 				\lstinputlisting[label={requestRegistration}, language=Java, firstline=168, lastline=170, caption={requestRegistration},captionpos=b]{../Codice/Java/ProxyObserver.java}
 				\lstinputlisting[label={requestSensorNode}, language=Java, firstline=172, lastline=174, caption={requestSensorNode},captionpos=b]{../Codice/Java/ProxyObserver.java}
 				\lstinputlisting[label={requestObserveCancel}, language=Java, firstline=176, lastline=178, caption={requestObserveCancel},captionpos=b]{../Codice/Java/ProxyObserver.java}
-				
+
 		\subsection { class ObservableResource extends CoapResource}
 			Questa classe estende una CoapResource standard e ridefinisce i metodo necessari per la gestione delle richieste.
 			\subsubsection{handleGET}

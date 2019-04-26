@@ -1,0 +1,14 @@
+\chapter{Subject}
+  \section{Descrizione}
+    Questo è il firmware che verrà eseguito sui \textit{nodi sensore}, tramite il quale si comporteranno come dei CoapServer, utilizzando un rest server, in ascolto sulla porta di default
+    di CoAP 5683, gestendo le richieste ricevute dal \textit{Proxy} di discovery delle risorse, di registrazione alle varie risorse con i diversi tipi di priorità, di cancellazione dalle risorse. \newline
+    Inoltre il nodo sensore, solo nel caso in cui è registrato almeno un \textit{Observer}, si occuperà di eseguire il sensing e l'invio delle risorse nel caso in cui
+    il valore della risorsa sia cambiato o il vecchio valore stia per scadere, per evitare di perdere la registrazione.\newline
+    Il nodo sensore si occupa anche di connettersi e di mantenere viva la connessione col \textit{Border Router}, utilizzato dal \textit{Proxy} per comunicare con i nodi sensore.
+
+  \section{Modifiche al Border Router}
+    Per poter compilare il codice del border router fornito con contikiOS per dispositivi di tipo SkyMote è stato necessario disabilitare il processo che implementava il web server in quanto il dispositivo non dispone di
+    memoria sufficiente per poter utilizzare questa funzione; la quale veniva utilizzata semplicemente con lo scopo di far vedere all'utente le rotte presenti al momento e la lista dei vicini tramite interfaccia web,
+    quindi rimuovendo questo processo non vengono rimosse funzionalità necessarie ad un router.\newline
+    Per rimuovere la funzionalità è bastato ridefinire WEBSERVER uguale a 0.
+    \lstinputlisting[language=C, firstline=64, lastline=67, caption={BorderRouter, \href{https://tinyurl.com/yxzcal2z}{codice originale}},captionpos=b]{../Codice/C/border-router.c}

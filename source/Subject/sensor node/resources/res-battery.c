@@ -102,7 +102,7 @@ static void periodic_handler(){
   //USE THIS IN REAL SENSOR
   //int battery = battery_sensor.value(0);
 
-  //SIMULATED BATTERY FOR COOJA
+  //SIMULATED BATTERY DRAIN FOR COOJA
   battery = reduceBattery(SENSING_DRAIN);
   ++interval_counter;
 

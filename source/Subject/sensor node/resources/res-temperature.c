@@ -62,6 +62,9 @@ static int temperature_old = INT_MIN;
 static uint32_t dataLevel = CRITICAL; //NON_CRITICAL, CRITICAL
 static uint8_t requestedLevel = 0; //NON_CRITICAL all, CRITICAL only criticals
 
+//Used to know if there is at least one subscriber to the resource
+static uint8_t requestedByObserver = 0;
+
 //Initialization of the resource temperature as an observable resource, with a periodic handler function
 PERIODIC_RESOURCE(res_temperature,
          "title=\"Temperature\";rt=\"Temperature\";obs",
@@ -85,12 +88,19 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
     }else{
       requestedLevel = 0;
     }
+    //We let the node to sense for the data, because there is at least one observer
+    requestedByObserver = 1;
+    //Done to have the actual real value
+    temperature_old = temperature_sensor.value(0);
+    //In this way we answer to the registration to all the observers -- REVIEW NEEDED
+    dataLevel = CRITICAL;
   }
 
   //If we receive a message with the field observer equal to 1, we know that the registration has been canceled
-  if(requestLevel == 1)
+  if(requestLevel == 1){
+      requestedByObserver = 0;
       return;
-  
+  }
   unsigned int accept = -1;
   REST.get_header_accept(request, &accept);
 
@@ -103,24 +113,12 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
 
     REST.set_response_payload(response, (uint8_t *)buffer, strlen((char *)buffer));
 
-  }
-  /* CODE NECESSARY ONLY IF JSON MESSAGES ARE IMPLEMENTED IN THE PROXY
-   else if(accept == REST.type.APPLICATION_JSON) {
-    REST.set_header_content_type(response, REST.type.APPLICATION_JSON);
-    if(dataLevel == CRITICAL)
-      snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "{'temperature':%d!}", temperature_old);
-    else
-      snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "{'temperature':%d}", temperature_old);
-    //Putting the data type Critical or Not in the Observe place of the response
-    //coap_set_header_observe(response, dataLevel);
-    //DO NOT WORK
+  }else {
 
-    REST.set_response_payload(response, buffer, strlen((char *)buffer));
-  }*/ 
-  else {
     REST.set_response_status(response, REST.status.NOT_ACCEPTABLE);
-    const char *msg = "Supporting content-types text/plain and application/json";
+    const char *msg = "Supporting content-types text/plain";
     REST.set_response_payload(response, msg, strlen(msg));
+  
   }
 
   //Change the default Max Age to the variable max age computed in the periodic handler
@@ -130,8 +128,6 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
 
   //Call the log function - TESTING PHASE
   stampa(temperature_old, "temperature", dataLevel);
-
-  /* The REST.subscription_handler() will be called for observable resources by the REST framework. */
 }
 
 
@@ -142,13 +138,13 @@ int TEMPERATURE_VALUES[60] = {10,38,-34,-6,22,50,-22,6,34,-38,-10,18,46,-26,2,30
  * It will be called by the REST manager process with the defined period.
  */
 static void periodic_handler(){
-  if(battery <= 0)
+  if(!requestedByObserver || battery <= 0)
     return;
 
   //Formula to get the real temperature//
   // USE THIS FOR THE REAL SENSOR NODE//
   //int temperature = (temperature_sensor.value(0)/10-396)/10;
-  //int temperature = (temperature_sensor.value(0);
+  //int temperature = temperature_sensor.value(0);
 
 
   // USED ONLY FOR THE SIMULATIONS ON COOJA //
