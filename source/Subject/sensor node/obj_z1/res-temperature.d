@@ -26,23 +26,9 @@ obj_z1/res-temperature.o: resources/res-temperature.c \
  /home/user/contiki/core/./sys/loader.h \
  /home/user/contiki/core/./sys/clock.h \
  /home/user/contiki/core/./sys/energest.h \
- /home/user/contiki/apps/er-coap/er-coap.h \
- /home/user/contiki/core/./contiki-net.h \
- /home/user/contiki/core/./contiki.h \
- /home/user/contiki/core/./net/ip/tcpip.h \
  /home/user/contiki/core/./net/ip/uip.h \
  /home/user/contiki/core/./net/ip/uipopt.h \
  /home/user/contiki/core/./net/ip/tcpip.h \
- /home/user/contiki/core/./net/ip/uip.h \
- /home/user/contiki/core/./net/ipv4/uip-fw.h \
- /home/user/contiki/core/./net/ipv4/uip-fw-drv.h \
- /home/user/contiki/core/./net/ipv4/uip-fw.h \
- /home/user/contiki/core/./net/ipv4/uip_arp.h \
- /home/user/contiki/core/./net/ip/uiplib.h \
- /home/user/contiki/core/./net/ip/uip-udp-packet.h \
- /home/user/contiki/core/./net/ip/simple-udp.h \
- /home/user/contiki/core/./net/ip/uip-nameserver.h \
- /home/user/contiki/core/./net/ipv6/uip-icmp6.h \
  /home/user/contiki/core/./net/ipv6/uip-ds6.h \
  /home/user/contiki/core/./sys/stimer.h \
  /home/user/contiki/core/./net/ipv6/uip-nd6.h \
@@ -59,6 +45,20 @@ obj_z1/res-temperature.o: resources/res-temperature.c \
  /home/user/contiki/core/./net/mac/framer.h \
  /home/user/contiki/core/./lib/list.h \
  /home/user/contiki/core/./net/ipv6/uip-ds6-nbr.h \
+ /home/user/contiki/core/./net/ip/uip-udp-packet.h \
+ /home/user/contiki/core/./contiki-net.h \
+ /home/user/contiki/core/./contiki.h \
+ /home/user/contiki/core/./net/ip/tcpip.h \
+ /home/user/contiki/core/./net/ip/uip.h \
+ /home/user/contiki/core/./net/ipv4/uip-fw.h \
+ /home/user/contiki/core/./net/ipv4/uip-fw-drv.h \
+ /home/user/contiki/core/./net/ipv4/uip-fw.h \
+ /home/user/contiki/core/./net/ipv4/uip_arp.h \
+ /home/user/contiki/core/./net/ip/uiplib.h \
+ /home/user/contiki/core/./net/ip/uip-udp-packet.h \
+ /home/user/contiki/core/./net/ip/simple-udp.h \
+ /home/user/contiki/core/./net/ip/uip-nameserver.h \
+ /home/user/contiki/core/./net/ipv6/uip-icmp6.h \
  /home/user/contiki/core/./net/ipv6/uip-ds6.h \
  /home/user/contiki/core/./net/ip/resolv.h \
  /home/user/contiki/core/./net/ip/uip.h \
@@ -103,6 +103,7 @@ obj_z1/res-temperature.o: resources/res-temperature.c \
  /home/user/contiki/core/./net/rime/timesynch.h \
  /home/user/contiki/core/./net/rime/trickle.h \
  /home/user/contiki/core/./net/netstack.h \
+ /home/user/contiki/apps/er-coap/er-coap.h \
  /home/user/contiki/apps/er-coap/er-coap-constants.h \
  /home/user/contiki/apps/er-coap/er-coap-conf.h \
  /home/user/contiki/apps/rest-engine/rest-engine.h \
@@ -137,23 +138,9 @@ resources/res-temperature.c :
  /home/user/contiki/core/./sys/loader.h :
  /home/user/contiki/core/./sys/clock.h :
  /home/user/contiki/core/./sys/energest.h :
- /home/user/contiki/apps/er-coap/er-coap.h :
- /home/user/contiki/core/./contiki-net.h :
- /home/user/contiki/core/./contiki.h :
- /home/user/contiki/core/./net/ip/tcpip.h :
  /home/user/contiki/core/./net/ip/uip.h :
  /home/user/contiki/core/./net/ip/uipopt.h :
  /home/user/contiki/core/./net/ip/tcpip.h :
- /home/user/contiki/core/./net/ip/uip.h :
- /home/user/contiki/core/./net/ipv4/uip-fw.h :
- /home/user/contiki/core/./net/ipv4/uip-fw-drv.h :
- /home/user/contiki/core/./net/ipv4/uip-fw.h :
- /home/user/contiki/core/./net/ipv4/uip_arp.h :
- /home/user/contiki/core/./net/ip/uiplib.h :
- /home/user/contiki/core/./net/ip/uip-udp-packet.h :
- /home/user/contiki/core/./net/ip/simple-udp.h :
- /home/user/contiki/core/./net/ip/uip-nameserver.h :
- /home/user/contiki/core/./net/ipv6/uip-icmp6.h :
  /home/user/contiki/core/./net/ipv6/uip-ds6.h :
  /home/user/contiki/core/./sys/stimer.h :
  /home/user/contiki/core/./net/ipv6/uip-nd6.h :
@@ -170,6 +157,20 @@ resources/res-temperature.c :
  /home/user/contiki/core/./net/mac/framer.h :
  /home/user/contiki/core/./lib/list.h :
  /home/user/contiki/core/./net/ipv6/uip-ds6-nbr.h :
+ /home/user/contiki/core/./net/ip/uip-udp-packet.h :
+ /home/user/contiki/core/./contiki-net.h :
+ /home/user/contiki/core/./contiki.h :
+ /home/user/contiki/core/./net/ip/tcpip.h :
+ /home/user/contiki/core/./net/ip/uip.h :
+ /home/user/contiki/core/./net/ipv4/uip-fw.h :
+ /home/user/contiki/core/./net/ipv4/uip-fw-drv.h :
+ /home/user/contiki/core/./net/ipv4/uip-fw.h :
+ /home/user/contiki/core/./net/ipv4/uip_arp.h :
+ /home/user/contiki/core/./net/ip/uiplib.h :
+ /home/user/contiki/core/./net/ip/uip-udp-packet.h :
+ /home/user/contiki/core/./net/ip/simple-udp.h :
+ /home/user/contiki/core/./net/ip/uip-nameserver.h :
+ /home/user/contiki/core/./net/ipv6/uip-icmp6.h :
  /home/user/contiki/core/./net/ipv6/uip-ds6.h :
  /home/user/contiki/core/./net/ip/resolv.h :
  /home/user/contiki/core/./net/ip/uip.h :
@@ -214,6 +215,7 @@ resources/res-temperature.c :
  /home/user/contiki/core/./net/rime/timesynch.h :
  /home/user/contiki/core/./net/rime/trickle.h :
  /home/user/contiki/core/./net/netstack.h :
+ /home/user/contiki/apps/er-coap/er-coap.h :
  /home/user/contiki/apps/er-coap/er-coap-constants.h :
  /home/user/contiki/apps/er-coap/er-coap-conf.h :
  /home/user/contiki/apps/rest-engine/rest-engine.h :

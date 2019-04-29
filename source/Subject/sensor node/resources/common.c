@@ -29,3 +29,7 @@ void stampa(int value, char* resourceName, uint32_t dataLevel){
   print_local_addresses();
   printf(",%d,%s,%lu,", value, resourceName, dataLevel);
 }
+
+void critic_battery(){ 
+  battery = CRITICAL_BATTERY;
+}

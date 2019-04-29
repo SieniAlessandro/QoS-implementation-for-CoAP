@@ -1,6 +1,5 @@
-#define SUBSCRIBER
-
 #include "common.h"
+#include "dev/button-sensor.h"
 
 /*DEFINING THE RESOURCE THOSE ARE PRESENT IN THE SENSOR NODE*/
 #include "dev/temperature-sensor.h"
@@ -17,28 +16,12 @@ static uip_ipaddr_t server_ipaddr;
 
 
 /*---------------------------------------------------------------------------*/
-//Necessary to establish and mantain the connection with the border-router
-PROCESS(udp_client_process, "UDP client process");
 //The rest server
 PROCESS(rest_server, "Erbium Server");
 
-AUTOSTART_PROCESSES(&udp_client_process, &rest_server);
+AUTOSTART_PROCESSES(&rest_server);
 /*---------------------------------------------------------------------------*/
-static int seq_id;
-static int reply;
 
-static void
-tcpip_handler(void)
-{
-  char *str;
-
-  if(uip_newdata()) {
-    str = uip_appdata;
-    str[uip_datalen()] = '\0';
-    reply++;
-    printf("DATA recv '%s' (s:%d, r:%d)\n", str, seq_id, reply);
-  }
-}
 
 static void set_global_address(void){
   uip_ipaddr_t ipaddr;
@@ -67,15 +50,15 @@ static void set_global_address(void){
   uip_ip6addr(&server_ipaddr, UIP_DS6_DEFAULT_PREFIX, 0, 0, 0, 0x0250, 0xc2ff, 0xfea8, 0xcd1a); //redbee-econotag
 
 }
-/*---------------------------------------------------------------------------*/
-PROCESS_THREAD(udp_client_process, ev, data){
 
-  static struct etimer periodic;
-#if WITH_COMPOWER
-  static int print = 0;
-#endif
 
+PROCESS_THREAD(rest_server, ev, data)
+{
   PROCESS_BEGIN();
+
+  /*
+   * Initializing IP address and connecting to the border router
+   */
 
   PROCESS_PAUSE();
 
@@ -94,28 +77,10 @@ PROCESS_THREAD(udp_client_process, ev, data){
   PRINTF(" local/remote port %u/%u\n",
   UIP_HTONS(client_conn->lport), UIP_HTONS(client_conn->rport));
 
-  etimer_set(&periodic, SEND_INTERVAL);
-  while(1) {
-    PROCESS_YIELD();
-    if(ev == tcpip_event) {
-      tcpip_handler();
-    }
 
-
-    if(etimer_expired(&periodic)) {
-      etimer_reset(&periodic);
-    }
-  }
-
-  PROCESS_END();
-}
-/*---------------------------------------------------------------------------*/
-
-
-
-PROCESS_THREAD(rest_server, ev, data)
-{
-  PROCESS_BEGIN();
+  /*
+   * Starting Erbium Server
+   */
 
   PRINTF("Starting Erbium Server\n");
 
@@ -135,11 +100,16 @@ PROCESS_THREAD(rest_server, ev, data)
   //Used only for Testing phase
   printf("Time,IPAddress,Value,Type,Critic,Observe\n");
 
-  while(1){
-    PROCESS_WAIT_EVENT();
-    //If we want we can put here a button event to recharge the battery
+
+
+  SENSORS_ACTIVATE(button_sensor);
+  while(1) {
+    PROCESS_WAIT_EVENT_UNTIL(ev==sensors_event && data==&button_sensor);
+    //Used to force the battery to go in the only critic connection accepted phase 
+    critic_battery();
   }
+
+
 
   PROCESS_END();
 }
-

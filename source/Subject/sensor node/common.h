@@ -5,15 +5,13 @@
  *******************************************************/
 #include "contiki.h"
 
-#ifdef SUBSCRIBER
+//#ifdef SUBSCRIBER
 
-#include "lib/random.h"
-#include "sys/ctimer.h"
+//#include "lib/random.h"
+//#include "sys/ctimer.h"
 #include "net/ip/uip.h"
 #include "net/ipv6/uip-ds6.h"
 #include "net/ip/uip-udp-packet.h"
-#include "sys/ctimer.h"
-
 
 #ifdef WITH_COMPOWER
 #include "powertrace.h"
@@ -23,12 +21,12 @@
 
 #include "net/ipv6/uip-ds6-route.h"
 
-#else
+//#else
 //FOR ALL THE RESOURCES
 #include <limits.h>
 #include "er-coap.h"
 
-#endif
+//#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -59,10 +57,9 @@
 #define NON_CRITICAL 0
 
 #define INITIAL_BATTERY 1000
+#define CRITICAL_BATTERY 300
 #define SENSING_DRAIN 1
 #define TRANSMITTING_DRAIN 5
-
-#ifdef SUBSCRIBER
 
 #define UDP_CLIENT_PORT 8765
 #define UDP_SERVER_PORT 5678
@@ -78,20 +75,16 @@
 #define SEND_TIME   (random_rand() % (SEND_INTERVAL))
 #define MAX_PAYLOAD_LEN   30
 
-#endif
-
 /*****************************************************
   PROJECT ANAWS util variables
 ******************************************************/
 
 
-//Used only by the resources
-
-#ifndef SUBSCRIBER
-
 static uint32_t battery = INITIAL_BATTERY;
 
 uint32_t reduceBattery(uint32_t drain);
+
 void stampa(int value, char* resourceName, uint32_t dataLevel);
 
-#endif
+//For testing purposes
+void critic_battery();
