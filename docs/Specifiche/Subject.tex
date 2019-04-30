@@ -1,9 +1,14 @@
 \chapter{Subject}
   \section{Descrizione}
-    Questo è il firmware che verrà eseguito sui \textit{nodi sensore}, tramite il quale si comporteranno come dei CoapServer, utilizzando un rest server, in ascolto sulla porta di default
-    di CoAP 5683, gestendo le richieste ricevute dal \textit{Proxy} di discovery delle risorse, di registrazione alle varie risorse con i diversi tipi di priorità, di cancellazione dalle risorse. \newline
-    Inoltre il nodo sensore, solo nel caso in cui è registrato almeno un \textit{Observer}, si occuperà di eseguire il sensing e l'invio delle risorse nel caso in cui
-    il valore della risorsa sia cambiato o il vecchio valore stia per scadere, per evitare di perdere la registrazione.\newline
+    Questo è il firmware che verrà eseguito sui \textit{nodi sensore}, i quali si comporteranno come dei CoapServer, avviando un server rest, in ascolto sulla porta di default
+    di CoAP 5683, gestendo le richieste ricevute dal \textit{Proxy}, che possono essere:
+    \begin{itemize}
+      \item Discovery delle risorse presenti sul nodo
+      \item Registrazione ad una risorsa con uno specifico tipo di priorità
+      \item Cancellazione dall'osservazione di una risorsa
+    \end{itemize}
+    Il nodo sensore, solo nel caso in cui è registrato almeno un \textit{Observer} ad una risorsa, si occuperà di eseguire il sensing e l'invio di quest'ultima nel caso in cui
+    il valore sia cambiato o il vecchio valore stia per scadere (questo secondo caso è gestito per evitare di perdere la registrazione dell'\textit{Osservatore}).\newline
     Il nodo sensore si occupa anche di connettersi e di mantenere viva la connessione col \textit{Border Router}, utilizzato dal \textit{Proxy} per comunicare con i nodi sensore.
 
   \section{Modifiche al Border Router}
@@ -11,7 +16,33 @@
     memoria sufficiente per poter utilizzare questa funzione; la quale veniva utilizzata semplicemente con lo scopo di far vedere all'utente le rotte presenti al momento e la lista dei vicini tramite interfaccia web,
     quindi rimuovendo questo processo non vengono rimosse funzionalità necessarie ad un router.\newline
     Per rimuovere la funzionalità è bastato ridefinire WEBSERVER uguale a 0.
-    \lstinputlisting[language=C, firstline=64, lastline=67, caption={BorderRouter, \href{https://tinyurl.com/yxzcal2z}{codice originale}},captionpos=b]{../Codice/C/border-router.c}
+    \lstinputlisting[label={BorderRouter}, language=C, firstnumber=64 ,firstline=64, lastline=67, caption={BorderRouter, \href{https://tinyurl.com/yxzcal2z}{codice originale}},captionpos=b]{../Codice/C/border-router.c}
 
   \section{Implementazione}
-    \subsection
+    \subsection{Process Rest Server}
+      Processo principale dei nodi sensore, si occupa di:
+      \begin{enumerate}
+        \item Ottenere un indirizzo IP connettendosi al border-router
+        \item Rendere disponibili le risorse presenti attivandole
+        \item Attivare i sensori relativi alle singole risorse
+      \end{enumerate}
+
+
+      \lstinputlisting[label={RestServer}, language=C, firstnumber=38, firstline=38, caption={Process RestServer},captionpos=b]{../Codice/C/subscriber.c}
+
+    \subsection{Risorse}
+      Per avere una maggiore modularità è stato realizzato un file per ogni singola risorsa e risorse sono state definite come variabili di tipo \textbf{extern}
+      \lstinputlisting[label={ExternResources}, language=C, firstnumber=4, firstline=4, lastline=12, caption={Risorse presenti sul nodo},captionpos=b]{../Codice/C/subscriber.c}
+
+      \subsubsection{Batteria}
+        La batteria viene fornita come risorsa di tipo osservabile, l'unico osservatore che si iscrive per ricevere le notifiche relative a questa risorsa è il \textit{Proxy},
+        in quanto se la batteria del sensore si trova sotto una specifica soglia vengono accettate soltanto richieste con un livello di priorità critico.\newline
+        Il sensing del livello della batteria viene fatto periodicamente
+        Le notifiche della batteria vengono inviate solo in due casi:
+        \begin{enumerate}
+          \item Valore della batteria è sotto la soglia critica
+          \item L'ultimo valore sta per scadere
+        \end{enumerate}
+
+
+      \subsubsection{Temperatura}
