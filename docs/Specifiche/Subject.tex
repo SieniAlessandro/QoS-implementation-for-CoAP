@@ -12,7 +12,7 @@
     Il nodo sensore si occupa anche di connettersi e di mantenere viva la connessione col \textit{Border Router}, utilizzato dal \textit{Proxy} per comunicare con i nodi sensore.
 
   \section{Modifiche al Border Router}
-    Per poter compilare il codice del border router fornito con contikiOS per dispositivi di tipo SkyMote è stato necessario disabilitare il processo che implementava il web server in quanto il dispositivo non dispone di
+    Per poter compilare il codice del border router fornito con contikiOS per dispositivi di tipo SkyMote è stato necessario disabilitare il processo che esegue il web server in quanto il dispositivo non dispone di
     memoria sufficiente per poter utilizzare questa funzione; la quale veniva utilizzata semplicemente con lo scopo di far vedere all'utente le rotte presenti al momento e la lista dei vicini tramite interfaccia web,
     quindi rimuovendo questo processo non vengono rimosse funzionalità necessarie ad un router.\newline
     Per rimuovere la funzionalità è bastato ridefinire WEBSERVER uguale a 0.

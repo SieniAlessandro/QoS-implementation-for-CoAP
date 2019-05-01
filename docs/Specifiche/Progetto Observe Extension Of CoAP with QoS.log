@@ -1,11 +1,11 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7000 64-bit) (preloaded format=pdflatex 2019.3.28)  19 APR 2019 15:33
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.6960 64-bit) (preloaded format=pdflatex 2019.5.1)  1 MAY 2019 17:58
 entering extended mode
-**"./Progetto Observe Extension Of CoAP with QoS.tex"
+**"Progetto Observe Extension Of CoAP with QoS"
 ("Progetto Observe Extension Of CoAP with QoS.tex"
 LaTeX2e <2018-12-01>
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\book.cls"
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\book.cls"
 Document Class: book 2018/09/03 v1.4i Standard LaTeX document class
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\bk11.clo"
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\bk11.clo"
 File: bk11.clo 2018/09/03 v1.4i Standard LaTeX file (size option)
 )
 \c@part=\count80
@@ -21,7 +21,7 @@ File: bk11.clo 2018/09/03 v1.4i Standard LaTeX file (size option)
 \belowcaptionskip=\skip42
 \bibindent=\dimen102
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\lmodern.sty"
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\lmodern.sty"
 Package: lmodern 2009/10/30 v1.6 Latin Modern Fonts
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
 (Font)                  OT1/cmr/m/n --> OT1/lmr/m/n on input line 22.
@@ -56,42 +56,42 @@ LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
 (Font)                  OT1/cmtt/m/n --> OT1/lmtt/m/n on input line 38.
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\fontenc.sty"
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\fontenc.sty"
 Package: fontenc 2018/08/11 v2.0j Standard LaTeX package
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\t1enc.def"
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\t1enc.def"
 File: t1enc.def 2018/08/11 v2.0j Standard LaTeX file
 LaTeX Font Info:    Redeclaring font encoding T1 on input line 48.
 ))
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\inputenc.sty"
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\inputenc.sty"
 Package: inputenc 2018/08/11 v1.3c Input encoding file
 \inpenc@prehook=\toks14
 \inpenc@posthook=\toks15
-) ("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/generic/babel\babel.st
+) ("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/generic/babel\babel.st
 y"
 Package: babel 2018/11/13 3.27 The Babel package
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/generic/babel\switch.def
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/generic/babel\switch.def
 "
 File: switch.def 2018/11/13 3.27 Babel switching mechanism
 )
 *************************************
 * Local config file bblopts.cfg used
 *
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/arabi\bblopts.cfg"
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/arabi\bblopts.cfg"
 File: bblopts.cfg 2005/09/08 v0.1 add Arabic and Farsi to "declared" options of
  babel
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/babel-english\engl
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/babel-english\engl
 ish.ldf"
 Language: english 2017/06/06 v3.3r English support from the babel system
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/generic/babel\babel.def"
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/generic/babel\babel.def"
 File: babel.def 2018/11/13 3.27 Babel common definitions
 \babel@savecnt=\count89
 \U@D=\dimen103
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/generic/babel\txtbabel.d
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/generic/babel\txtbabel.d
 ef")
 \bbl@dirlevel=\count90
 )
@@ -99,37 +99,37 @@ ef")
 \l@australian = a dialect from \language\l@british 
 \l@newzealand = a dialect from \language\l@british 
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/babel-italian\ital
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/babel-italian\ital
 ian.ldf"
 Language: italian 2019/01/05 v.1.4.01 Italian support for the babel system
 \it@lettering=\count91
 \it@doublequoteactive=\count92
 \it@ISOcompliance=\count93
 ))
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/etoolbox\etoolbox.
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/etoolbox\etoolbox.
 sty"
 Package: etoolbox 2018/08/19 v2.5f e-TeX tools for LaTeX (JAW)
 \etb@tempcnta=\count94
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/geometry\geometry.
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/geometry\geometry.
 sty"
 Package: geometry 2018/04/16 v5.8 Page Geometry
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics\keyval.st
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics\keyval.st
 y"
 Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
 \KV@toks@=\toks16
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/generic/oberdiek\ifpdf.s
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/generic/oberdiek\ifpdf.s
 ty"
 Package: ifpdf 2018/09/07 v3.3 Provides the ifpdf switch
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/generic/oberdiek\ifvtex.
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/generic/oberdiek\ifvtex.
 sty"
 Package: ifvtex 2016/05/16 v1.6 Detect VTeX and its facilities (HO)
 Package ifvtex Info: VTeX not detected.
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/generic/ifxetex\ifxetex.
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/generic/ifxetex\ifxetex.
 sty"
 Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
 )
@@ -146,13 +146,13 @@ Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
 \Gm@layoutvoffset=\dimen111
 \Gm@dimlist=\toks17
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/geometry\geometry.
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/geometry\geometry.
 cfg"))
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/tools\indentfirst.
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/tools\indentfirst.
 sty"
 Package: indentfirst 1995/11/23 v1.03 Indent first paragraph (DPC)
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/microtype\microtyp
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/microtype\microtyp
 e.sty"
 Package: microtype 2019/02/28 v2.7b Micro-typographical refinements (RS)
 \MT@toks=\toks18
@@ -162,7 +162,7 @@ LaTeX Info: Redefining \textls on input line 790.
 LaTeX Info: Redefining \textmicrotypecontext on input line 1336.
 \MT@listname@count=\count99
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/microtype\microtyp
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/microtype\microtyp
 e-pdftex.def"
 File: microtype-pdftex.def 2019/02/28 v2.7b Definitions specific to pdftex (RS)
 
@@ -172,46 +172,46 @@ LaTeX Info: Redefining \lslig on input line 914.
 )
 Package microtype Info: Loading configuration file microtype.cfg.
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/microtype\microtyp
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/microtype\microtyp
 e.cfg"
 File: microtype.cfg 2019/02/28 v2.7b microtype main configuration file (RS)
 ))
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/setspace\setspace.
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/setspace\setspace.
 sty"
 Package: setspace 2011/12/19 v6.7a set line spacing
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics\graphicx.
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics\graphicx.
 sty"
 Package: graphicx 2017/06/01 v1.1a Enhanced LaTeX Graphics (DPC,SPQR)
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics\graphics.
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics\graphics.
 sty"
 Package: graphics 2017/06/25 v1.2c Standard LaTeX Graphics (DPC,SPQR)
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics\trig.sty"
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics\trig.sty"
 Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics-cfg\graph
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics-cfg\graph
 ics.cfg"
 File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
 Package graphics Info: Driver file: pdftex.def on input line 99.
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics-def\pdfte
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics-def\pdfte
 x.def"
 File: pdftex.def 2018/01/08 v1.0l Graphics/color driver for pdftex
 ))
 \Gin@req@height=\dimen113
 \Gin@req@width=\dimen114
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/subfig\subfig.sty"
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/subfig\subfig.sty"
 Package: subfig 2005/06/28 ver: 1.3 subfig package
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/caption\caption.st
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/caption\caption.st
 y"
 Package: caption 2018/10/06 v3.3-154 Customizing captions (AR)
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/caption\caption3.s
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/caption\caption3.s
 ty"
 Package: caption3 2018/09/12 v1.8c caption3 kernel (AR)
 Package caption3 Info: TeX engine: e-TeX on input line 64.
@@ -240,7 +240,7 @@ Package caption3 Info: TeX engine: e-TeX on input line 64.
 \sf@top=\skip47
 \sf@bottom=\skip48
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/booktabs\booktabs.
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/booktabs\booktabs.
 sty"
 Package: booktabs 2005/04/14 v1.61803 publication quality tables
 \heavyrulewidth=\dimen123
@@ -261,10 +261,10 @@ Package: booktabs 2005/04/14 v1.61803 publication quality tables
 \@lastruleclass=\count112
 \@thisrulewidth=\dimen135
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/tools\tabularx.sty
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/tools\tabularx.sty
 "
 Package: tabularx 2016/02/03 v2.11b `tabularx' package (DPC)
- ("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/tools\array.sty"
+ ("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/tools\array.sty"
 Package: array 2018/12/30 v2.4k Tabular extension package (FMi)
 \col@sep=\dimen136
 \ar@mcellbox=\box27
@@ -282,16 +282,16 @@ Package: array 2018/12/30 v2.4k Tabular extension package (FMi)
 \TX@cols=\count113
 \TX@ftn=\toks20
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/hyperref\hyperref.
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/hyperref\hyperref.
 sty"
 Package: hyperref 2018/11/30 v6.88e Hypertext links for LaTeX
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/generic/oberdiek\hobsub-
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/generic/oberdiek\hobsub-
 hyperref.sty"
 Package: hobsub-hyperref 2016/05/16 v1.14 Bundle oberdiek, subset hyperref (HO)
 
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/generic/oberdiek\hobsub-
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/generic/oberdiek\hobsub-
 generic.sty"
 Package: hobsub-generic 2016/05/16 v1.14 Bundle oberdiek, subset generic (HO)
 Package: hobsub 2016/05/16 v1.14 Construct package bundles (HO)
@@ -326,11 +326,11 @@ Package: atbegshi 2016/06/09 v1.18 At begin shipout hook (HO)
 Package: refcount 2016/05/16 v3.5 Data extraction from label references (HO)
 Package: hycolor 2016/05/16 v1.8 Color options for hyperref/bookmark (HO)
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/oberdiek\auxhook.s
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/oberdiek\auxhook.s
 ty"
 Package: auxhook 2016/05/16 v1.4 Hooks for auxiliary files (HO)
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/oberdiek\kvoptions
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/oberdiek\kvoptions
 .sty"
 Package: kvoptions 2016/05/16 v3.12 Key value format for package options (HO)
 )
@@ -338,7 +338,7 @@ Package: kvoptions 2016/05/16 v3.12 Key value format for package options (HO)
 \Hy@linkcounter=\count114
 \Hy@pagecounter=\count115
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/hyperref\pd1enc.de
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/hyperref\pd1enc.de
 f"
 File: pd1enc.def 2018/11/30 v6.88e Hyperref: PDFDocEncoding definition (HO)
 Now handling font encoding PD1 ...
@@ -346,7 +346,7 @@ Now handling font encoding PD1 ...
 )
 \Hy@SavedSpaceFactor=\count116
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/00miktex\hyperref.
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/00miktex\hyperref.
 cfg"
 File: hyperref.cfg 2002/06/06 v1.2 hyperref configuration of TeXLive
 )
@@ -358,7 +358,7 @@ Package hyperref Info: Backreferencing OFF on input line 4539.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
 Package hyperref Info: Bookmarks ON on input line 4772.
 \c@Hy@tempcnt=\count117
- ("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/url\url.sty"
+ ("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/url\url.sty"
 \Urlmuskip=\muskip10
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
@@ -382,13 +382,13 @@ LaTeX Info: Redefining \pageref on input line 6454.
 )
 Package hyperref Info: Driver (autodetected): hpdftex.
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/hyperref\hpdftex.d
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/hyperref\hpdftex.d
 ef"
 File: hpdftex.def 2018/11/30 v6.88e Hyperref driver for pdfTeX
 \Fld@listcount=\count122
 \c@bookmark@seq@number=\count123
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/oberdiek\rerunfile
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/oberdiek\rerunfile
 check.sty"
 Package: rerunfilecheck 2016/05/16 v1.8 Rerun checks for auxiliary files (HO)
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
@@ -398,26 +398,27 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 )
 Package hyperref Info: Option `colorlinks' set `true' on input line 18.
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/siunitx\siunitx.st
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/siunitx\siunitx.st
 y"
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/l3kernel\expl3.sty
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/l3kernel\expl3.sty
 "
-Package: expl3 2019-03-05 L3 programming layer (loader) 
+Package: expl3 2019-04-21 L3 programming layer (loader) 
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/l3kernel\expl3-cod
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/l3kernel\expl3-cod
 e.tex"
-Package: expl3 2019-03-05 L3 programming layer (code)
+Package: expl3 2019-04-21 L3 programming layer (code)
 \c_max_int=\count124
 \l_tmpa_int=\count125
 \l_tmpb_int=\count126
 \g_tmpa_int=\count127
 \g_tmpb_int=\count128
 \g__kernel_prg_map_int=\count129
-\c_log_iow=\count130
-\l_iow_line_count_int=\count131
-\l__iow_line_target_int=\count132
-\l__iow_one_indent_int=\count133
-\l__iow_indent_int=\count134
+\c__ior_term_ior=\count130
+\c_log_iow=\count131
+\l_iow_line_count_int=\count132
+\l__iow_line_target_int=\count133
+\l__iow_one_indent_int=\count134
+\l__iow_indent_int=\count135
 \c_zero_dim=\dimen147
 \c_max_dim=\dimen148
 \l_tmpa_dim=\dimen149
@@ -436,78 +437,78 @@ Package: expl3 2019-03-05 L3 programming layer (code)
 \l_tmpb_muskip=\muskip14
 \g_tmpa_muskip=\muskip15
 \g_tmpb_muskip=\muskip16
-\l_keys_choice_int=\count135
-\l__intarray_loop_int=\count136
+\l_keys_choice_int=\count136
+\l__intarray_loop_int=\count137
 \c__intarray_sp_dim=\dimen153
-\g__intarray_font_int=\count137
-\c__fp_leading_shift_int=\count138
-\c__fp_middle_shift_int=\count139
-\c__fp_trailing_shift_int=\count140
-\c__fp_big_leading_shift_int=\count141
-\c__fp_big_middle_shift_int=\count142
-\c__fp_big_trailing_shift_int=\count143
-\c__fp_Bigg_leading_shift_int=\count144
-\c__fp_Bigg_middle_shift_int=\count145
-\c__fp_Bigg_trailing_shift_int=\count146
-\c__kernel_randint_max_int=\count147
-\g__fp_array_int=\count148
-\l__fp_array_loop_int=\count149
-\l__sort_length_int=\count150
-\l__sort_min_int=\count151
-\l__sort_top_int=\count152
-\l__sort_max_int=\count153
-\l__sort_true_max_int=\count154
-\l__sort_block_int=\count155
-\l__sort_begin_int=\count156
-\l__sort_end_int=\count157
-\l__sort_A_int=\count158
-\l__sort_B_int=\count159
-\l__sort_C_int=\count160
-\l__tl_analysis_normal_int=\count161
-\l__tl_analysis_index_int=\count162
-\l__tl_analysis_nesting_int=\count163
-\l__tl_analysis_type_int=\count164
-\l__regex_internal_a_int=\count165
-\l__regex_internal_b_int=\count166
-\l__regex_internal_c_int=\count167
-\l__regex_balance_int=\count168
-\l__regex_group_level_int=\count169
-\l__regex_mode_int=\count170
-\c__regex_cs_in_class_mode_int=\count171
-\c__regex_cs_mode_int=\count172
-\l__regex_catcodes_int=\count173
-\l__regex_default_catcodes_int=\count174
-\c__regex_catcode_D_int=\count175
-\c__regex_catcode_S_int=\count176
-\c__regex_catcode_L_int=\count177
-\c__regex_catcode_O_int=\count178
-\c__regex_catcode_A_int=\count179
-\c__regex_all_catcodes_int=\count180
-\l__regex_show_lines_int=\count181
-\l__regex_min_state_int=\count182
-\l__regex_max_state_int=\count183
-\l__regex_left_state_int=\count184
-\l__regex_right_state_int=\count185
-\l__regex_capturing_group_int=\count186
-\l__regex_min_pos_int=\count187
-\l__regex_max_pos_int=\count188
-\l__regex_curr_pos_int=\count189
-\l__regex_start_pos_int=\count190
-\l__regex_success_pos_int=\count191
-\l__regex_curr_char_int=\count192
-\l__regex_curr_catcode_int=\count193
-\l__regex_last_char_int=\count194
-\l__regex_case_changed_char_int=\count195
-\l__regex_curr_state_int=\count196
-\l__regex_step_int=\count197
-\l__regex_min_active_int=\count198
-\l__regex_max_active_int=\count199
-\l__regex_replacement_csnames_int=\count266
-\l__regex_match_count_int=\count267
-\l__regex_min_submatch_int=\count268
-\l__regex_submatch_int=\count269
-\l__regex_zeroth_submatch_int=\count270
-\g__regex_trace_regex_int=\count271
+\g__intarray_font_int=\count138
+\c__fp_leading_shift_int=\count139
+\c__fp_middle_shift_int=\count140
+\c__fp_trailing_shift_int=\count141
+\c__fp_big_leading_shift_int=\count142
+\c__fp_big_middle_shift_int=\count143
+\c__fp_big_trailing_shift_int=\count144
+\c__fp_Bigg_leading_shift_int=\count145
+\c__fp_Bigg_middle_shift_int=\count146
+\c__fp_Bigg_trailing_shift_int=\count147
+\c__kernel_randint_max_int=\count148
+\g__fp_array_int=\count149
+\l__fp_array_loop_int=\count150
+\l__sort_length_int=\count151
+\l__sort_min_int=\count152
+\l__sort_top_int=\count153
+\l__sort_max_int=\count154
+\l__sort_true_max_int=\count155
+\l__sort_block_int=\count156
+\l__sort_begin_int=\count157
+\l__sort_end_int=\count158
+\l__sort_A_int=\count159
+\l__sort_B_int=\count160
+\l__sort_C_int=\count161
+\l__tl_analysis_normal_int=\count162
+\l__tl_analysis_index_int=\count163
+\l__tl_analysis_nesting_int=\count164
+\l__tl_analysis_type_int=\count165
+\l__regex_internal_a_int=\count166
+\l__regex_internal_b_int=\count167
+\l__regex_internal_c_int=\count168
+\l__regex_balance_int=\count169
+\l__regex_group_level_int=\count170
+\l__regex_mode_int=\count171
+\c__regex_cs_in_class_mode_int=\count172
+\c__regex_cs_mode_int=\count173
+\l__regex_catcodes_int=\count174
+\l__regex_default_catcodes_int=\count175
+\c__regex_catcode_D_int=\count176
+\c__regex_catcode_S_int=\count177
+\c__regex_catcode_L_int=\count178
+\c__regex_catcode_O_int=\count179
+\c__regex_catcode_A_int=\count180
+\c__regex_all_catcodes_int=\count181
+\l__regex_show_lines_int=\count182
+\l__regex_min_state_int=\count183
+\l__regex_max_state_int=\count184
+\l__regex_left_state_int=\count185
+\l__regex_right_state_int=\count186
+\l__regex_capturing_group_int=\count187
+\l__regex_min_pos_int=\count188
+\l__regex_max_pos_int=\count189
+\l__regex_curr_pos_int=\count190
+\l__regex_start_pos_int=\count191
+\l__regex_success_pos_int=\count192
+\l__regex_curr_char_int=\count193
+\l__regex_curr_catcode_int=\count194
+\l__regex_last_char_int=\count195
+\l__regex_case_changed_char_int=\count196
+\l__regex_curr_state_int=\count197
+\l__regex_step_int=\count198
+\l__regex_min_active_int=\count199
+\l__regex_max_active_int=\count266
+\l__regex_replacement_csnames_int=\count267
+\l__regex_match_count_int=\count268
+\l__regex_min_submatch_int=\count269
+\l__regex_submatch_int=\count270
+\l__regex_zeroth_submatch_int=\count271
+\g__regex_trace_regex_int=\count272
 \c_empty_box=\box29
 \l_tmpa_box=\box30
 \l_tmpb_box=\box31
@@ -552,62 +553,62 @@ Package: expl3 2019-03-05 L3 programming layer (code)
 \l__coffin_display_x_dim=\dimen177
 \l__coffin_display_y_dim=\dimen178
 \g__file_internal_ior=\read1
-\l__seq_internal_a_int=\count272
-\l__seq_internal_b_int=\count273
-\c__deprecation_minus_one=\count274
+\l__seq_internal_a_int=\count273
+\l__seq_internal_b_int=\count274
+\c__deprecation_minus_one=\count275
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/l3kernel\l3pdfmode
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/l3kernel\l3pdfmode
 .def"
-File: l3pdfmode.def 2019-03-05 v L3 Experimental driver: PDF mode
-\l__driver_color_stack_int=\count275
+File: l3pdfmode.def 2019-04-06 v L3 Experimental driver: PDF mode
+\l__driver_color_stack_int=\count276
 ))
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/l3packages/xparse\
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/l3packages/xparse\
 xparse.sty"
 Package: xparse 2019-03-05 L3 Experimental document command parser
-\l__xparse_current_arg_int=\count276
-\g__xparse_grabber_int=\count277
-\l__xparse_m_args_int=\count278
-\l__xparse_v_nesting_int=\count279
+\l__xparse_current_arg_int=\count277
+\g__xparse_grabber_int=\count278
+\l__xparse_m_args_int=\count279
+\l__xparse_v_nesting_int=\count280
 )
 Package: siunitx 2018/05/17 v2.7s A comprehensive (SI) units package
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/amsmath\amstext.st
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/amsmath\amstext.st
 y"
 Package: amstext 2000/06/29 v2.01 AMS text
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/amsmath\amsgen.sty
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/amsmath\amsgen.sty
 "
 File: amsgen.sty 1999/11/30 v2.0 generic functions
 \@emptytoks=\toks21
 \ex@=\dimen179
 ))
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/l3packages/l3keys2
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/l3packages/l3keys2
 e\l3keys2e.sty"
 Package: l3keys2e 2019-03-05 LaTeX2e option processing using LaTeX3 keys
 )
 \l__siunitx_tmp_box=\box47
 \l__siunitx_tmp_dim=\dimen180
-\l__siunitx_tmp_int=\count280
-\l__siunitx_number_mantissa_length_int=\count281
-\l__siunitx_number_uncert_length_int=\count282
-\l__siunitx_round_int=\count283
-\l__siunitx_process_decimal_int=\count284
-\l__siunitx_process_uncertainty_int=\count285
-\l__siunitx_process_fixed_int=\count286
-\l__siunitx_process_integer_min_int=\count287
-\l__siunitx_process_precision_int=\count288
-\l__siunitx_group_min_int=\count289
+\l__siunitx_tmp_int=\count281
+\l__siunitx_number_mantissa_length_int=\count282
+\l__siunitx_number_uncert_length_int=\count283
+\l__siunitx_round_int=\count284
+\l__siunitx_process_decimal_int=\count285
+\l__siunitx_process_uncertainty_int=\count286
+\l__siunitx_process_fixed_int=\count287
+\l__siunitx_process_integer_min_int=\count288
+\l__siunitx_process_precision_int=\count289
+\l__siunitx_group_min_int=\count290
 \l__siunitx_angle_marker_box=\box48
 \l__siunitx_angle_unit_box=\box49
 \l__siunitx_angle_marker_dim=\dimen181
 \l__siunitx_angle_unit_dim=\dimen182
-\l__siunitx_unit_int=\count290
-\l__siunitx_unit_denominator_int=\count291
-\l__siunitx_unit_numerator_int=\count292
-\l__siunitx_unit_prefix_int=\count293
-\l__siunitx_unit_prefix_base_int=\count294
-\l__siunitx_unit_prefix_gram_int=\count295
-\l__siunitx_number_product_int=\count296
+\l__siunitx_unit_int=\count291
+\l__siunitx_unit_denominator_int=\count292
+\l__siunitx_unit_numerator_int=\count293
+\l__siunitx_unit_prefix_int=\count294
+\l__siunitx_unit_prefix_base_int=\count295
+\l__siunitx_unit_prefix_gram_int=\count296
+\l__siunitx_number_product_int=\count297
 \c__siunitx_one_fill_skip=\skip58
 \l__siunitx_table_unit_align_skip=\skip59
 \l__siunitx_table_exponent_dim=\dimen183
@@ -626,15 +627,15 @@ Package: l3keys2e 2019-03-05 LaTeX2e option processing using LaTeX3 keys
 \l__siunitx_table_number_align_skip=\skip60
 \l__siunitx_table_text_align_skip=\skip61
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/translator\transla
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/translator\transla
 tor.sty"
 Package: translator 2018/01/04 v1.12 Easy translation of strings in LaTeX
 ))
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/anyfontsize\anyfon
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/anyfontsize\anyfon
 tsize.sty"
 Package: anyfontsize 2007/11/22 anyfontsize.sty by pts
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/titlesec\titlesec.
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/titlesec\titlesec.
 sty"
 Package: titlesec 2016/03/21 v2.10.2 Sectioning titles
 \ttl@box=\box54
@@ -647,73 +648,85 @@ Package: titlesec 2016/03/21 v2.10.2 Sectioning titles
 \titlewidthlast=\dimen195
 \titlewidthfirst=\dimen196
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/quoting\quoting.st
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/quoting\quoting.st
 y"
 Package: quoting 2014/01/28 v0.1c Consolidated environment for displayed text
 \quo@toppartop=\skip64
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/listings\listings.
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/listings\listings.
 sty"
-\lst@mode=\count297
+\lst@mode=\count298
 \lst@gtempboxa=\box55
 \lst@token=\toks23
-\lst@length=\count298
+\lst@length=\count299
 \lst@currlwidth=\dimen197
-\lst@column=\count299
-\lst@pos=\count300
+\lst@column=\count300
+\lst@pos=\count301
 \lst@lostspace=\dimen198
 \lst@width=\dimen199
-\lst@newlines=\count301
-\lst@lineno=\count302
+\lst@newlines=\count302
+\lst@lineno=\count303
 \lst@maxwidth=\dimen256
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/listings\lstmisc.s
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/listings\lstmisc.s
 ty"
 File: lstmisc.sty 2019/02/27 1.8b (Carsten Heinz)
-\c@lstnumber=\count303
-\lst@skipnumbers=\count304
+\c@lstnumber=\count304
+\lst@skipnumbers=\count305
 \lst@framebox=\box56
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/listings\listings.
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/listings\listings.
 cfg"
 File: listings.cfg 2019/02/27 1.8b listings configuration
 ))
 Package: listings 2019/02/27 1.8b (Carsten Heinz)
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics\color.sty
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics\color.sty
 "
 Package: color 2016/07/10 v1.1e Standard LaTeX Color (DPC)
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics-cfg\color
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics-cfg\color
 .cfg"
 File: color.cfg 2016/01/02 v1.6 sample color configuration
 )
 Package color Info: Driver file: pdftex.def on input line 147.
+)
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/listings\lstlang1.
+sty"
+File: lstlang1.sty 2019/02/27 1.8b listings language file
+)
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/listings\lstmisc.s
+ty"
+File: lstmisc.sty 2019/02/27 1.8b (Carsten Heinz)
+)
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/listings\lstlang1.
+sty"
+File: lstlang1.sty 2019/02/27 1.8b listings language file
 ) ("Progetto Observe Extension Of CoAP with QoS.aux" (specifiche.aux)
-(ProxyObserver.aux) (Observer.aux))
+(ProxyObserver.aux) (ProxySubject.aux) (Observer.aux) (Subject.aux))
 \openout1 = `"Progetto Observe Extension Of CoAP with QoS.aux"'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 58.
-LaTeX Font Info:    ... okay on input line 58.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 58.
-LaTeX Font Info:    ... okay on input line 58.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 58.
-LaTeX Font Info:    ... okay on input line 58.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 58.
-LaTeX Font Info:    ... okay on input line 58.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 58.
-LaTeX Font Info:    ... okay on input line 58.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 58.
-LaTeX Font Info:    ... okay on input line 58.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 58.
-LaTeX Font Info:    ... okay on input line 58.
-LaTeX Font Info:    Try loading font information for T1+lmr on input line 58.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Try loading font information for T1+lmr on input line 61.
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\t1lmr.fd"
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\t1lmr.fd"
 File: t1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Info: Redefining \it@ocap on input line 58.
-LaTeX Info: Redefining \it@ccap on input line 58.
+LaTeX Info: Redefining \it@ocap on input line 61.
+LaTeX Info: Redefining \it@ccap on input line 61.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -749,7 +762,7 @@ LaTeX Info: Redefining \it@ccap on input line 58.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-LaTeX Info: Redefining \microtypecontext on input line 58.
+LaTeX Info: Redefining \microtypecontext on input line 61.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
@@ -760,31 +773,31 @@ Package microtype Info: No adjustment of tracking.
 Package microtype Info: No adjustment of interword spacing.
 Package microtype Info: No adjustment of character kerning.
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/microtype\mt-cmr.c
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/microtype\mt-cmr.c
 fg"
 File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
 (RS)
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/context/base/mkii\supp-p
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/context/base/mkii\supp-p
 df.mkii"
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count305
+\scratchcounter=\count306
 \scratchdimen=\dimen257
 \scratchbox=\box57
-\nofMPsegments=\count306
-\nofMParguments=\count307
+\nofMPsegments=\count307
+\nofMParguments=\count308
 \everyMPshowfont=\toks24
-\MPscratchCnt=\count308
+\MPscratchCnt=\count309
 \MPscratchDim=\dimen258
-\MPnumerator=\count309
-\makeMPintoPDFobject=\count310
+\MPnumerator=\count310
+\makeMPintoPDFobject=\count311
 \everyMPtoPDFconversion=\toks25
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/oberdiek\epstopdf-
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/oberdiek\epstopdf-
 base.sty"
 Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/oberdiek\grfext.st
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/oberdiek\grfext.st
 y"
 Package: grfext 2016/05/16 v1.2 Manage graphics extensions (HO)
 )
@@ -801,21 +814,21 @@ Package caption Info: hyperref package is loaded.
 Package caption Info: listings package is loaded.
 Package caption Info: End \AtBeginDocument code.
 \AtBeginShipoutBox=\box58
-Package hyperref Info: Link coloring ON on input line 58.
+Package hyperref Info: Link coloring ON on input line 61.
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/hyperref\nameref.s
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/hyperref\nameref.s
 ty"
 Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/generic/oberdiek\gettitl
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/generic/oberdiek\gettitl
 estring.sty"
 Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
-\c@section@level=\count311
+\c@section@level=\count312
 )
-LaTeX Info: Redefining \ref on input line 58.
-LaTeX Info: Redefining \pageref on input line 58.
-LaTeX Info: Redefining \nameref on input line 58.
+LaTeX Info: Redefining \ref on input line 61.
+LaTeX Info: Redefining \pageref on input line 61.
+LaTeX Info: Redefining \nameref on input line 61.
  ("Progetto Observe Extension Of CoAP with QoS.out")
 ("Progetto Observe Extension Of CoAP with QoS.out")
 \@outlinefile=\write3
@@ -824,7 +837,7 @@ LaTeX Info: Redefining \nameref on input line 58.
 Now handling font encoding TS1 ...
 ... processing UTF-8 mapping file for font encoding TS1
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\ts1enc.dfu"
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\ts1enc.dfu"
 File: ts1enc.dfu 2018/10/05 v1.2f UTF-8 support for inputenc
    defining Unicode char U+00A2 (decimal 162)
    defining Unicode char U+00A3 (decimal 163)
@@ -897,57 +910,57 @@ File: ts1enc.dfu 2018/10/05 v1.2f UTF-8 support for inputenc
    defining Unicode char U+266A (decimal 9834)
    defining Unicode char U+FEFF (decimal 65279)
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/translator\transla
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/translator\transla
 tor-basic-dictionary-English.dict"
 Dictionary: translator-basic-dictionary, Language: English 
 )
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/siunitx\siunitx-ab
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/siunitx\siunitx-ab
 breviations.cfg"
 File: siunitx-abbreviations.cfg 2017/11/26 v2.7k siunitx: Abbreviated units
 )
-\c@lstlisting=\count312
-LaTeX Font Info:    Try loading font information for OT1+lmr on input line 58.
+\c@lstlisting=\count313
+LaTeX Font Info:    Try loading font information for OT1+lmr on input line 61.
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\ot1lmr.fd"
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\ot1lmr.fd"
 File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OML+lmm on input line 58.
+LaTeX Font Info:    Try loading font information for OML+lmm on input line 61.
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\omllmm.fd"
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\omllmm.fd"
 File: omllmm.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 58.
+LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 61.
 
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\omslmsy.fd"
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\omslmsy.fd"
 File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OMX+lmex on input line 58.
+LaTeX Font Info:    Try loading font information for OMX+lmex on input line 61.
 
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\omxlmex.fd"
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\omxlmex.fd"
 File: omxlmex.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 58.
+(Font)              <10.95> on input line 61.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 58.
+(Font)              <8> on input line 61.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 58.
-LaTeX Font Info:    Try loading font information for OT1+lmss on input line 58.
+(Font)              <6> on input line 61.
+LaTeX Font Info:    Try loading font information for OT1+lmss on input line 61.
 
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\ot1lmss.fd"
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\ot1lmss.fd"
 File: ot1lmss.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `lmss' (encoding: OT1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
-LaTeX Font Info:    Try loading font information for OT1+lmtt on input line 58.
+LaTeX Font Info:    Try loading font information for OT1+lmtt on input line 61.
 
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\ot1lmtt.fd"
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\ot1lmtt.fd"
 File: ot1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 Package microtype Info: Loading generic protrusion settings for font family
@@ -961,21 +974,21 @@ Package microtype Info: Character `029' is missing
 [1
 
 
-{C:/Users/nabow/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}]
-("Progetto Observe Extension Of CoAP with QoS.toc")
+{C:/Users/sieni/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}]
+("Progetto Observe Extension Of CoAP with QoS.toc" [1
+
+
+])
 \tf@toc=\write4
 \openout4 = `"Progetto Observe Extension Of CoAP with QoS.toc"'.
 
- [1
-
-
-]
+ [2]
 \openout2 = `specifiche.aux'.
 
  (specifiche.tex
 Capitolo 1.
 LaTeX Font Info:    Try loading font information for OMS+lmr on input line 5.
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\omslmr.fd"
+("C:\Users\sieni\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\omslmr.fd"
 File: omslmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Font shape `OMS/lmr/m/n' in size <10.95> not available
@@ -996,10 +1009,6 @@ l.22       \item P
  (ProxyObserver.tex
 Capitolo 2.
 
-("C:\Users\nabow\AppData\Local\Programs\MiKTeX 2.9\tex/latex/listings\lstlang1.
-sty"
-File: lstlang1.sty 2019/02/27 1.8b listings language file
-)
 Underfull \hbox (badness 10000) in paragraph at lines 8--9
 
  []
@@ -1069,69 +1078,130 @@ mr/bx/n/10.95 Re-spon-se-Co-de.NOT_ACCEPTABLE
  []
 
 [19]) [20]
+\openout2 = `ProxySubject.aux'.
+
+ (ProxySubject.tex
+Capitolo 3.
+[21
+
+
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 11--12
+
+ []
+
+(../Codice/Java/ProxySubject/CacheTable.java)
+Underfull \hbox (badness 10000) in paragraph at lines 14--15
+
+ []
+
+[22] (../Codice/Java/ProxySubject/CacheTable.java)
+Underfull \hbox (badness 10000) in paragraph at lines 17--21
+
+ []
+
+(../Codice/Java/ProxySubject/ResponseHandler.java [23])
+Underfull \hbox (badness 10000) in paragraph at lines 23--24
+
+ []
+
+[24]
+Underfull \hbox (badness 10000) in paragraph at lines 25--27
+
+ []
+
+(../Codice/Java/ProxySubject/Registrator.java [25])
+Underfull \hbox (badness 10000) in paragraph at lines 29--30
+
+ []
+
+[26] (../Codice/Java/ProxySubject/Registrator.java) [27]
+(../Codice/Java/ProxySubject/SensorNode.java)
+Underfull \hbox (badness 10000) in paragraph at lines 42--43
+
+ []
+
+(../Codice/Java/ProxySubject/SensorNode.java)
+Underfull \hbox (badness 10000) in paragraph at lines 45--46
+
+ []
+
+[28] (../Codice/Java/ProxySubject/SensorData.java)) [29]
 \openout2 = `Observer.aux'.
 
  (Observer.tex
-Capitolo 3.
+Capitolo 4.
 
 Underfull \hbox (badness 10000) in paragraph at lines 14--15
 
  []
 
-[21
+[30
 
 
 
-] (../Codice/Java/CoapClient.java [22]) (../Codice/Java/CoapClient.java
-[23])
+] (../Codice/Java/CoapClient.java [31]) (../Codice/Java/CoapClient.java
+[32])
 Underfull \hbox (badness 10000) in paragraph at lines 33--34
 
  []
 
 (../Codice/Java/CoapObserveRelation.java)
-(../Codice/Java/CoapObserveRelation.java [24])
+(../Codice/Java/CoapObserveRelation.java [33])
 Underfull \hbox (badness 10000) in paragraph at lines 36--37
 
  []
 
-(../Codice/Java/CoapObserveRelation.java) [25] (../Codice/Java/Observer.java)
-(../Codice/Java/Observer.java [26]) (../Codice/Java/Observer.java) [27])
-[28]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 79.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 79.
- ("Progetto Observe Extension Of CoAP with QoS.aux" (specifiche.aux)
-(ProxyObserver.aux) (Observer.aux))
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 79.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 79.
+(../Codice/Java/CoapObserveRelation.java) [34] (../Codice/Java/Observer.java)
+(../Codice/Java/Observer.java [35]) (../Codice/Java/Observer.java) [36])
+[37]
+\openout2 = `Subject.aux'.
+
+ (Subject.tex
+Capitolo 5.
+[38
+
+
+
+] (../Codice/C/border-router.c) (../Codice/C/subscriber.c [39]) [40]
+(../Codice/C/subscriber.c)) [41]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 83.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 83.
+
+("Progetto Observe Extension Of CoAP with QoS.aux" (specifiche.aux)
+(ProxyObserver.aux) (ProxySubject.aux) (Observer.aux) (Subject.aux))
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 83.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 83.
 Package rerunfilecheck Info: File `"Progetto Observe Extension Of CoAP with QoS
 ".out' has not changed.
-(rerunfilecheck)             Checksum: ACC578DC1920D1B807D41311B6CAEC3B;1474.
+(rerunfilecheck)             Checksum: 2A922146721E39443825FF30F0B23D61;1892.
  ) 
 Here is how much of TeX's memory you used:
- 24553 strings out of 492945
- 457905 string characters out of 3126252
- 859068 words of memory out of 3000000
- 27550 multiletter control sequences out of 15000+200000
- 625267 words of font info for 136 fonts, out of 3000000 for 9000
+ 25085 strings out of 492946
+ 463680 string characters out of 3126267
+ 863827 words of memory out of 3000000
+ 27757 multiletter control sequences out of 15000+200000
+ 625480 words of font info for 138 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 45i,6n,63p,842b,2370s stack positions out of 5000i,500n,10000p,200000b,50000s
-{C:/Users/nabow/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/lm/lm-maths
-y.enc}{C:/Users/nabow/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/lm/lm-e
-c.enc}<C:/Users/nabow/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/lm/l
-mbx10.pfb><C:/Users/nabow/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/
-lm/lmbx12.pfb><C:/Users/nabow/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/pub
-lic/lm/lmcsc10.pfb><C:/Users/nabow/AppData/Local/Programs/MiKTeX 2.9/fonts/type
-1/public/lm/lmr10.pfb><C:/Users/nabow/AppData/Local/Programs/MiKTeX 2.9/fonts/t
-ype1/public/lm/lmr12.pfb><C:/Users/nabow/AppData/Local/Programs/MiKTeX 2.9/font
-s/type1/public/lm/lmr9.pfb><C:/Users/nabow/AppData/Local/Programs/MiKTeX 2.9/fo
-nts/type1/public/lm/lmri10.pfb><C:/Users/nabow/AppData/Local/Programs/MiKTeX 2.
-9/fonts/type1/public/lm/lmro10.pfb><C:/Users/nabow/AppData/Local/Programs/MiKTe
-X 2.9/fonts/type1/public/lm/lmsy10.pfb><C:/Users/nabow/AppData/Local/Programs/M
+ 45i,6n,63p,1295b,2378s stack positions out of 5000i,500n,10000p,200000b,50000s
+{C:/Users/sieni/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/lm/lm-maths
+y.enc}{C:/Users/sieni/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/lm/lm-e
+c.enc}<C:/Users/sieni/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/lm/l
+mbx10.pfb><C:/Users/sieni/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/
+lm/lmbx12.pfb><C:/Users/sieni/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/pub
+lic/lm/lmcsc10.pfb><C:/Users/sieni/AppData/Local/Programs/MiKTeX 2.9/fonts/type
+1/public/lm/lmr10.pfb><C:/Users/sieni/AppData/Local/Programs/MiKTeX 2.9/fonts/t
+ype1/public/lm/lmr12.pfb><C:/Users/sieni/AppData/Local/Programs/MiKTeX 2.9/font
+s/type1/public/lm/lmr9.pfb><C:/Users/sieni/AppData/Local/Programs/MiKTeX 2.9/fo
+nts/type1/public/lm/lmri10.pfb><C:/Users/sieni/AppData/Local/Programs/MiKTeX 2.
+9/fonts/type1/public/lm/lmro10.pfb><C:/Users/sieni/AppData/Local/Programs/MiKTe
+X 2.9/fonts/type1/public/lm/lmsy10.pfb><C:/Users/sieni/AppData/Local/Programs/M
 iKTeX 2.9/fonts/type1/public/lm/lmsy9.pfb>
-Output written on "Progetto Observe Extension Of CoAP with QoS.pdf" (30 pages, 
-412126 bytes).
+Output written on "Progetto Observe Extension Of CoAP with QoS.pdf" (44 pages, 
+497636 bytes).
 PDF statistics:
- 808 PDF objects out of 1000 (max. 8388607)
- 441 named destinations out of 1000 (max. 500000)
- 31913 words of extra memory for PDF output out of 35830 (max. 10000000)
+ 1206 PDF objects out of 1440 (max. 8388607)
+ 709 named destinations out of 1000 (max. 500000)
+ 31969 words of extra memory for PDF output out of 35830 (max. 10000000)
 
