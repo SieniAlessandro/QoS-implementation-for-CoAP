@@ -34,7 +34,7 @@ public class ResponseHandler implements CoapHandler {
 		// Creating the sensorData
 		if(this.registration.getType().equals("battery")) {
 			//Updating battery
-			Log.info("ResponseHandler", "Update battery level");
+			Log.info("ResponseHandler", "Update battery level, new value: " + response.getResponseText());
 			this.registration.getSensorNode().updateBattery(Double.valueOf(response.getResponseText()), proxyObserver);
 		}
 		else {

@@ -9,7 +9,7 @@ public class Proxy
     {
     	ProxyObserver proxyObserver = new ProxyObserver();
     	
-    	ProxySubject proxySubject = new ProxySubject(proxyObserver);
+    	ProxySubject proxySubject = new ProxySubject(proxyObserver, Integer.parseInt(args[0]));
     	proxyObserver.addProxySubject(proxySubject);
     	    	
     }

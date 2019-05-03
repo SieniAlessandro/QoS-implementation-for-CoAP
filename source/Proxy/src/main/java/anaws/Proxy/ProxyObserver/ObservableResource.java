@@ -1,6 +1,5 @@
 package anaws.Proxy.ProxyObserver;
 
-
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.Option;
