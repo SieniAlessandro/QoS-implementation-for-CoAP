@@ -51,14 +51,14 @@ public class ResponseHandler implements CoapHandler {
 			onError();
 			return;
 		}
-		
+
 		if (response.getCode().equals(CoAP.ResponseCode.FORBIDDEN)) {
 			Log.error("Observer " + observer.getId(),
 					"Observe Relation has been canceled because the subject cannot handle it anymore, please ask for only critical notification: " + response.getCode());
 			onError();
 			return;
 		}
-		
+
 
 		if (!response.getOptions().hasObserve()) {
 			Log.error("Observer " + observer.getId(), "No observe option found ");
@@ -79,7 +79,7 @@ public class ResponseHandler implements CoapHandler {
 		} else if (response.getCode().equals(CoAP.ResponseCode.NOT_ACCEPTABLE) && acceptProposal) {
 			Log.info("Observer " + observer.getId(),
 					"Negotiation started, subject proposes the following priority: " + response.getOptions());
-			// Subject started the negotiation, observer need to accept it			
+			// Subject started the negotiation, observer need to accept it
 			Request observeRequest = new Request(Code.GET);
 			observeRequest.setObserve();
 			observeRequest
@@ -99,25 +99,5 @@ public class ResponseHandler implements CoapHandler {
 	public void onError() {
 		observer.getRelations().remove(path);
 	}
-	
-//	private void writeCSVData(String path, double value, String resourceName ) {
-//		// timestamp, ipSensore, valore ricevuto, nome risorsa, critico, observeDellaNotifica
-//		String ipSensor = path.replace("[", "");
-//		ipSensor = ipSensor.replace("]", "").split(":")[0];
-//		String[] data = { new Timestamp(System.currentTimeMillis()).toString(), ipSensor, value, 
-//	}
-//
-//	private String escapeSpecialCharacters(String data) {
-//	    String escapedData = data.replaceAll("\\R", " ");
-//	    if (data.contains(",") || data.contains("\"") || data.contains("'")) {
-//	        data = data.replace("\"", "\"\"");
-//	        escapedData = "\"" + data + "\"";
-//	    }
-//	    return escapedData;
-//	}
-//	
-//	private String convertToCSV(String[] data) {
-//		return Stream.of(data).map(this::escapeSpecialCharacters).collect(Collectors.joining(","));
-//	}
 
 }

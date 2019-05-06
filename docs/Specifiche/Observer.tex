@@ -12,7 +12,7 @@
 
 			\subsection{CoapClient}\label{CoapClient}
 				Con l'introduzione della negoziazione del livello di priorità è necessario effettuare ulteriori controlli alla risposta ricevuta, riga 28 di \ref{observeAndWaitNegotiation}. Nel caso in cui la negoziazione è stata avviata, la risposta avrà come \textit{ResponseCode} \textbf{NOT\_ACCEPTABLE} e la CoapObserveRelation appena creata viene cancellata. Se la registrazione viene accettata senza negoziazione, allora bisogna controllare che il campo \textit{Observe} della risposta coincida con quello della richiesta.\newline
-				\lstinputlisting[label={observeAndWaitNegotiation}, language=Java, firstline=1149, lastline=1187, caption={CoapClient, \href{https://tinyurl.com/y25fegl8}{codice originale}},captionpos=b]{../Codice/Java/CoapClient.java}
+				\lstinputlisting[label={observeAndWaitNegotiation}, language=Java, firstline=1149, lastline=1187, caption={CoapClient, \href{https://tinyurl.com/y25fegl8}{codice originale}},captionpos=b]{../Codice/Java/Californium/CoapClient.java}
 
 				Dopo la prima notifica ricevuta, il contatore, usato per mantenere ordinate le notifiche, viene settato con il valore del campo \textit{Observe} appena ricevuto e la prossima notifica deve avere un valore superiore a quest'ultimo per essere considerata fresca ed essere accettata. Se la registrazione è accettata subito, il contatore ottiene uno dei 4 valori del campo \textit{QoSLevel} e difficilmente la prossima notifica ha un numero di superiore a questi. Pertanto il contatore deve essere resettato in modo tale che la prossima notifica non venga scartata.
 				Quando si riceve la risposta possono attivarsi 2 thread:
@@ -26,30 +26,30 @@
 					\item MainThread resetta il contatore
 				\end{enumerate}
 				Per garantire ciò, il MainThread attende tramite una \textit{wait} (riga 21 di \ref{observeAndWaitNegotiation}) sulla \textit{CoapObserveRelation} che la risposta è stata gestita dal Coap.Endpoint che esegue una \textit{notify} sullo stesso oggetto dopo che la freschezza della notifica è stata controlla nella funzione \textit{deliver} \ref{deliver}. Inoltre, l'attesa è effettuata solo se la risposta non è stata ancora gestita, mentra la \textit{notify} è effettuata solo se il MainThread è in attesa. Questi controlli sono effettuati tramite delle nuove variabili introdotti nella \textit{CoapObserveRelation} indicate in \ref{CoapObserveRelationBoolean}
-				\lstinputlisting[label={deliver}, language=Java, firstline=1493, lastline=1515, caption={deliver, \href{https://tinyurl.com/y6gvpzrm}{codice originale}},captionpos=b]{../Codice/Java/CoapClient.java}
+				\lstinputlisting[label={deliver}, language=Java, firstline=1493, lastline=1515, caption={deliver, \href{https://tinyurl.com/y6gvpzrm}{codice originale}},captionpos=b]{../Codice/Java/Californium/CoapClient.java}
 
 
 			\subsection{CoapObserveRelation}
 				Variabili usate nel meccanismo di \textit{wait} e \textit{notify} spiegato in \ref{CoapClient}. \newline
-				\lstinputlisting[label={CoapObserveRelationBoolean}, language=Java, firstline=68, lastline=71, caption={CoapObserveRelation, \href{https://tinyurl.com/y4ockh22}{codice originale}},captionpos=b]{../Codice/Java/CoapObserveRelation.java}
-				\lstinputlisting[language=Java, firstline=114, lastline=138, caption={CoapObserveRelation, \href{https://tinyurl.com/y4ockh22}{codice originale}},captionpos=b]{../Codice/Java/CoapObserveRelation.java}
+				\lstinputlisting[label={CoapObserveRelationBoolean}, language=Java, firstline=68, lastline=71, caption={CoapObserveRelation, \href{https://tinyurl.com/y4ockh22}{codice originale}},captionpos=b]{../Codice/Java/Californium/CoapObserveRelation.java}
+				\lstinputlisting[language=Java, firstline=114, lastline=138, caption={CoapObserveRelation, \href{https://tinyurl.com/y4ockh22}{codice originale}},captionpos=b]{../Codice/Java/Californium/CoapObserveRelation.java}
 				Per resettare il gestore dell'ordine delle notifiche il contatore viene settato a 0.\newline
-				\lstinputlisting[language=Java, firstline=308, lastline=312, caption={CoapObserveRelation, \href{https://tinyurl.com/y4ockh22}{codice originale}},captionpos=b]{../Codice/Java/CoapObserveRelation.java}
+				\lstinputlisting[language=Java, firstline=308, lastline=312, caption={CoapObserveRelation, \href{https://tinyurl.com/y4ockh22}{codice originale}},captionpos=b]{../Codice/Java/Californium/CoapObserveRelation.java}
 
 	\section{Implementazione}
 		\subsection{classe Observer}
 			Questa classe utilizza un \textit{CoapClient} per effettuare le richeste verso il Proxy. Inoltre, mantiene le informazioni relative alle risorse trovate durante la discovery e una lista delle relazioni attualmente attive.
 			\subsubsection{resourceDiscovery}
 			Effettua la discovery delle risorse disponibili sul Proxy al quale viene inviata una richiesta di tipo \textbf{GET} sulla risorsa \textit{<well-known>} che contiene la lista delle risorse presenti.
-			\lstinputlisting[language=Java, firstline=138, lastline=144, caption={ResourceDiscovery},captionpos=b]{../Codice/Java/Observer.java}
+			\lstinputlisting[language=Java, firstline=138, lastline=144, caption={ResourceDiscovery},captionpos=b]{../Codice/Java/Observer/Observer.java}
 
 			\subsubsection{resourceRegistration}
 				Prepara una richiesta di tipo \textbf{GET} contenente nel campo \textit{Observe} il valore specificato dall'utente e la invia utilizzando la funzione \ref{observeAndWaitNegotiation}. Nel caso in cui la \textit{CoapObserveRelation} venga costruita con successo, allora questa viene mantenuta in una lista in modo da poter essere usata in seguito per la cancellazione della relazione.
-				\lstinputlisting[language=Java, firstline=116, lastline=136, caption={ResourceRegistration},captionpos=b]{../Codice/Java/Observer.java}
+				\lstinputlisting[language=Java, firstline=116, lastline=136, caption={ResourceRegistration},captionpos=b]{../Codice/Java/Observer/Observer.java}
 
 			\subsubsection{resourceCancellation}
 				Effettua la richiesta di cancellazione di una relazione inviando al Proxy una richiesta \textbf{GET} sulla risorsa di cui non si vuole più ricevere le notifiche, specificando nel campo \textit{Observe} il valore 1.
-				\lstinputlisting[language=Java, firstline=146, lastline=155, caption={ResourceCancellation},captionpos=b]{../Codice/Java/Observer.java}
+				\lstinputlisting[language=Java, firstline=146, lastline=155, caption={ResourceCancellation},captionpos=b]{../Codice/Java/Observer/Observer.java}
 
 		\subsection{classe ResponseHandler implements CoapHandler}
 			Questa classe implementa l'interfaccia \textit{CoapHandler} che gestisce le risposte ricevute in seguito all'invio di una richiesta. In particolare, ad ogni risposta ricevuta, la funzione \textit{onLoad(CoapResponse response)} viene eseguita.
@@ -62,8 +62,11 @@
 					\item \textbf{ResponseCode.NOT\_FOUND}: se viene richiesta una risorsa al Proxy, ma quest'ultimo non conclude con successo la registrazione con il sensore
 					\item risposta senza opzione \textit{Observe}: la risposta non è valida e viene scartata
 				\end{itemize}
+				\lstinputlisting[language=Java, firstline=36, lastline=67, caption={ResponseHandler controlli},captionpos=b]{../Codice/Java/Observer/ResponseHandler.java}
+
 				In seguito controlla se la risposta contiene una notifica oppure sia l'inizio di una negoziazione:
 				\begin{itemize}
 					\item \textbf{ResponseCode.CONTENT}: la risposta contiene il nuovo valore della risorsa che viene stampa a video
 					\item \textbf{ResponseCode.NOT\_ACCEPTABLE}: la negoziazione è stata avviata, allora se l'accettazione delle proposte è abilitata, viene preparata un'altra richiesta \textbf{GET} contenente nel campo \textit{Observe} il valore proposto dal Proxy, inviata tramite una semplice \textit{observe(CoapRequest, CoapHandler)} a cui si passa la stessa istanza di questa classe come CoapHandler.
 				\end{itemize}
+				\lstinputlisting[language=Java, firstline=69, lastline=97, caption={ResponseHandler},captionpos=b]{../Codice/Java/Observer/ResponseHandler.java}

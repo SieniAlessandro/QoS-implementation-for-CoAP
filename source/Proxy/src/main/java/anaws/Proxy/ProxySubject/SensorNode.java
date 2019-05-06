@@ -44,7 +44,7 @@ public class SensorNode{
 		if(battery <= 30)  {
 			if(battery <= 0) {
 				Log.info("SensorNode", "Sensor Dead");
-				actualState = ServerState.UNVAVAILABLE;
+				actualState = ServerState.UNAVAILABLE;
 			} else {
 				actualState = ServerState.ONLY_CRITICAL;
 				Log.info("SensorNode", "Battery Under Threshold");

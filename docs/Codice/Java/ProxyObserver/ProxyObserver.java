@@ -41,6 +41,10 @@ public class ProxyObserver {
 	public void addObserver(String key, ObserverState state) {
 		observers.put(key, state);
 	}
+	
+	public void removeObserver(String key) {
+		observers.remove(key);
+	}
 
 	public ObserverState getObserverState(String key) {
 		return observers.get(key);
@@ -155,7 +159,7 @@ public class ProxyObserver {
 		Log.info("ProxyObserver", "Clear relations after sensor state changed: " + key + " | " + state);
 		if (state == ServerState.ONLY_CRITICAL) {
 			o.clearAndNotifyNonCriticalObserveRelations(CoAP.ResponseCode.FORBIDDEN);
-		} else if (state == ServerState.UNVAVAILABLE) {
+		} else if (state == ServerState.UNAVAILABLE) {
 			o.clearAndNotifyObserveRelations(CoAP.ResponseCode.SERVICE_UNAVAILABLE);
 		}
 	}

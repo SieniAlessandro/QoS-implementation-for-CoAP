@@ -77,7 +77,7 @@ public class ObservableResource extends CoapResource {
 			server.removeObserver(observerID);
 			return;
 		}
-		if (sensor.getState().equals(ServerState.UNVAVAILABLE)) {
+		if (sensor.getState().equals(ServerState.UNAVAILABLE)) {
 			System.out.println("Subject is unavailable");
 			return;
 		}
@@ -150,19 +150,16 @@ public class ObservableResource extends CoapResource {
 		double value = data.getValue();
 		Response response = new Response(CoAP.ResponseCode.CONTENT);
 		
-		//response.setPayload(Double.toString(value));*/
 		response.setPayload((data.getCritic() == true)?Double.toString(value)+"!":Double.toString(value));
 		exchange.setMaxAge(data.getTime());
 
 		if (observeField < 0) {
 			exchange.respond(response, (int) data.getObserve());
-//			exchange.respond(response);
 		} else {
 			// This is a registration response, respond with the same observe number ;
 			exchange.respond(response, observeField);
 		}
 		
-//		Log.debug("ObservableResource", "Response: " + response.toString());
 		Log.info(getPath()+getName(), "Notification sent to: " + exchange.getSourcePort() + " | notification: " + value
 				+ " | isCritical: " + data.getCritic());
 	}
