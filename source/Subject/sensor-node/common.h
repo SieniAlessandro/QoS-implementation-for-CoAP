@@ -56,31 +56,39 @@
 #define CRITICAL 0x800000
 #define NON_CRITICAL 0
 
-#define INITIAL_BATTERY 1000
-#define CRITICAL_BATTERY 300
+#define BATTERY_MULTIPLIER 10
+#define INITIAL_BATTERY 100*BATTERY_MULTIPLIER
+#define CRITICAL_BATTERY 30*BATTERY_MULTIPLIER
+
 #define SENSING_DRAIN 1
-#define TRANSMITTING_DRAIN 5
+#define TRANSMITTING_DRAIN 4
 
-#define UDP_CLIENT_PORT 8765
-#define UDP_SERVER_PORT 5678
+#define RESOURCES_SENSING_PERIOD 2
 
-#define UDP_EXAMPLE_ID  190
+#define BATTERY_MAX_AGE      255
+#define BATTERY_INTERVAL_MAX (BATTERY_MAX_AGE - 1)
+#define BATTERY_SENSING_PERIOD 10
 
-#ifndef PERIOD
-#define PERIOD 60
-#endif
+#define RESOURCE_MAX_AGE 60
 
-#define START_INTERVAL    (15 * CLOCK_SECOND)
-#define SEND_INTERVAL   (PERIOD * CLOCK_SECOND)
-#define SEND_TIME   (random_rand() % (SEND_INTERVAL))
-#define MAX_PAYLOAD_LEN   30
+//Temperature Constants
+
+#define TEMPERATURE_NON_CRITICAL_CHANGE 4
+#define TEMPERATURE_CRITICAL_CHANGE 1
+#define TEMPERATURE_CRITICAL_THRESHOLD 30
+
+//Sinusoid Constants
+#define SINUSOID_NON_CRITICAL_CHANGE       4
+#define SINUSOID_CRITICAL_CHANGE 1
+#define SINUSOID_CRITICAL_THRESHOLD 30 //TO DEFINE
+
 
 /*****************************************************
   PROJECT ANAWS util variables
 ******************************************************/
 
 
-static uint32_t battery = INITIAL_BATTERY;
+static uint32_t battery = INITIAL_BATTERY*BATTERY_MULTIPLIER;
 
 uint32_t reduceBattery(uint32_t drain);
 

@@ -27,22 +27,44 @@
         \item Attivare i sensori relativi alle singole risorse
       \end{enumerate}
 
+      %A seconda di come viene usato e se viene usato o meno alla fine del progetto, inserisci qualche nota relativa a powertrace
 
       \lstinputlisting[label={RestServer}, language=C, firstnumber=38, firstline=38, caption={Process RestServer},captionpos=b]{../Codice/C/subscriber.c}
 
     \subsection{Risorse}
       Per avere una maggiore modularità è stato realizzato un file per ogni singola risorsa e risorse sono state definite come variabili di tipo \textbf{extern}
+
       \lstinputlisting[label={ExternResources}, language=C, firstnumber=4, firstline=4, lastline=12, caption={Risorse presenti sul nodo},captionpos=b]{../Codice/C/subscriber.c}
+
+      Per il nostro scopo vengono utilizzate esclusivamente risorse osservabili, che devono essere dichiarate come risorse di tipo \textbf{PERIODIC\_RESOURCE};
+      la peculiarità di questo tipo di risorse è il fatto che al momento dell'inizializzazione sono necessarie, tra le altre cose:
+      \begin{itemize}
+        \item get\_handler: una funzione utilizzata nel caso in cui venga fatta una richiesta di tipo get alla risorsa (necessaria anche per risorse non periodiche),
+              ma che viene richiamata, anche, ogni volta sia necessario inviare un nuovo valore ai vari osservatori
+        \item Il periodo con il quale viene richiamata la funzione periodic\_handler
+        \item periodic\_handler: una funzione che viene utilizzata per eseguire il sensing della risorsa, verificare se è necessario o meno inviare il valore ottenuto, a causa
+              della scandenza della vecchia risorsa oppure della rilevazione di un valore critico o meno che differisce dal precedente di una certa soglia, e in caso di invio
+              decide anche il valore del campo MaxAge
+      \end{itemize}
 
       \subsubsection{Batteria}
         La batteria viene fornita come risorsa di tipo osservabile, l'unico osservatore che si iscrive per ricevere le notifiche relative a questa risorsa è il \textit{Proxy},
-        in quanto se la batteria del sensore si trova sotto una specifica soglia vengono accettate soltanto richieste con un livello di priorità critico.\newline
-        Il sensing del livello della batteria viene fatto periodicamente
-        Le notifiche della batteria vengono inviate solo in due casi:
+        in quanto se la batteria del sensore si trova sotto una specifica soglia (\textbf{CRITICAL\_BATTERY}) vengono accettate
+        soltanto richieste con un livello di priorità critico.\newline
+        Il livello della batteria è simulato e viene fatto variare in base al tipo di operazione (sensing e trasmissione del valore)
+        di una certa quantità costante differente per ogni tipologia (\textbf{SENSING\_DRAIN}, \textbf{TRANSMITTING\_DRAIN}).\newline
+        Il sensing del livello della batteria viene fatto periodicamente.Invece per quanto riguarda le notifiche della batteria vengono inviate solo in due casi:
         \begin{enumerate}
           \item Valore della batteria è sotto la soglia critica
-          \item L'ultimo valore sta per scadere
+          \item L'ultimo valore sta per scadere, per evitare che il protocollo per la registrazione alla batteria venga rieseguito nuovamente
         \end{enumerate}
+
+        Una volta che la batteria è stata inviata perché la soglia è scesa sotto il livello critico, questa non verrà più inviata al \textit{Proxy} in quanto ormai gestisce le richieste di registrazione in modo
+        opportuno e sa che dal momento in cui non riceverà più valori da quel nodo, questo non avrà più batteria.
+
+        \lstinputlisting[label={res-battery}, language=C, caption={Codice di gestione relativo alla risorsa batteria},captionpos=b]{../Codice/C/resources/res-battery.c}
 
 
       \subsubsection{Temperatura}
+
+    \subsection{Parametri}

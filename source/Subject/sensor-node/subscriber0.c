@@ -9,11 +9,12 @@ extern resource_t res_temperature;
 extern resource_t res_battery;
 
 //For debug purposes
-extern resource_t res_hello;
+extern resource_t res_sinusoid;
 
 static struct uip_udp_conn *client_conn;
 static uip_ipaddr_t server_ipaddr;
 
+#include "powertrace.h"
 
 /*---------------------------------------------------------------------------*/
 //The rest server
@@ -95,11 +96,13 @@ PROCESS_THREAD(rest_server, ev, data)
   SENSORS_ACTIVATE(temperature_sensor);
 
   //Resource used only for debug purposes
-  rest_activate_resource(&res_hello, "sensors/hello");
+  rest_activate_resource(&res_sinusoid, "sensors/sinusoid");
 
   //Used only for Testing phase
   printf("Time,IPAddress,Value,Type,Critic,Observe\n");
 
+  //Starting powertrace with a period of 5 minutes
+  //powertrace_start(CLOCK_SECOND*20);
 
 
   SENSORS_ACTIVATE(button_sensor);

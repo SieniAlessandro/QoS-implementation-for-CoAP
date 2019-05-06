@@ -26,7 +26,8 @@ SMALL=1
 # REST Engine shall use Erbium CoAP implementation
 APPS += er-coap
 APPS += rest-engine
-APPS += project-anaws
+#APPS += project-anaws
+APPS += powertrace
 
 # optional rules to get assembly
 #CUSTOM_RULE_C_TO_OBJECTDIR_O = 1

@@ -114,6 +114,26 @@ powertrace_print(char *str)
   all_time = all_cpu + all_lpm;
   all_radio = energest_type_time(ENERGEST_TYPE_LISTEN) +
     energest_type_time(ENERGEST_TYPE_TRANSMIT);
+  /*
+    1-Stringa passata come argomento
+    2-Numero di clock trascorsi dall'accensione del dispositivo
+    3.4-Linkaddr del nodo
+    5-Numero di sequenza relativo alle stampe di questo messaggio
+    6-Tempo TOTALE di utilizzo della CPU
+    7-Tempo TOTALE in cui la CPU è stata in low power mode
+    8-Tempo TOTALE in cui il nodo ha mantenuto la radio accesa per trasmettere pacchetti
+    9-Tempo TOTALE in cui il nodo è stato in ascolto per ricevere pacchetti
+    Dalla documentazione This is the idle communication activity, to which all energy that is not possible to attribute to individual packets, is attributed. Examples include idle listening for incoming packets and MAC-level beacon transmissions. 
+      10-per la trasmissione
+      11-per ricezione
+    12-Tempo utilizzo CPU dall'ultima stampa di questo messaggio (USQM - Ultima Stampa di Questo Messaggio)
+    13-Tempo in cui la CPU è stata in low power mode da USQM
+    14-Tempo in cui il nodo ha mantenuto la radio accesa per trasmettere pacchetti da USQM
+    15-Tempo in cui il nodo è stato in ascolto per ricevere pacchetti da USQM
+    16-Tempo idle trasmissione da USQM
+    17-Tempo idle ricezione da USQM
+    Poi ci sono delle percentuali relative alla trasmissione e all'ascolto che per gli umani non hanno molto senso
+  */
 
   printf("%s %lu P %d.%d %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu (radio %d.%02d%% / %d.%02d%% tx %d.%02d%% / %d.%02d%% listen %d.%02d%% / %d.%02d%%)\n",
          str,
@@ -132,7 +152,6 @@ powertrace_print(char *str)
          (int)((10000L * all_listen) / all_time - (100L * all_listen / all_time) * 100),
          (int)((100L * listen) / time),
          (int)((10000L * listen) / time - (100L * listen / time) * 100));
-
   for(s = list_head(stats_list); s != NULL; s = list_item_next(s)) {
 
 #if ! NETSTACK_CONF_WITH_IPV6
