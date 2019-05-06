@@ -45,7 +45,7 @@
 
 #define MAX_AGE      60
 #define INTERVAL_MAX (MAX_AGE - 1)
-#define NON_CRITICAL_CHANGE       3
+#define NON_CRITICAL_CHANGE       4
 #define CRITICAL_CHANGE 1
 #define CRITICAL_THRESHOLD 30 //TO DEFINE
 
@@ -56,7 +56,18 @@ static void periodic_handler(void);
 //Used to handle the variable max_age
 static uint32_t variable_max_age = MAX_AGE;
 //Used to know when we are near to the end of the validity of the previous data
-static int32_t interval_counter = INTERVAL_MAX;
+static uint32_t interval_counter = INTERVAL_MAX;
+
+//Vectors of temperature values, used to simulate the temperature
+#define VALUES 60
+//int TEMPERATURE_VALUES[VALUES] = {-10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10};
+int TEMPERATURE_VALUES[VALUES] = {10,   2,  -5, -11, -16, -19, -19, -18, -15, -10,  -3,   3,  11,
+        19,  26,  32,  36,  39,  39,  38,  34,  29,  22,  14,   6,   0,
+        -7, -13, -17, -19, -19, -17, -13,  -7,   0,   6,  14,  22,  29,
+        34,  38,  39,  39,  36,  32,  26,  19,  11,   3,  -4, -10, -15,
+       -18, -19, -19, -16, -11,  -5,   2,  10};
+
+uint32_t indexValues = 0;
 
 static int temperature_old = INT_MIN;
 static uint32_t dataLevel = CRITICAL; //NON_CRITICAL, CRITICAL
@@ -72,7 +83,7 @@ PERIODIC_RESOURCE(res_temperature,
          NULL,
          NULL,
          NULL,
-         2*CLOCK_SECOND,
+         5*CLOCK_SECOND,
          periodic_handler);
 
 static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset){
@@ -91,9 +102,13 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
     //We let the node to sense for the data, because there is at least one observer
     requestedByObserver = 1;
     //Done to have the actual real value
-    temperature_old = temperature_sensor.value(0);
+    indexValues = (indexValues+1)%VALUES;
+    temperature_old = TEMPERATURE_VALUES[indexValues];
     //In this way we answer to the registration to all the observers -- REVIEW NEEDED
-    dataLevel = CRITICAL;
+    if(temperature_old > CRITICAL_THRESHOLD)
+      dataLevel = CRITICAL;
+    else
+      dataLevel = NON_CRITICAL;
   }
 
   //If we receive a message with the field observer equal to 1, we know that the registration has been canceled
@@ -131,8 +146,6 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
 }
 
 
-//Vectors of temperature values, used to simulate the temperature
-int TEMPERATURE_VALUES[60] = {10,38,-34,-6,22,50,-22,6,34,-38,-10,18,46,-26,2,30,58,-14,14,42,-30,-2,26,54,-18,10,38,-34,-6,22,50,-22,6,34,-38,-10,18,46,-26,2,30,58,-14,14,42,-30,-2,26,54,-18,10,38,-34,-6,22,50,-22,6,34,-38};
 /*
  * Additionally, a handler function named [resource name]_handler must be implemented for each PERIODIC_RESOURCE.
  * It will be called by the REST manager process with the defined period.
@@ -148,7 +161,8 @@ static void periodic_handler(){
 
 
   // USED ONLY FOR THE SIMULATIONS ON COOJA //
-  int temperature = TEMPERATURE_VALUES[interval_counter%60];
+  indexValues = (indexValues+1)%VALUES;
+  int temperature = TEMPERATURE_VALUES[indexValues%VALUES];
 
   ++interval_counter;
   //Used to simulate the drain of performing the sensing

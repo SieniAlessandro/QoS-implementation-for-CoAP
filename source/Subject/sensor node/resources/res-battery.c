@@ -46,6 +46,9 @@ static void periodic_handler(void);
 #define MAX_AGE      255
 #define INTERVAL_MAX (MAX_AGE - 1)
 
+
+int8_t sendedCritical = 0;
+
 //Defining the battery resource as an observable one
 PERIODIC_RESOURCE(res_battery,
          "title=\"Battery status\";rt=\"Battery\";obs",
@@ -109,8 +112,9 @@ static void periodic_handler(){
   }
 
   //Check if the battery must be sent or not
-  if((battery <= CRITICAL_BATTERY && interval_counter > 9) || interval_counter >= INTERVAL_MAX) {
-     interval_counter = 0;
+  if((battery <= CRITICAL_BATTERY && sendedCritical == 0) || interval_counter >= INTERVAL_MAX) {
+    interval_counter = 0;
+    sendedCritical = 1;
     /* Notify the registered observers which will trigger the res_get_handler to create the response. */
     REST.notify_subscribers(&res_battery);
   }
