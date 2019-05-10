@@ -48,6 +48,10 @@
 #define PRINTLLADDR(addr)
 #endif
 
+//Necessarie per acquisizione indirizzo IP
+#define UDP_CLIENT_PORT 8765
+#define UDP_SERVER_PORT 5678
+
 /*****************************************************
   PROJECT ANAWS CONSTANTS
 ******************************************************/
