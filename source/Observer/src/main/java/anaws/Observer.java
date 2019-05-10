@@ -20,7 +20,7 @@ public class Observer {
 
 	private int portProxy;
 	private int id;
-	private int requestedPriority;
+	private int argPriority;
 	private boolean autocomplete;
 	private boolean DEBUG;
 
@@ -30,12 +30,13 @@ public class Observer {
 	private ArrayList<WebLink> resourceList;
 	private HashMap<String, CoapObserveRelation> relations;
 
-	public Observer(String ipv4Proxy, int portProxy, int port, boolean autocomplete, boolean debug) {
+	public Observer(String ipv4Proxy, int portProxy, int port, boolean autocomplete, boolean debug, int argPriority) {
 		this.observerCoap = new CoapClient();
 		this.ipv4Proxy = ipv4Proxy;
 		this.portProxy = portProxy;
 		this.autocomplete = autocomplete;
 		this.DEBUG = debug;
+		this.argPriority = argPriority;
 
 		this.resourceList = new ArrayList<WebLink>();
 		this.relations = new HashMap<String, CoapObserveRelation>();
@@ -53,14 +54,6 @@ public class Observer {
 
 	public int getId() {
 		return id;
-	}
-
-	public int getRequestedPriority() {
-		return requestedPriority;
-	}
-
-	public void setRequestedPriority(int requestedPriority) {
-		this.requestedPriority = getPriority(requestedPriority);
 	}
 
 	public HashMap<String, CoapObserveRelation> getRelations() {
@@ -131,7 +124,7 @@ public class Observer {
 		observeRequest.setURI(URI);
 		Log.info("Observer", "Request observation of " + path + " with priority " + getPriority(priority));
 		CoapObserveRelation relation = observerCoap.observeAndWaitNegotiation(observeRequest,
-				new ResponseHandler(this, priority, path, URI, acceptProposal, DEBUG));
+				new ResponseHandler(this, path, URI, acceptProposal, DEBUG));
 
 		if (relation.isCanceled()) {
 			Log.info("Observer", "Relation has been canceled or the negotiation started");
@@ -182,7 +175,6 @@ public class Observer {
 			return;
 		}
 
-		requestedPriority = (int) Math.floor(Math.random() * 4 + 1);
 		String subjectAddress = "";
 		String resourceName = "";
 		String[] input;
@@ -208,8 +200,8 @@ public class Observer {
 		} else {
 			String[] splitted = splitURI(getRandomURI());
 			subjectAddress = splitted[1];
-			resourceName = splitted[2];
-			priority = getQoSBits(requestedPriority);
+			resourceName = "temperature";
+			priority = getQoSBits(argPriority);
 		}
 		String path = "/" + subjectAddress + "/" + resourceName;
 
@@ -284,9 +276,14 @@ public class Observer {
 		scanner = new Scanner(System.in);
 		boolean autocomplete = Boolean.parseBoolean(args[3]);
 		boolean DEBUG = Boolean.parseBoolean(args[4]);
-		Observer observerClient = new Observer(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]),
-				autocomplete, DEBUG);
-
+		Observer observerClient = null;
+		if (autocomplete)
+			observerClient = new Observer(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]),
+				autocomplete, DEBUG, Integer.parseInt(args[5]));
+		else
+			observerClient = new Observer(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]),
+					autocomplete, DEBUG, -1);
+		
 		System.out.println("Welcome to the Observer's Command Line Interface");
 		observerClient.printHelpMenu();
 		if (observerClient.autocomplete)

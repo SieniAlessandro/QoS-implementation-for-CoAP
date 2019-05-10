@@ -13,16 +13,14 @@ import org.eclipse.californium.core.coap.OptionSet;
 public class ResponseHandler implements CoapHandler {
 
 	private boolean DEBUG;
-	private int priority;
 	private Observer observer;
 	private String path;
 	private String URI;
 	private boolean acceptProposal;
 
-	public ResponseHandler(Observer observer, int priority, String path, String URI, boolean acceptProposal,
+	public ResponseHandler(Observer observer, String path, String URI, boolean acceptProposal,
 			boolean debug) {
 		this.observer = observer;
-		this.priority = priority;
 		this.path = path;
 		this.URI = URI;
 		this.acceptProposal = acceptProposal;
@@ -95,14 +93,12 @@ public class ResponseHandler implements CoapHandler {
 		} else if (response.getCode().equals(CoAP.ResponseCode.NOT_ACCEPTABLE) && acceptProposal) {
 			Log.info("Observer " + observer.getId(),
 					"Negotiation started, subject proposes the following priority: " + response.getOptions());
-			priority = responsePriority;
 			// Subject started the negotiation, observer need to accept it			
 			Request observeRequest = new Request(Code.GET);
 			observeRequest.setObserve();
 			observeRequest
 					.setOptions(new OptionSet().addOption(new Option(OptionNumberRegistry.OBSERVE, responsePriority)));
 			observeRequest.setURI(URI);
-			observer.setRequestedPriority(responsePriority);
 			CoapObserveRelation relation = observer.getCoapClient().observe(observeRequest, this);
 			Log.info("Observer " + observer.getId(), "Accepting the subject's proposal " + observeRequest.toString());
 			if (relation != null && !relation.isCanceled()) {

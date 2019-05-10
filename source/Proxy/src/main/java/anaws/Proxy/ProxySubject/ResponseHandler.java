@@ -27,7 +27,7 @@ public class ResponseHandler implements CoapHandler {
 			Log.error("ResponseHandler", "resource unreachable");
 			return;
 		}
-		if (!response.getOptions().hasObserve() ) {
+		if (!response.getOptions().hasObserve() && !response.advanced().getType().equals(CoAP.Type.ACK)) {
 			Log.error("ResponseHandler", "resource not available: " + response.advanced().toString());
 			return;
 		}
