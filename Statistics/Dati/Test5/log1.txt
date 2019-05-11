@@ -1,11 +1,4 @@
-17:44 /home/user/contiki/tools/sky/serialdump-linux -b115200 /dev/ttyUSB0
-17:47 Rime started with address 193.12.0.0.0.0.0.1
-17:47 MAC c1:0c:00:00:00:00:00:01 Ref ID: 3446
-17:47 Contiki-3.x-2945-g40b6217 started. Node id is set to 1.
-17:47 nullmac nullrdc, channel check rate 128 Hz, radio channel 21
-17:47 Tentative link-local IPv6 address fe80:0000:0000:0000:c30c:0000:0000:0001
-17:47 Starting 'Erbium Server'
-17:47 Time,IPAddress,Value,Type,Critic,Observe
+Time,IPAddress,Value,Type,Critic,Observe
 18:24 ,fd00::c30c:0:0:1,42,temperature,1,0
 18:25 ,fd00::c30c:0:0:1,43,temperature,1,1
 18:27 ,fd00::c30c:0:0:1,42,temperature,1,2

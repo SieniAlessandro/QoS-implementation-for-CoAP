@@ -4,31 +4,49 @@ import itertools
 from datetime import datetime
 from statistics import mean
 import matplotlib.pyplot as plt
+import sys
+
 TIME_FORMAT_SENSOR = "%M:%S "
 TIME_FORMAT = "%M:%S"
-
-SensorDF = pandas.read_csv("log1.txt")
-BASEPATH = "ObserverLog"
+BASEPATH = "\ObserverLog"
+MERGEKEYS = ["IPAddress","Value","Type","Critic","Observe"]
 avgs = []
-for i in range(1,5):
-    FILENAME = BASEPATH+str(i)+".csv"
-    ObserverDF= pandas.read_csv(FILENAME)
-    MergeList = ["IPAddress","Value","Type","Critic","Observe"]
-    result = SensorDF.merge(ObserverDF,on=MergeList)
-    result = result.loc[result["Critic"] == 1]
-    #print(result)
-    TimeDiff = []
-    for t1,t2 in zip(result['Time_x'].tolist(),result["Time_y"].tolist()):
-        t1 = datetime.strptime(t1,TIME_FORMAT_SENSOR)
-        t2 = datetime.strptime(t2,TIME_FORMAT)
-    #    print(str(t2)+"------"+str(t1))
-        TimeDiff.append((t2-t1).seconds)
-    print(len(TimeDiff))
-    avgs.append(mean(TimeDiff))
-print(avgs)
+tmp = []
+Dataframes = {}
+root = str(sys.argv[1])
+nlogs = int(sys.argv[2])
+
+#APERTURA DEL DATAFRAME RELATIVO AL SENSORE
+SensorDF = pandas.read_csv("Dati\\"+root+"\log1.txt")
+#Scrolling the sets
+
+
+for set in range(0,int(int(nlogs)/4)):
+    Dataframes[str(set)] = []
+    for priority in range(1,5):
+        FILENAME = "Dati\\"+root+BASEPATH+str(set)+str(priority)+".csv"
+        ObserverDF= pandas.read_csv(FILENAME)
+        result = SensorDF.merge(ObserverDF,on=MERGEKEYS)
+        # Choosing only the critic value
+        result = result.loc[result["Critic"] == 1]
+        Dataframes[str(set)].append(result)
+
+#Computing the average timediff for all the priorities
+for priority in range(0,4):
+    tmp = []
+    for sets in range(0,int(int(nlogs)/4)):
+        TimeDiff = []
+        actualDF = Dataframes[str(sets)][priority]
+        for t1,t2 in zip(actualDF['Time_x'].values.tolist(),actualDF["Time_y"].values.tolist()):
+            t1 = datetime.strptime(t1,TIME_FORMAT_SENSOR)
+            t2 = datetime.strptime(t2,TIME_FORMAT)
+            TimeDiff.append((t2-t1).seconds)
+        tmp.append(mean(TimeDiff))
+    avgs.append(mean(tmp))
+
+#Preparing and plotting the line graph
 plt.xticks(list(range(1,5)))
 plt.yticks(avgs)
 plt.plot(list(range(1,5)),avgs,color="r",marker="o")
-#for i in range(0,4):
-#    plt.annotate(str(avgs[i]),xy=(i+1.05,avgs[i]+avgs[0]/300))
+plt.savefig("Dati\\"+root+"\plot.png")
 plt.show()

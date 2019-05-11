@@ -7,4 +7,4 @@ args = parser.parse_args()
 
 for observer in range(0,int(args.poolSize)):
     dirname = "Observer-" + str(observer)
-    os.rename(dirname+"/ObserverLog.csv", dirname+"/ObserverLog" + str(observer) + ".csv")
+    os.rename(dirname+"/ObserverLog.csv", dirname+"/ObserverLog" + str(int(observer/4)) +str((observer%4)+1)+ ".csv")
