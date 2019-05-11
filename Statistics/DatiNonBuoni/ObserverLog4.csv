@@ -1,0 +1,9 @@
+Time,IPAddress,Value,Type,Critic,Observe
+36:21,fd00::c30c:0:0:1,36.0,temperature,1,12582912
+36:25,fd00::c30c:0:0:1,38.0,temperature,1,12
+37:5,fd00::c30c:0:0:1,34.0,temperature,1,29
+37:13,fd00::c30c:0:0:1,36.0,temperature,1,32
+37:15,fd00::c30c:0:0:1,32.0,temperature,1,33
+38:19,fd00::c30c:0:0:1,36.0,temperature,1,57
+38:25,fd00::c30c:0:0:1,38.0,temperature,1,59
+39:15,fd00::c30c:0:0:1,32.0,temperature,1,80
