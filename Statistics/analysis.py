@@ -5,6 +5,7 @@ from datetime import datetime
 from statistics import mean
 import matplotlib.pyplot as plt
 import sys
+import argparse
 
 TIME_FORMAT_SENSOR = "%M:%S "
 TIME_FORMAT = "%M:%S"
@@ -13,8 +14,13 @@ MERGEKEYS = ["IPAddress","Value","Type","Critic","Observe"]
 avgs = []
 tmp = []
 Dataframes = {}
-root = str(sys.argv[1])
-nlogs = int(sys.argv[2])
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-r","--root",help="Select the root folder relatives to the csv files,inside the Dati folder")
+parser.add_argument("-n","--number",help="The number of csv files",type=int)
+args = parser.parse_args()
+root = args.root
+nlogs = args.number
 
 #APERTURA DEL DATAFRAME RELATIVO AL SENSORE
 SensorDF = pandas.read_csv("Dati\\"+root+"\log1.txt")
