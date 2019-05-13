@@ -1,20 +1,20 @@
 #include "common.h"
 #include "dev/button-sensor.h"
-
-/*DEFINING THE RESOURCE THOSE ARE PRESENT IN THE SENSOR NODE*/
 #include "dev/temperature-sensor.h"
-extern resource_t res_temperature;
-
 #include "dev/battery-sensor.h"
-extern resource_t res_battery;
+//#include "dev/humidity.h"
+//#include "dev/light.h"
 
-//For debug purposes
-extern resource_t res_sinusoid;
+/*DEFINING THE RESOURCE THAT ARE PRESENT IN THE SENSOR NODE*/
+extern resource_t res_temperature;
+extern resource_t res_battery;
+extern resource_t res_humidity;
+extern resource_t res_luminosity;
 
 static struct uip_udp_conn *client_conn;
 static uip_ipaddr_t server_ipaddr;
 
-#include "powertrace.h"
+//#include "powertrace.h"
 
 /*---------------------------------------------------------------------------*/
 //The rest server
@@ -46,7 +46,7 @@ static void set_global_address(void){
  * Note the IPCMV6 checksum verification depends on the correct uncompressed
  * addresses.
  */
- 
+
 /* Derived from server link-local (MAC) address */
   uip_ip6addr(&server_ipaddr, UIP_DS6_DEFAULT_PREFIX, 0, 0, 0, 0x0250, 0xc2ff, 0xfea8, 0xcd1a); //redbee-econotag
 
@@ -66,12 +66,12 @@ PROCESS_THREAD(rest_server, ev, data)
   set_global_address();
 
   /* new connection with remote host */
-  client_conn = udp_new(NULL, UIP_HTONS(UDP_SERVER_PORT), NULL); 
+  client_conn = udp_new(NULL, UIP_HTONS(UDP_SERVER_PORT), NULL);
   if(client_conn == NULL) {
     PRINTF("No UDP connection available, exiting the process!\n");
     PROCESS_EXIT();
   }
-  udp_bind(client_conn, UIP_HTONS(UDP_CLIENT_PORT)); 
+  udp_bind(client_conn, UIP_HTONS(UDP_CLIENT_PORT));
 
   PRINTF("Created a connection with the server ");
   PRINT6ADDR(&client_conn->ripaddr);
@@ -89,14 +89,17 @@ PROCESS_THREAD(rest_server, ev, data)
   rest_init_engine();
 
   /* Activate the application-specific resources. */
-  rest_activate_resource(&res_battery, "sensors/battery");  
-  SENSORS_ACTIVATE(battery_sensor);  
-  
+  rest_activate_resource(&res_battery, "sensors/battery");
+  SENSORS_ACTIVATE(battery_sensor);
+
   rest_activate_resource(&res_temperature, "sensors/temperature");
   SENSORS_ACTIVATE(temperature_sensor);
 
-  //Resource used only for debug purposes
-  rest_activate_resource(&res_sinusoid, "sensors/sinusoid");
+  rest_activate_resource(&res_humidity, "sensors/humidity");
+  //SENSORS_ACTIVATE(humidity_sensor);
+
+  rest_activate_resource(&res_luminosity, "sensors/luminosity");
+  //SENSOR_ACTIVATE(light_sensor);
 
   //Used only for Testing phase
   printf("Time,IPAddress,Value,Type,Critic,Observe\n");
@@ -108,7 +111,7 @@ PROCESS_THREAD(rest_server, ev, data)
   SENSORS_ACTIVATE(button_sensor);
   while(1) {
     PROCESS_WAIT_EVENT_UNTIL(ev==sensors_event && data==&button_sensor);
-    //Used to force the battery to go in the only critic connection accepted phase 
+    //Used to force the battery to go in the only critic connection accepted phase
     critic_battery();
   }
 

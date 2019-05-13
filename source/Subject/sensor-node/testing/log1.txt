@@ -1,16 +1,75 @@
-38:40 /home/user/contiki/tools/sky/serialdump-linux -b115200 /dev/ttyUSB0
-38:54 Rime started with address 193.12.0.0.0.0.0.2
-38:54 MAC c1:0c:00:00:00:00:00:02 Ref ID: 3446
-38:54 Contiki-3.x-2945-g40b6217 started. Node id is set to 2.
-38:54 nullmac nullrdc, channel check rate 128 Hz, radio channel 21
-38:54 Tentative link-local IPv6 address fe80:0000:0000:0000:c30c:0000:0000:0002
-38:54 Starting 'Erbium Server'
-38:54 Time,IPAddress,Value,Type,Critic,Observe
-40:41 Rime started with address 193.12.0.0.0.0.0.2
-40:41 MAC c1:0c:00:00:00:00:00:02 Ref ID: 3446
-40:41 Contiki-3.x-2945-g40b6217 started. Node id is set to 2.
-40:41 nullmac nullrdc, channel check rate 128 Hz, radio channel 21
-40:41 Tentative link-local IPv6 address fe80:0000:0000:0000:c30c:0000:0000:0002
-40:41 Starting 'Erbium Server'
-40:41 Time,IPAddress,Value,Type,Critic,Observe
-44:56 1
+11:09 /home/user/contiki/tools/sky/serialdump-linux -b115200 /dev/ttyUSB2
+11:11  2664 P 2.0 0 9999 645413 471 622598 2 18 9999 645413 471 622598 2 18 (radio 95.-6547% / 95.-6547% tx 0.07% / 0.07% listen 94.-6454% / 94.-6454%)
+11:16 Rime started with address 193.12.0.0.0.0.0.1
+11:16 MAC c1:0c:00:00:00:00:00:01 Ref ID: 3446
+11:16 Contiki-3.x-2945-g40b6217 started. Node id is set to 1.
+11:16 nullmac nullrdc, channel check rate 128 Hz, radio channel 21
+11:16 Tentative link-local IPv6 address fe80:0000:0000:0000:c30c:0000:0000:0001
+11:16 Starting 'Erbium Server'
+11:16 Time,IPAddress,Value,Type,Critic,Observe
+11:36  2664 P 2.0 0 12602 642821 338 530305 329252864 329252864 12602 642821 338 530305 329252864 329252864 (radio 80.-6457% / 80.-6457% tx 0.05% / 0.05% listen 80.-6462% / 80.-6462%)
+11:56  5224 P 2.0 1 21268 1289512 574 1185426 1805516800 10198 8664 646691 236 655120 1476263936 3965724630 (radio 90.-6506% / 100.-6554% tx 0.04% / 0.03% listen 90.-6510% / 99.-6458%)
+12:16  7784 P 2.0 2 24806 1941333 574 1840784 1805516800 10198 3536 651821 0 655356 0 0 (radio 93.-8673% / 99.-6454% tx 0.02% / 0.00% listen 93.-8676% / 99.-6454%)
+12:18 Rime started with address 193.12.0.0.0.0.0.1
+12:18 MAC c1:0c:00:00:00:00:00:01 Ref ID: 3446
+12:18 Contiki-3.x-2945-g40b6217 started. Node id is set to 1.
+12:18 nullmac nullrdc, channel check rate 128 Hz, radio channel 21
+12:18 Tentative link-local IPv6 address fe80:0000:0000:0000:c30c:0000:0000:0001
+12:18 Starting 'Erbium Server'
+12:18 Time,IPAddress,Value,Type,Critic,Observe
+12:37 Rime started with address 193.12.0.0.0.0.0.1
+12:37 MAC c1:0c:00:00:00:00:00:01 Ref ID: 3446
+12:37 Contiki-3.x-2945-g40b6217 started. Node id is set to 1.
+12:37 nullmac nullrdc, channel check rate 128 Hz, radio channel 21
+12:37 Tentative link-local IPv6 address fe80:0000:0000:0000:c30c:0000:0000:0001
+12:37 Starting 'Erbium Server'
+12:37 Time,IPAddress,Value,Type,Critic,Observe
+12:57  2664 P 193.12 0 3149 652269 68 623000 0 0 3149 652269 68 623000 0 0 (radio 95.-6547% / 95.-6547% tx 0.01% / 0.01% listen 95.-6548% / 95.-6548%)
+13:17  5224 P 193.12 1 15844 1294938 365 1278067 31468 4932 12694 642669 297 655065 31468 4932 (radio 97.-6501% / 99.-6454% tx 0.02% / 0.04% listen 97.-6503% / 99.-6459%)
+13:37  7784 P 193.12 2 27393 1938749 1934 1931852 0 31314 11548 643811 1569 653783 4294935828 26382 (radio 98.-8703% / 99.-6454% tx 0.09% / 0.23% listen 98.-8713% / 99.-6478%)
+13:57  10344 P 193.12 3 37649 2583852 2903 2586237 3 10203 10255 645103 969 654383 3 4294946185 (radio 98.-9754% / 99.-6454% tx 0.11% / 0.14% listen 98.-9765% / 99.-6469%)
+14:04 ,fd00::c30c:0:0:1,-5,temperature,0,0
+14:05 ,fd00::c30c:0:0:1,-11,temperature,0,1
+14:07 ,fd00::c30c:0:0:1,-16,temperature,0,2
+14:17 ,fd00::c30c:0:0:1,-10,temperature,0,3
+14:17  12905 P 0.0 4 42875 3234304 3208 3241611 0 43732 5225 650452 305 655372 4294967293 33529 (radio 99.-9173% / 100.-6551% tx 0.09% / 0.04% listen 98.-9083% / 99.-6456%)
+14:19 ,fd00::c30c:0:0:1,-3,temperature,0,4
+14:21 ,fd00::c30c:0:0:1,3,temperature,0,5
+14:23 ,fd00::c30c:0:0:1,11,temperature,0,6
+14:25 ,fd00::c30c:0:0:1,19,temperature,0,7
+14:27 ,fd00::c30c:0:0:1,26,temperature,0,8
+14:30 ,fd00::c30c:0:0:1,32,temperature,1,9
+14:31 ,fd00::c30c:0:0:1,36,temperature,1,10
+14:33 ,fd00::c30c:0:0:1,39,temperature,1,11
+14:37 ,fd00::c30c:0:0:1,38,temperature,1,12
+14:37  15465 P 0.0 5 49335 3883162 3816 3896320 1 43732 6458 648858 608 654708 1 0 (radio 99.-9812% / 100.-6555% tx 0.09% / 0.09% listen 99.-9822% / 99.-6464%)
+14:39 ,fd00::c30c:0:0:1,34,temperature,1,13
+14:41 ,fd00::c30c:0:0:1,29,temperature,0,14
+14:43 ,fd00::c30c:0:0:1,22,temperature,0,15
+14:45 ,fd00::c30c:0:0:1,14,temperature,0,16
+14:47 ,fd00::c30c:0:0:1,6,temperature,0,17
+14:49 ,fd00::c30c:0:0:1,0,temperature,0,18
+14:51 ,fd00::c30c:0:0:1,-7,temperature,0,19
+14:53 ,fd00::c30c:0:0:1,-13,temperature,0,20
+14:55 ,fd00::c30c:0:0:1,-17,temperature,0,21
+14:57  18024 P 0.0 6 60069 4527516 4411 4550811 0 43732 10732 644354 595 654490 4294967295 0 (radio 99.-9333% / 99.-6457% tx 0.09% / 0.09% listen 99.-9343% / 99.-6466%)
+15:03 ,fd00::c30c:0:0:1,-13,temperature,0,22
+15:05 ,fd00::c30c:0:0:1,-7,temperature,0,23
+15:07 ,fd00::c30c:0:0:1,0,temperature,0,24
+15:09 ,fd00::c30c:0:0:1,6,temperature,0,25
+15:11 ,fd00::c30c:0:0:1,14,temperature,0,26
+15:13 ,fd00::c30c:0:0:1,22,temperature,0,27
+15:15 ,fd00::c30c:0:0:1,29,temperature,0,28
+15:17 ,fd00::c30c:0:0:1,34,temperature,1,29
+15:17  20585 P 0.0 7 66630 5176641 5094 5205812 0 43732 6560 649125 683 655000 0 0 (radio 99.-9792% / 99.-6451% tx 0.09% / 0.10% listen 99.-9802% / 99.-6461%)
+15:19 ,fd00::c30c:0:0:1,38,temperature,1,30
+15:21 ,fd00::c30c:0:0:1,39,temperature,1,31
+15:25 ,fd00::c30c:0:0:1,36,temperature,1,32
+15:27 ,fd00::c30c:0:0:1,32,temperature,1,33
+15:29 ,fd00::c30c:0:0:1,26,temperature,0,34
+15:31 ,fd00::c30c:0:0:1,19,temperature,0,35
+15:33 ,fd00::c30c:0:0:1,11,temperature,0,36
+15:35 ,fd00::c30c:0:0:1,3,temperature,0,37
+15:37 ,fd00::c30c:0:0:1,-4,temperature,0,38
+15:37  23145 P 0.0 8 73238 5825390 5779 5860481 0 43732 6606 648749 685 654667 0 0 (radio 99.-9421% / 99.-6454% tx 0.09% / 0.10% listen 99.-9431% / 99.-6465%)
+15:39 ,fd00::c30c:0:0:1,-10,temperature,0,39

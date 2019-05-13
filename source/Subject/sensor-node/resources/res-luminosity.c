@@ -1,5 +1,13 @@
+/*res-luminosity.c
+ *Simulated resource
+ *Here we do not use a threshold value but we watch only the variation with the previous sent value, if it is above a certain treshold then we can consider 
+ *the new value as a non-critical or a critical value and send it
+ **/
 #include "../common.h"
-#include "dev/temperature-sensor.h"
+
+#define LUMINOSITY_CRITICAL_CHANGE 20
+#define LUMINOSITY_NON_CRITICAL_CHANGE 5
+
 
 static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset);
 static void periodic_handler(void);
@@ -9,29 +17,22 @@ static uint32_t variable_max_age = RESOURCE_MAX_AGE;
 //Used to know when we are near to the end of the validity of the previous data
 static uint32_t interval_counter = 0;
 
-//Vectors of temperature values, used to simulate the temperature
+//Vectors of luminosity values, used to simulate the luminosity
 #define VALUES 6
-//int TEMPERATURE_VALUES[VALUES] = {-10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10};
-/*int TEMPERATURE_VALUES[VALUES] = {10,   2,  -5, -11, -16, -19, -19, -18, -15, -10,  -3,   3,  11,
-        19,  26,  32,  36,  39,  39,  38,  34,  29,  22,  14,   6,   0,
-        -7, -13, -17, -19, -19, -17, -13,  -7,   0,   6,  14,  22,  29,
-        34,  38,  39,  39,  36,  32,  26,  19,  11,   3,  -4, -10, -15,
-       -18, -19, -19, -16, -11,  -5,   2,  10};
-*/
-int TEMPERATURE_VALUES[VALUES] = {40,   41,  42, 43, 42, 41};
+int LUMINOSITY_VALUES[VALUES] = {20,   26,  30, 60, 55, 25};
 
-uint32_t indexTemperatureValues = 1;
+uint32_t indexLuminosityValues = 1;
 
-static int temperature_old = 10;
+static int luminosity_old = 10;
 static uint32_t dataLevel; //NON_CRITICAL, CRITICAL
 static uint8_t requestedLevel; //NON_CRITICAL all, CRITICAL only criticals
 
 //Used to know if there is at least one subscriber to the resource
 static uint8_t requestedByObserver = 0;
 
-//Initialization of the resource temperature as an observable resource, with a periodic handler function
-PERIODIC_RESOURCE(res_temperature,
-         "title=\"Temperature\";rt=\"Temperature\";obs",
+//Initialization of the resource luminosity as an observable resource, with a periodic handler function
+PERIODIC_RESOURCE(res_luminosity,
+         "title=\"Luminosity\";rt=\"Luminosity\";obs",
          get_handler,
          NULL,
          NULL,
@@ -55,13 +56,10 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
     //We let the node to sense for the data, because there is at least one observer
     requestedByObserver = 1;
     //Done to have the actual real value
-    indexTemperatureValues = (indexTemperatureValues+1)%VALUES;
-    temperature_old = TEMPERATURE_VALUES[indexTemperatureValues];
+    indexLuminosityValues = (indexLuminosityValues+1)%VALUES;
+    luminosity_old = LUMINOSITY_VALUES[indexLuminosityValues];
     //In this way we answer to the registration to all the observers -- REVIEW NEEDED
-    if(temperature_old > TEMPERATURE_CRITICAL_THRESHOLD)
-      dataLevel = CRITICAL;
-    else
-      dataLevel = NON_CRITICAL;
+    dataLevel = NON_CRITICAL;
   }
 
   //If we receive a message with the field observer equal to 1, we know that the registration has been canceled
@@ -75,9 +73,9 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
   if(accept == -1 || accept == REST.type.TEXT_PLAIN) {
     REST.set_header_content_type(response, REST.type.TEXT_PLAIN);
     if(dataLevel == CRITICAL)
-      snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "%d!", temperature_old);
+      snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "%d!", luminosity_old);
     else
-      snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "%d", temperature_old);
+      snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "%d", luminosity_old);
 
     REST.set_response_payload(response, (uint8_t *)buffer, strlen((char *)buffer));
 
@@ -86,7 +84,7 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
     REST.set_response_status(response, REST.status.NOT_ACCEPTABLE);
     const char *msg = "Supporting content-types text/plain";
     REST.set_response_payload(response, msg, strlen(msg));
-
+  
   }
 
   //Change the default Max Age to the variable max age computed in the periodic handler
@@ -95,12 +93,12 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
   battery = reduceBattery(TRANSMITTING_DRAIN);
 
   //Call the log function - TESTING PHASE
-  stampa(temperature_old, "temperature", dataLevel);
+  stampa(luminosity_old, "luminosity", dataLevel);
 
   if(requestLevel == 0 || requestLevel == CRITICAL){
     printf("0\n");
   }
-
+  
 }
 
 
@@ -112,13 +110,9 @@ static void periodic_handler(){
   if(!requestedByObserver || battery <= 0)
     return;
 
-  //Formula to get the real temperature//
-  // USE THIS FOR THE REAL SENSOR NODE//
-  //int temperature = temperature_sensor.value(0);
-
   // USED ONLY FOR THE SIMULATIONS ON COOJA //
-  indexTemperatureValues = (indexTemperatureValues+1)%VALUES;
-  int temperature = TEMPERATURE_VALUES[indexTemperatureValues%VALUES];
+  indexLuminosityValues = (indexLuminosityValues+1)%VALUES;
+  int luminosity = LUMINOSITY_VALUES[indexLuminosityValues%VALUES];
 
   interval_counter += RESOURCES_SENSING_PERIOD;
   //Used to simulate the drain of performing the sensing
@@ -128,23 +122,19 @@ static void periodic_handler(){
   if(interval_counter+RESOURCES_SENSING_PERIOD >= variable_max_age) {
       //Reset the counter
       interval_counter = 0;
-      //Chek if the value is a critical one, without watching the old value
-      if(temperature >= TEMPERATURE_CRITICAL_THRESHOLD)
-        dataLevel = CRITICAL;
-      else
-        //If the value is not critical and the observer has requested all the values, we know that is a NON_CRITICAL value
-        if(requestedLevel == 0)
-          dataLevel = NON_CRITICAL;
-        else
-          //Otherwise we do not set any type of level and nothing will be send to the observer
-          dataLevel = -1;
+    //if the observer has requested all the values, we know that is a NON_CRITICAL value
+    if(requestedLevel == 0)
+      dataLevel = NON_CRITICAL;
+    else
+      //Otherwise we do not set any type of level and nothing will be send to the observer
+      dataLevel = -1;
   }else{
     //The old packet is still valid, so we must see if the new value is different from the previous one
-    if(temperature >= TEMPERATURE_CRITICAL_THRESHOLD && abs(temperature - temperature_old) >= TEMPERATURE_CRITICAL_CHANGE){
+    if(abs(luminosity - luminosity_old) >= LUMINOSITY_CRITICAL_CHANGE){
       dataLevel = CRITICAL;
     }else{
-      if( requestedLevel == 0 &&
-          abs(temperature - temperature_old) >= TEMPERATURE_NON_CRITICAL_CHANGE &&
+      if( requestedLevel == 0 && 
+          abs(luminosity - luminosity_old) >= LUMINOSITY_NON_CRITICAL_CHANGE &&
           battery > 30){
             dataLevel = NON_CRITICAL;
       }else{
@@ -156,7 +146,7 @@ static void periodic_handler(){
   //If there is a dataLevel it means that a new valid data has been sensed so it must be sent
   if(dataLevel != -1){
     //We put the recorded old value as the new one
-    temperature_old = temperature;
+    luminosity_old = luminosity;
     //We check if there are any spurios non critical data detected, that should not be sent, maybe because of the change of the
     //level of the battery
     if(requestedLevel == 1 && dataLevel == NON_CRITICAL){
@@ -178,6 +168,6 @@ static void periodic_handler(){
       }
     }
     /* Notify the registered observers which will trigger the res_get_handler to create the response. */
-    REST.notify_subscribers(&res_temperature);
+    REST.notify_subscribers(&res_luminosity);
   }
 }

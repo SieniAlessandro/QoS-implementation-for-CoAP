@@ -29,15 +29,15 @@
 
       %A seconda di come viene usato e se viene usato o meno alla fine del progetto, inserisci qualche nota relativa a powertrace
 
-      \lstinputlisting[label={RestServer}, language=C, firstnumber=38, firstline=38, caption={Process RestServer},captionpos=b]{../Codice/C/subscriber.c}
+      \lstinputlisting[label={RestServer}, language=C, firstnumber=56, firstline=56, caption={Process RestServer},captionpos=b]{../Codice/C/subscriber.c}
 
     \subsection{Risorse}
       Per avere una maggiore modularità è stato realizzato un file per ogni singola risorsa e risorse sono state definite come variabili di tipo \textbf{extern}
 
-      \lstinputlisting[label={ExternResources}, language=C, firstnumber=4, firstline=4, lastline=12, caption={Risorse presenti sul nodo},captionpos=b]{../Codice/C/subscriber.c}
+      \lstinputlisting[label={ExternResources}, language=C, firstnumber=8, firstline=8, lastline=12, caption={Risorse presenti sul nodo},captionpos=b]{../Codice/C/subscriber.c}
 
       Per il nostro scopo vengono utilizzate esclusivamente risorse osservabili, che devono essere dichiarate come risorse di tipo \textbf{PERIODIC\_RESOURCE};
-      la peculiarità di questo tipo di risorse è il fatto che al momento dell'inizializzazione sono necessarie, tra le altre cose:
+      la peculiarità di questo tipo di risorse è il fatto che al momento dell'inizializzazione sono necessarie:
       \begin{itemize}
         \item get\_handler: una funzione utilizzata nel caso in cui venga fatta una richiesta di tipo get alla risorsa (necessaria anche per risorse non periodiche),
               ma che viene richiamata, anche, ogni volta sia necessario inviare un nuovo valore ai vari osservatori
@@ -46,6 +46,23 @@
               della scandenza della vecchia risorsa oppure della rilevazione di un valore critico o meno che differisce dal precedente di una certa soglia, e in caso di invio
               decide anche il valore del campo MaxAge
       \end{itemize}
+      Le risorse utilizzate ed offerte dal nodo sono:
+      \begin{itemize}
+        \item Batteria
+        \item Temperatura
+        \item Luminosità
+        \item Umidità
+      \end{itemize}
+      Per permetterci di eseguire la fase di Testing, tutte le risorse sono simulate in quanto il Testing verrà eseguito in un ambiente stabile (non ci saranno variazioni
+      significative di temperatura/luminosità/umidità).\newline
+      Più osservatori possono iscriversi per ricevere le notifiche relative a queste risorse, fatta eccezione della batteria; la registrazione da parte di più osservatori
+      viene gestita dal \textit{Proxy}, come descritto sopra, in modo tale che al \textit{subscriber} arrivi una sola richiesta di registrazione (quella relativa alla registrazione
+      da parte del Proxy).\newline
+      Durante la fase di registrazione viene gestito il tipo dei messaggi che si vuole ricevere \textbf{CRITICAL} (solo messaggi di tipo critico), o \textbf{NON\_CRITICAL} (tutti i
+      messaggi critici e non).\newline
+      Quando una notifica viene inviata gli viene assegnato un \textit{Tempo di validità} indicato all'interno del campo \textbf{MaxAge} del pacchetto; il \textit{Subscriber} si
+      preoccupa di inviare una nuova notifica sempre prima dello scadere della precedente notifica, che sia con un nuovo valore o con l'ultimo valore che ha inviato, questo
+      per evitare di dover rieseguire tutto il protocollo di registrazione alla risorsa da parte del \textit{Proxy} e degli \textit{Observer}.
 
       \subsubsection{Batteria}
         La batteria viene fornita come risorsa di tipo osservabile, l'unico osservatore che si iscrive per ricevere le notifiche relative a questa risorsa è il \textit{Proxy},
@@ -59,12 +76,34 @@
           \item L'ultimo valore sta per scadere, per evitare che il protocollo per la registrazione alla batteria venga rieseguito nuovamente
         \end{enumerate}
 
-        Una volta che la batteria è stata inviata perché la soglia è scesa sotto il livello critico, questa non verrà più inviata al \textit{Proxy} in quanto ormai gestisce le richieste di registrazione in modo
-        opportuno e sa che dal momento in cui non riceverà più valori da quel nodo, questo non avrà più batteria.
+        Una volta che la batteria è stata inviata perché la soglia è scesa sotto il livello critico, questa non verrà più inviata al \textit{Proxy}, in quanto ormai, quest'ultimo,
+        gestirà le richieste di registrazione in modo opportuno e nel momento in cui non riceverà più valori da quel nodo, saprà che la batteria è scesa a 0.
 
         \lstinputlisting[label={res-battery}, language=C, caption={Codice di gestione relativo alla risorsa batteria},captionpos=b]{../Codice/C/resources/res-battery.c}
 
 
       \subsubsection{Temperatura}
+        La temperatura è una risorsa di tipo osservabile, un valore è considerato critico nel caso in cui è superiore ad una soglia (\textbf{TEMPERATURE\_CRITICAL\_THRESHOLD})
+        e viene inviato solo nel caso in cui sia la differenza con il valore precedentemente inviato sia di almeno \textbf{TEMPERATURE\_CRITICAL\_CHANGE},
+        o sia scaduto il tempo di validità dell'ultima notifica inviata relativa a questa risorsa; invece il valore viene considerato non critico nel caso in cui sia sotto la
+        soglia critica e viene inviato subito se differisce dal vecchio valore di una quantità maggiore di \textbf{TEMPERATURE\_NON\_CRITICAL\_CHANGE}, altrimenti poco prima
+        dello scadere del tempo di validità
+
+        \lstinputlisting[label={res-battery}, language=C, caption={Codice di gestione relativo alla risorsa temperatura},captionpos=b]{../Codice/C/resources/res-temperature.c}
+
+      \subsubsection{Luminosità}
+        La luminosità è una risorsa di tipo osservabile, un valore è considerato critico solo nel caso in cui la differenza col valore precedentemente inviato sia di almeno \textbf{LUMINOSITY\_CRITICAL\_CHANGE}, altrimenti viene considerato come valore non critico da inviare se la differenza è minore alla soglia critica, ma maggiore
+        di almeno \textbf{LUMINOSITY\_NON\_CRITICAL\_CHANGE}; nel caso di scadenza del tempo di validità il valore è considerato sempre di tipo non critico e inviato
+        solo nel caso la registrazione alla risorsa sia per tutti i tipi di messaggio e non solo per i critici
+
+        \lstinputlisting[label={res-battery}, language=C, caption={Codice di gestione relativo alla risorsa luminosità},captionpos=b]{../Codice/C/resources/res-luminosity.c}
+
+      \subsubsection{Umidità}
+        L'umidità è una risorsa di tipo osservabile, un valore è considerato non critico nel caso in cui questo si trovi all'interno dell'intervallo dei valori non critici,
+        i valori compresi tra \textbf{HUMIDITY\_CRITICAL\_MIN\_THRESHOLD} e \textbf{HUMIDITY\_CRITICAL\_MAX\_THRESHOLD}, viene inviato subito nel caso in cui differisca dal
+        valore precedente di un valore superiore a \textbf{HUMIDITY\_NON\_CRITICAL\_CHANGE}, altrimenti si attende il termine del tempo di validità della notifica precedente;
+        tutti gli altri valori sono considerati critici e inviati subito nel caso in cui la differenza col valore precedente sia superiore a \textbf{HUMIDITY\_CRITICAL\_CHANGE}
+
+        \lstinputlisting[label={res-battery}, language=C, caption={Codice di gestione relativo alla risorsa umidità},captionpos=b]{../Codice/C/resources/res-humidity.c}
 
     \subsection{Parametri}

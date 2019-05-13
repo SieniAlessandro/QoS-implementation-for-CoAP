@@ -10,15 +10,17 @@ static uint32_t variable_max_age = RESOURCE_MAX_AGE;
 static uint32_t interval_counter = 0;
 
 //Vectors of temperature values, used to simulate the temperature
-#define VALUES 60
+#define VALUES 6
 //int TEMPERATURE_VALUES[VALUES] = {-10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10};
-int TEMPERATURE_VALUES[VALUES] = {10,   2,  -5, -11, -16, -19, -19, -18, -15, -10,  -3,   3,  11,
+/*int TEMPERATURE_VALUES[VALUES] = {10,   2,  -5, -11, -16, -19, -19, -18, -15, -10,  -3,   3,  11,
         19,  26,  32,  36,  39,  39,  38,  34,  29,  22,  14,   6,   0,
         -7, -13, -17, -19, -19, -17, -13,  -7,   0,   6,  14,  22,  29,
         34,  38,  39,  39,  36,  32,  26,  19,  11,   3,  -4, -10, -15,
        -18, -19, -19, -16, -11,  -5,   2,  10};
+*/
+int TEMPERATURE_VALUES[VALUES] = {40,   41,  42, 43, 42, 41};
 
-uint32_t indexValues = 1;
+uint32_t indexTemperatureValues = 1;
 
 static int temperature_old = 10;
 static uint32_t dataLevel; //NON_CRITICAL, CRITICAL
@@ -53,8 +55,8 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
     //We let the node to sense for the data, because there is at least one observer
     requestedByObserver = 1;
     //Done to have the actual real value
-    indexValues = (indexValues+1)%VALUES;
-    temperature_old = TEMPERATURE_VALUES[indexValues];
+    indexTemperatureValues = (indexTemperatureValues+1)%VALUES;
+    temperature_old = TEMPERATURE_VALUES[indexTemperatureValues];
     //In this way we answer to the registration to all the observers -- REVIEW NEEDED
     if(temperature_old > TEMPERATURE_CRITICAL_THRESHOLD)
       dataLevel = CRITICAL;
@@ -84,7 +86,7 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
     REST.set_response_status(response, REST.status.NOT_ACCEPTABLE);
     const char *msg = "Supporting content-types text/plain";
     REST.set_response_payload(response, msg, strlen(msg));
-  
+
   }
 
   //Change the default Max Age to the variable max age computed in the periodic handler
@@ -98,7 +100,7 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
   if(requestLevel == 0 || requestLevel == CRITICAL){
     printf("0\n");
   }
-  
+
 }
 
 
@@ -117,8 +119,8 @@ static void periodic_handler(){
 
 
   // USED ONLY FOR THE SIMULATIONS ON COOJA //
-  indexValues = (indexValues+1)%VALUES;
-  int temperature = TEMPERATURE_VALUES[indexValues%VALUES];
+  indexTemperatureValues = (indexTemperatureValues+1)%VALUES;
+  int temperature = TEMPERATURE_VALUES[indexTemperatureValues%VALUES];
 
   interval_counter += RESOURCES_SENSING_PERIOD;
   //Used to simulate the drain of performing the sensing
@@ -129,7 +131,7 @@ static void periodic_handler(){
       //Reset the counter
       interval_counter = 0;
       //Chek if the value is a critical one, without watching the old value
-      if(temperature >= CRITICAL)
+      if(temperature >= TEMPERATURE_CRITICAL_THRESHOLD)
         dataLevel = CRITICAL;
       else
         //If the value is not critical and the observer has requested all the values, we know that is a NON_CRITICAL value
@@ -143,7 +145,7 @@ static void periodic_handler(){
     if(temperature >= TEMPERATURE_CRITICAL_THRESHOLD && abs(temperature - temperature_old) >= TEMPERATURE_CRITICAL_CHANGE){
       dataLevel = CRITICAL;
     }else{
-      if( requestedLevel == 0 && 
+      if( requestedLevel == 0 &&
           abs(temperature - temperature_old) >= TEMPERATURE_NON_CRITICAL_CHANGE &&
           battery > 30){
             dataLevel = NON_CRITICAL;

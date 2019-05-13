@@ -1,5 +1,16 @@
+/*res-humidity.c
+ *Simulated resource
+ *The value is considered as a non-critical value if it stays inside a specific interval, it is sent as a non critical value if it differs from the previous one
+ *of a specific quantity; when the value is outside the interval it is immediately considered as critical and sent to the proxy, it will be sent again as a critical
+ *if it differs from the previous one of a specific quantity and it is still outside the interval
+ **/
 #include "../common.h"
-#include "dev/temperature-sensor.h"
+
+#define HUMIDITY_CRITICAL_CHANGE 1
+#define HUMIDITY_NON_CRITICAL_CHANGE 3
+#define HUMIDITY_CRITICAL_MAX_THRESHOLD 70//% percentage value
+#define HUMIDITY_CRITICAL_MIN_THRESHOLD 65//% percentage value
+
 
 static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset);
 static void periodic_handler(void);
@@ -9,29 +20,23 @@ static uint32_t variable_max_age = RESOURCE_MAX_AGE;
 //Used to know when we are near to the end of the validity of the previous data
 static uint32_t interval_counter = 0;
 
-//Vectors of temperature values, used to simulate the temperature
-#define VALUES 6
-//int TEMPERATURE_VALUES[VALUES] = {-10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10};
-/*int TEMPERATURE_VALUES[VALUES] = {10,   2,  -5, -11, -16, -19, -19, -18, -15, -10,  -3,   3,  11,
-        19,  26,  32,  36,  39,  39,  38,  34,  29,  22,  14,   6,   0,
-        -7, -13, -17, -19, -19, -17, -13,  -7,   0,   6,  14,  22,  29,
-        34,  38,  39,  39,  36,  32,  26,  19,  11,   3,  -4, -10, -15,
-       -18, -19, -19, -16, -11,  -5,   2,  10};
-*/
-int TEMPERATURE_VALUES[VALUES] = {40,   41,  42, 43, 42, 41};
+//Vectors of HUMIDITY_NON_CRITICAL_CHANGE values, used to simulate the humidity
+#define VALUES 23
 
-uint32_t indexTemperatureValues = 1;
+int HUMIDITY_VALUES[VALUES] = {60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 70, 69, 65, 64, 63, 62, 61};
 
-static int temperature_old = 10;
+uint32_t indexHumidityValues = 1;
+
+static int humidity_old = 10;
 static uint32_t dataLevel; //NON_CRITICAL, CRITICAL
 static uint8_t requestedLevel; //NON_CRITICAL all, CRITICAL only criticals
 
 //Used to know if there is at least one subscriber to the resource
 static uint8_t requestedByObserver = 0;
 
-//Initialization of the resource temperature as an observable resource, with a periodic handler function
-PERIODIC_RESOURCE(res_temperature,
-         "title=\"Temperature\";rt=\"Temperature\";obs",
+//Initialization of the resource humidity as an observable resource, with a periodic handler function
+PERIODIC_RESOURCE(res_humidity,
+         "title=\"Humidity\";rt=\"Humidity\";obs",
          get_handler,
          NULL,
          NULL,
@@ -55,13 +60,10 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
     //We let the node to sense for the data, because there is at least one observer
     requestedByObserver = 1;
     //Done to have the actual real value
-    indexTemperatureValues = (indexTemperatureValues+1)%VALUES;
-    temperature_old = TEMPERATURE_VALUES[indexTemperatureValues];
+    indexHumidityValues = (indexHumidityValues+1)%VALUES;
+    humidity_old = HUMIDITY_VALUES[indexHumidityValues];
     //In this way we answer to the registration to all the observers -- REVIEW NEEDED
-    if(temperature_old > TEMPERATURE_CRITICAL_THRESHOLD)
-      dataLevel = CRITICAL;
-    else
-      dataLevel = NON_CRITICAL;
+    dataLevel = NON_CRITICAL;
   }
 
   //If we receive a message with the field observer equal to 1, we know that the registration has been canceled
@@ -75,9 +77,9 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
   if(accept == -1 || accept == REST.type.TEXT_PLAIN) {
     REST.set_header_content_type(response, REST.type.TEXT_PLAIN);
     if(dataLevel == CRITICAL)
-      snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "%d!", temperature_old);
+      snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "%d!", humidity_old);
     else
-      snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "%d", temperature_old);
+      snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "%d", humidity_old);
 
     REST.set_response_payload(response, (uint8_t *)buffer, strlen((char *)buffer));
 
@@ -86,7 +88,7 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
     REST.set_response_status(response, REST.status.NOT_ACCEPTABLE);
     const char *msg = "Supporting content-types text/plain";
     REST.set_response_payload(response, msg, strlen(msg));
-
+  
   }
 
   //Change the default Max Age to the variable max age computed in the periodic handler
@@ -95,12 +97,12 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
   battery = reduceBattery(TRANSMITTING_DRAIN);
 
   //Call the log function - TESTING PHASE
-  stampa(temperature_old, "temperature", dataLevel);
+  stampa(humidity_old, "humidity", dataLevel);
 
   if(requestLevel == 0 || requestLevel == CRITICAL){
     printf("0\n");
   }
-
+  
 }
 
 
@@ -112,13 +114,9 @@ static void periodic_handler(){
   if(!requestedByObserver || battery <= 0)
     return;
 
-  //Formula to get the real temperature//
-  // USE THIS FOR THE REAL SENSOR NODE//
-  //int temperature = temperature_sensor.value(0);
-
   // USED ONLY FOR THE SIMULATIONS ON COOJA //
-  indexTemperatureValues = (indexTemperatureValues+1)%VALUES;
-  int temperature = TEMPERATURE_VALUES[indexTemperatureValues%VALUES];
+  indexHumidityValues = (indexHumidityValues+1)%VALUES;
+  int humidity = HUMIDITY_VALUES[indexHumidityValues%VALUES];
 
   interval_counter += RESOURCES_SENSING_PERIOD;
   //Used to simulate the drain of performing the sensing
@@ -129,7 +127,7 @@ static void periodic_handler(){
       //Reset the counter
       interval_counter = 0;
       //Chek if the value is a critical one, without watching the old value
-      if(temperature >= TEMPERATURE_CRITICAL_THRESHOLD)
+      if(humidity <= HUMIDITY_CRITICAL_MIN_THRESHOLD || humidity >= HUMIDITY_CRITICAL_MAX_THRESHOLD)
         dataLevel = CRITICAL;
       else
         //If the value is not critical and the observer has requested all the values, we know that is a NON_CRITICAL value
@@ -140,11 +138,13 @@ static void periodic_handler(){
           dataLevel = -1;
   }else{
     //The old packet is still valid, so we must see if the new value is different from the previous one
-    if(temperature >= TEMPERATURE_CRITICAL_THRESHOLD && abs(temperature - temperature_old) >= TEMPERATURE_CRITICAL_CHANGE){
+    if( ( humidity <= HUMIDITY_CRITICAL_MIN_THRESHOLD || humidity >= HUMIDITY_CRITICAL_MAX_THRESHOLD) 
+    	&& (abs(humidity - humidity_old) >= HUMIDITY_CRITICAL_CHANGE)
+    	){
       dataLevel = CRITICAL;
     }else{
-      if( requestedLevel == 0 &&
-          abs(temperature - temperature_old) >= TEMPERATURE_NON_CRITICAL_CHANGE &&
+      if( requestedLevel == 0 && 
+          abs(humidity - humidity_old) >= HUMIDITY_NON_CRITICAL_CHANGE &&
           battery > 30){
             dataLevel = NON_CRITICAL;
       }else{
@@ -156,7 +156,7 @@ static void periodic_handler(){
   //If there is a dataLevel it means that a new valid data has been sensed so it must be sent
   if(dataLevel != -1){
     //We put the recorded old value as the new one
-    temperature_old = temperature;
+    humidity_old = humidity;
     //We check if there are any spurios non critical data detected, that should not be sent, maybe because of the change of the
     //level of the battery
     if(requestedLevel == 1 && dataLevel == NON_CRITICAL){
@@ -178,6 +178,6 @@ static void periodic_handler(){
       }
     }
     /* Notify the registered observers which will trigger the res_get_handler to create the response. */
-    REST.notify_subscribers(&res_temperature);
+    REST.notify_subscribers(&res_humidity);
   }
 }

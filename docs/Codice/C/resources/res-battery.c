@@ -61,7 +61,8 @@ static void periodic_handler(){
 
   if(battery == 0){
     //IF THE BATTERY IS ENDED WE ABORT ALL, THE SENSOR NODE WILL NOT PERFORM ANY OTHER ACTION
-    abort();
+    //abort();
+    stampa(battery, "BATTERY FINISHED", 0);
   }
 
   //Check if the battery must be sent or not

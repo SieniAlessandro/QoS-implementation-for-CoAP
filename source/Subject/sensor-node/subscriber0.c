@@ -8,13 +8,16 @@ extern resource_t res_temperature;
 #include "dev/battery-sensor.h"
 extern resource_t res_battery;
 
-//For debug purposes
-extern resource_t res_sinusoid;
+//#include "dev/humidity.h"
+extern resource_t res_humidity;
+
+//#include "dev/light.h"
+extern resource_t res_luminosity;
 
 static struct uip_udp_conn *client_conn;
 static uip_ipaddr_t server_ipaddr;
 
-#include "powertrace.h"
+//#include "powertrace.h"
 
 /*---------------------------------------------------------------------------*/
 //The rest server
@@ -95,8 +98,11 @@ PROCESS_THREAD(rest_server, ev, data)
   rest_activate_resource(&res_temperature, "sensors/temperature");
   SENSORS_ACTIVATE(temperature_sensor);
 
-  //Resource used only for debug purposes
-  rest_activate_resource(&res_sinusoid, "sensors/sinusoid");
+  rest_activate_resource(&res_humidity, "sensors/humidity");
+  //SENSORS_ACTIVATE(humidity_sensor);
+
+  rest_activate_resource(&res_luminosity, "sensors/luminosity");
+  //SENSOR_ACTIVATE(light_sensor);
 
   //Used only for Testing phase
   printf("Time,IPAddress,Value,Type,Critic,Observe\n");
