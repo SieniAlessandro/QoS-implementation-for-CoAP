@@ -27,11 +27,14 @@ SensorDF = pandas.read_csv("Dati\\"+root+"\log1.txt")
 #Scrolling the sets
 
 
+
+
 for set in range(0,int(int(nlogs)/4)):
     Dataframes[str(set)] = []
     for priority in range(1,5):
         FILENAME = "Dati\\"+root+BASEPATH+str(set)+str(priority)+".csv"
         ObserverDF= pandas.read_csv(FILENAME)
+        print(ObserverDF.shape)
         result = SensorDF.merge(ObserverDF,on=MERGEKEYS)
         # Choosing only the critic value
         result = result.loc[result["Critic"] == 1]
