@@ -13,6 +13,7 @@ import java.util.Map;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.coap.CoAP;
+import org.eclipse.californium.core.network.config.NetworkConfig;
 import org.eclipse.californium.core.server.resources.Resource;
 
 import org.eclipse.californium.core.server.ServerState;
@@ -20,13 +21,16 @@ import org.eclipse.californium.core.server.ServerState;
 public class ProxyObserver {
 
 	private CoapServer proxyObserver;
+	final private int MAX_RETRANSMISSION = 10;
 
 	private volatile ProxySubject proxySubject;
 	private Map<String, ObservableResource> resourceList;
 	private Map<String, ObserverState> observers;
 
 	public ProxyObserver() {
-		this.proxyObserver = new CoapServer();
+		NetworkConfig config = NetworkConfig.getStandard();
+		config.setInt(NetworkConfig.Keys.MAX_RETRANSMIT, MAX_RETRANSMISSION);
+		this.proxyObserver = new CoapServer(config, 5683);
 		this.observers = new HashMap<String, ObserverState>();
 		this.resourceList = new HashMap<String, ObservableResource>();
 

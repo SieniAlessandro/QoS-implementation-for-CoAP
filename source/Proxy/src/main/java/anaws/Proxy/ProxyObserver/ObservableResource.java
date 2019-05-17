@@ -17,7 +17,6 @@ import org.eclipse.californium.core.server.ServerState;
 
 public class ObservableResource extends CoapResource {
 
-	final private boolean DEBUG = false;
 	final private int PROPOSAL = CoAP.QoSLevel.CRITICAL_HIGH_PRIORITY;
 
 	private ProxyObserver server;
@@ -80,7 +79,8 @@ public class ObservableResource extends CoapResource {
 		if (sensor.getState().equals(ServerState.UNAVAILABLE)) {
 			System.out.println("Subject is unavailable");
 			return;
-		}
+		}		
+		
 		// store observer information if the endpoint is not already present
 		int mid = exchange.advanced().getRequest().getMID();
 		if (!server.isObserverPresent(observerID)) {
