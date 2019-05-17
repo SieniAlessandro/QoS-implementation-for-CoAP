@@ -56,20 +56,19 @@
   PROJECT ANAWS CONSTANTS
 ******************************************************/
 
-#define CRITICAL_MAX_AGE 255
+#define CRITICAL_MAX_AGE 60
 #define CRITICAL 0x800000
 #define NON_CRITICAL 0
 
-#define BATTERY_MULTIPLIER 10
-#define INITIAL_BATTERY 100*BATTERY_MULTIPLIER
-#define CRITICAL_BATTERY 30*BATTERY_MULTIPLIER
+#define INITIAL_BATTERY 100
+#define CRITICAL_BATTERY 30
 
-#define SENSING_DRAIN 1
-#define TRANSMITTING_DRAIN 4
+#define SENSING_DRAIN 0
+#define TRANSMITTING_DRAIN 1
 
-#define RESOURCES_SENSING_PERIOD 2
+#define RESOURCES_SENSING_PERIOD 10
 
-#define BATTERY_MAX_AGE      255
+#define BATTERY_MAX_AGE      100
 #define BATTERY_INTERVAL_MAX (BATTERY_MAX_AGE - 1)
 #define BATTERY_SENSING_PERIOD 10
 
@@ -92,7 +91,7 @@
 ******************************************************/
 
 
-static uint32_t battery = INITIAL_BATTERY*BATTERY_MULTIPLIER;
+static uint32_t battery = INITIAL_BATTERY;
 
 uint32_t reduceBattery(uint32_t drain);
 

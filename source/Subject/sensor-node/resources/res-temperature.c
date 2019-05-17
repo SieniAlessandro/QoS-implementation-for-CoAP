@@ -28,6 +28,7 @@ static uint8_t requestedLevel; //NON_CRITICAL all, CRITICAL only criticals
 
 //Used to know if there is at least one subscriber to the resource
 static uint8_t requestedByObserver = 0;
+static uint32_t temperatureObserver = 0;
 
 //Initialization of the resource temperature as an observable resource, with a periodic handler function
 PERIODIC_RESOURCE(res_temperature,
@@ -86,7 +87,7 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
     REST.set_response_status(response, REST.status.NOT_ACCEPTABLE);
     const char *msg = "Supporting content-types text/plain";
     REST.set_response_payload(response, msg, strlen(msg));
-
+  
   }
 
   //Change the default Max Age to the variable max age computed in the periodic handler
@@ -98,9 +99,12 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
   stampa(temperature_old, "temperature", dataLevel);
 
   if(requestLevel == 0 || requestLevel == CRITICAL){
-    printf("0\n");
+    temperatureObserver = 0;
+  }else{
+    temperatureObserver++;
   }
-
+  printf("%lu\n", temperatureObserver);
+  
 }
 
 
@@ -109,8 +113,9 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
  * It will be called by the REST manager process with the defined period.
  */
 static void periodic_handler(){
-  if(!requestedByObserver || battery <= 0)
+  if(!requestedByObserver || battery <= 0){
     return;
+  }
 
   //Formula to get the real temperature//
   // USE THIS FOR THE REAL SENSOR NODE//
@@ -145,7 +150,7 @@ static void periodic_handler(){
     if(temperature >= TEMPERATURE_CRITICAL_THRESHOLD && abs(temperature - temperature_old) >= TEMPERATURE_CRITICAL_CHANGE){
       dataLevel = CRITICAL;
     }else{
-      if( requestedLevel == 0 &&
+      if( requestedLevel == 0 && 
           abs(temperature - temperature_old) >= TEMPERATURE_NON_CRITICAL_CHANGE &&
           battery > 30){
             dataLevel = NON_CRITICAL;
