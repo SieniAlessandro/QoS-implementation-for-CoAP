@@ -25,6 +25,7 @@ public class ProxySubject{
 		this.cache = new CacheTable();
 		this.coapClient = new CoapClient();
 		this.sensors = new SensorList();
+		this.coapClient.useCONs();
 		new Updater(this.cache, this.registrator).start();
 		for (int i = 1; i <= this.NUMBER_SENSORS;i++)
 			prepareResources("fd00::c30c:0:0:"+i,5683);
