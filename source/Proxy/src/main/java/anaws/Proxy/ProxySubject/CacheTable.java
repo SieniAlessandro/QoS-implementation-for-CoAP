@@ -53,6 +53,7 @@ public class CacheTable{
 		SensorData sd;
 		while((sd = searchData(resource,type)) == null) {
 			try {
+				Log.debug("CacheTable", "Waiting for data not null in cache: " +  resource + " " + type );
 				wait();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -62,11 +63,12 @@ public class CacheTable{
 	}
 	synchronized public SensorData searchData(String resource,String type) {
 		for (SensorData sd : cache) {
-			if(sd.getRegistration().getSensorNode().getUri().equals(resource) && sd.getRegistration().getType().contentEquals(type)){
-				if(sd.getTime() <= this.THRESHOLD)
-					return null;
-				else
-					return sd;
+			if(sd.getRegistration().getSensorNode().getUri().equals(resource) && sd.getRegistration().getType().equals(type)){
+//				if(sd.getTime() <= this.THRESHOLD)
+//					return null;
+//				else
+//					return sd;
+				return sd;
 			}
 		}
 		return null;		

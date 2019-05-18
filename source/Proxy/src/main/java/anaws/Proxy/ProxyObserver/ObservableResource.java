@@ -8,6 +8,7 @@ import org.eclipse.californium.core.coap.OptionSet;
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.californium.core.coap.CoAP.Type;
 import org.eclipse.californium.core.server.resources.CoapExchange;
+import org.eclipse.californium.core.server.resources.ConcurrentCoapResource;
 
 import anaws.Proxy.Log;
 import anaws.Proxy.ProxySubject.SensorData;
@@ -77,7 +78,7 @@ public class ObservableResource extends CoapResource {
 			return;
 		}
 		if (sensor.getState().equals(ServerState.UNAVAILABLE)) {
-			System.out.println("Subject is unavailable");
+			Log.error("ObservableResource", "Subject not available");
 			return;
 		}		
 		
@@ -154,6 +155,7 @@ public class ObservableResource extends CoapResource {
 		exchange.setMaxAge(data.getTime());
 
 		if (observeField < 0) {
+			observeField = (int) data.getObserve();
 			exchange.respond(response, (int) data.getObserve());
 		} else {
 			// This is a registration response, respond with the same observe number ;
@@ -161,7 +163,7 @@ public class ObservableResource extends CoapResource {
 		}
 		
 		Log.info(getPath()+getName(), "Notification sent to: " + exchange.getSourcePort() + " | notification: " + value
-				+ " | isCritical: " + data.getCritic());
+				+ " | isCritical: " + data.getCritic() + " | Observer: " + observeField + " | MaxAge: " + data.getTime());
 	}
 }
 

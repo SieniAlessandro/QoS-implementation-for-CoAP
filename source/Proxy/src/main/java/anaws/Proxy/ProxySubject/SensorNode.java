@@ -11,7 +11,7 @@ public class SensorNode{
 
 	volatile String IPaddress;
 	volatile int Port;
-	volatile double battery;
+	volatile int battery;
 	volatile ServerState actualState;
 	ArrayList<String> resources;
 	
@@ -39,7 +39,7 @@ public class SensorNode{
 	}
 	public ArrayList<String> getResources() {return this.resources;}
 	
-	synchronized public ServerState updateBattery(double newBatteryValue, ProxyObserver po) {
+	synchronized public ServerState updateBattery(int newBatteryValue, ProxyObserver po) {
 		battery = newBatteryValue;
 		if(battery <= 30)  {
 			if(battery <= 0) {
@@ -50,8 +50,9 @@ public class SensorNode{
 				Log.info("SensorNode", "Battery Under Threshold");
 			}			
 			for (String resource: resources) {
-				if ( !resource.equals("battery"))
+				if ( !resource.equals("battery")) {
 					po.clearObservationAfterStateChanged(getUri(), resource, actualState);
+				}
 			}
 		}
 		return actualState;

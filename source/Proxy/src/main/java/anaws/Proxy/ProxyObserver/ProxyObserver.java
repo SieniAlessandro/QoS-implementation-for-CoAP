@@ -21,7 +21,7 @@ import org.eclipse.californium.core.server.ServerState;
 public class ProxyObserver {
 
 	private CoapServer proxyObserver;
-	final private int MAX_RETRANSMISSION = 10;
+	final private int MAX_RETRANSMISSION = 100;
 
 	private volatile ProxySubject proxySubject;
 	private Map<String, ObservableResource> resourceList;

@@ -34,7 +34,7 @@ public class Log {
 			if(file.exists()) {
 				//If file Exists append to those file
 //				debug("Log","Scrittura sul file");
-				BufferedWriter writer = new BufferedWriter(new FileWriter(file,true));
+				BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
 				writer.newLine();
 				writer.write(value);
 				writer.close();

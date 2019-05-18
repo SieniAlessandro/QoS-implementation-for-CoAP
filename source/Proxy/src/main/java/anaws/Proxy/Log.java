@@ -33,7 +33,7 @@ public class Log {
 		try {
 			if(file.exists()) {
 				//If file Exists append to those file
-				BufferedWriter writer = new BufferedWriter(new FileWriter(file,true));
+				BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
 				writer.newLine();
 				writer.write(value);
 				writer.close();
