@@ -3,7 +3,7 @@
 
 //Used to simulated the battery
 uint32_t reduceBattery(uint32_t drain){
-  battery = (battery != 0 && (battery - drain) < battery) ? battery-drain : 0;
+  battery = (battery != 0 && (battery - drain) <= battery) ? battery-drain : 0;
   //printf("Actual Battery:%lu\n", battery);
   return battery;
 }

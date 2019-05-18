@@ -1,4 +1,5 @@
 Time,IPAddress,Value,Type,Critic,Observe
+<<<<<<< HEAD
 8:53,fd00::c30c:0:0:1,42.0,temperature,1,8388608
 8:54,fd00::c30c:0:0:1,43.0,temperature,1,1
 9:4,fd00::c30c:0:0:1,42.0,temperature,1,2
@@ -29,3 +30,14 @@ Time,IPAddress,Value,Type,Critic,Observe
 13:54,fd00::c30c:0:0:1,43.0,temperature,1,31
 14:4,fd00::c30c:0:0:1,42.0,temperature,1,32
 14:24,fd00::c30c:0:0:1,40.0,temperature,1,34
+=======
+55:38,fd00::c30c:0:0:1,42.0,temperature,1,8388608
+55:52,fd00::c30c:0:0:1,41.0,temperature,1,3
+56:11,fd00::c30c:0:0:1,41.0,temperature,1,5
+57:1,fd00::c30c:0:0:1,40.0,temperature,1,10
+57:15,fd00::c30c:0:0:1,41.0,temperature,1,11
+57:35,fd00::c30c:0:0:1,43.0,temperature,1,13
+57:41,fd00::c30c:0:0:1,42.0,temperature,1,14
+58:11,fd00::c30c:0:0:1,41.0,temperature,1,17
+58:41,fd00::c30c:0:0:1,42.0,temperature,1,20
+>>>>>>> 5c9cc6794fb12eb0032d10fa4b3f9e7981e59f77
