@@ -32,7 +32,7 @@ static uint32_t dataLevel; //NON_CRITICAL, CRITICAL
 static uint8_t requestedLevel; //NON_CRITICAL all, CRITICAL only criticals
 
 //Used to know if there is at least one subscriber to the resource
-static uint8_t requestedByObserver = 0;
+static uint8_t humidityRequestedByObserver = 0;
 
 //Initialization of the resource humidity as an observable resource, with a periodic handler function
 PERIODIC_RESOURCE(res_humidity,
@@ -58,7 +58,7 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
       requestedLevel = 0;
     }
     //We let the node to sense for the data, because there is at least one observer
-    requestedByObserver = 1;
+    humidityRequestedByObserver = 1;
     //Done to have the actual real value
     indexHumidityValues = (indexHumidityValues+1)%VALUES;
     humidity_old = HUMIDITY_VALUES[indexHumidityValues];
@@ -68,7 +68,7 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
 
   //If we receive a message with the field observer equal to 1, we know that the registration has been canceled
   if(requestLevel == 1){
-      requestedByObserver = 0;
+      humidityRequestedByObserver = 0;
       return;
   }
   unsigned int accept = -1;
@@ -111,7 +111,7 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
  * It will be called by the REST manager process with the defined period.
  */
 static void periodic_handler(){
-  if(!requestedByObserver || battery <= 0)
+  if(!humidityRequestedByObserver || battery <= 0)
     return;
 
   // USED ONLY FOR THE SIMULATIONS ON COOJA //

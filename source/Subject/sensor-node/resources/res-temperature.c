@@ -27,7 +27,7 @@ static uint32_t dataLevel; //NON_CRITICAL, CRITICAL
 static uint8_t requestedLevel; //NON_CRITICAL all, CRITICAL only criticals
 
 //Used to know if there is at least one subscriber to the resource
-static uint8_t requestedByObserver = 0;
+static uint8_t temperatureRequestedByObserver = 0;
 static uint32_t temperatureObserver = 0;
 
 //Initialization of the resource temperature as an observable resource, with a periodic handler function
@@ -54,7 +54,7 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
       requestedLevel = 0;
     }
     //We let the node to sense for the data, because there is at least one observer
-    requestedByObserver = 1;
+    temperatureRequestedByObserver = 1;
     //Done to have the actual real value
     indexTemperatureValues = (indexTemperatureValues+1)%VALUES;
     temperature_old = TEMPERATURE_VALUES[indexTemperatureValues];
@@ -67,7 +67,7 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
 
   //If we receive a message with the field observer equal to 1, we know that the registration has been canceled
   if(requestLevel == 1){
-      requestedByObserver = 0;
+      temperatureRequestedByObserver = 0;
       return;
   }
   unsigned int accept = -1;
@@ -113,7 +113,7 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
  * It will be called by the REST manager process with the defined period.
  */
 static void periodic_handler(){
-  if(!requestedByObserver || battery <= 0){
+  if(temperatureRequestedByObserver == 0 || battery <= 0){
     return;
   }
 
