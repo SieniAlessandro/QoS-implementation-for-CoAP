@@ -9,10 +9,10 @@ extern resource_t res_temperature;
 extern resource_t res_battery;
 
 //#include "dev/humidity.h"
-//extern resource_t res_humidity;
+extern resource_t res_humidity;
 
 //#include "dev/light.h"
-//extern resource_t res_luminosity;
+extern resource_t res_luminosity;
 
 static struct uip_udp_conn *client_conn;
 static uip_ipaddr_t server_ipaddr;
@@ -98,10 +98,10 @@ PROCESS_THREAD(rest_server, ev, data)
   rest_activate_resource(&res_temperature, "sensors/temperature");
   SENSORS_ACTIVATE(temperature_sensor);
 
-  //rest_activate_resource(&res_humidity, "sensors/humidity");
+  rest_activate_resource(&res_humidity, "sensors/humidity");
   //SENSORS_ACTIVATE(humidity_sensor);
 
-  //rest_activate_resource(&res_luminosity, "sensors/luminosity");
+  rest_activate_resource(&res_luminosity, "sensors/luminosity");
   //SENSOR_ACTIVATE(light_sensor);
 
   //Used only for Testing phase
