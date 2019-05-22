@@ -1,3 +1,0 @@
-Time,IPAddress,Value,Type,Critic,Observe
-52:58,fd00::c30c:0:0:1,42.0,temperature,1,0
-53:41,fd00::c30c:0:0:1,41.0,temperature,1,5

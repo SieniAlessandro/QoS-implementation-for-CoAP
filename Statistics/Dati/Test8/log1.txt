@@ -1,1 +1,0 @@
-29:26 /home/user/contiki/tools/sky/serialdump-linux -b115200 

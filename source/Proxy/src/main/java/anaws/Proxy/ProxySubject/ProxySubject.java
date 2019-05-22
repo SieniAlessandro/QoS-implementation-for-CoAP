@@ -27,7 +27,7 @@ public class ProxySubject{
 		this.sensors = new SensorList();
 		//this.coapClient.useCONs();
 		new Updater(this.cache, this.registrator).start();
-		for (int i = 1; i <= this.NUMBER_SENSORS;i++)
+		for (int i = 2; i <= this.NUMBER_SENSORS+1;i++)
 			prepareResources("fd00::c30c:0:0:"+i,5683);
 		this.sensors.printSensors();
 		// Registration for the battery information

@@ -57,5 +57,7 @@ for priority in range(0,4):
 plt.xticks(list(range(1,5)))
 plt.yticks(avgs)
 plt.plot(list(range(1,5)),avgs,color="r",marker="o")
+plt.ylabel("Delay [s]")
+plt.xlabel("Priority")
 plt.savefig("Dati\\"+root+"\plot.png")
 plt.show()
