@@ -1,0 +1,22 @@
+Testing dell'algoritmo che modifica il numero di pacchetti inviati
+Simulazione tutta in locale:
+border router simulato su cooja
+subject simulato su cooja
+Proxy e Observer eseguiti sulla stessa macchina
+Un solo Observer registrato alla temperatura con priorità 1
+Durata della simulazione fino a quando la batteria del nodo sensore non scende sotto il valore critico
+
+Testing eseguiti:
+-senza utilizzare l'algoritmo
+-Invio sempre di un valore critico
+   variazione valore non critico di almeno:
+	- 1
+	- 2 
+	- 3
+ 	- 4
+-Con variazione necessaria prima dell'invio di un valore critico
+    variazione valore non critico di almeno:
+	- 1
+	- 2 
+	- 3
+ 	- 4
