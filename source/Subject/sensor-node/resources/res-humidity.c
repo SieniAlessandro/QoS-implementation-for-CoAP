@@ -21,9 +21,9 @@ static uint32_t variable_max_age = RESOURCE_MAX_AGE;
 static uint32_t interval_counter = 0;
 
 //Vectors of HUMIDITY_NON_CRITICAL_CHANGE values, used to simulate the humidity
-#define VALUES 23
+#define VALUES 3
 
-int HUMIDITY_VALUES[VALUES] = {60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 70, 69, 65, 64, 63, 62, 61};
+int HUMIDITY_VALUES[VALUES] = {60, 74, 61};
 
 uint32_t indexHumidityValues = 1;
 
@@ -34,6 +34,7 @@ static uint8_t requestedLevel; //NON_CRITICAL all, CRITICAL only criticals
 //Used to know if there is at least one subscriber to the resource
 static uint8_t humidityRequestedByObserver = 0;
 
+static uint32_t humidityObserver = 0;
 //Initialization of the resource humidity as an observable resource, with a periodic handler function
 PERIODIC_RESOURCE(res_humidity,
          "title=\"Humidity\";rt=\"Humidity\";obs",
@@ -100,9 +101,12 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
   stampa(humidity_old, "humidity", dataLevel);
 
   if(requestLevel == 0 || requestLevel == CRITICAL){
-    printf("0\n");
+    humidityObserver = 0;
+  }else{
+    humidityObserver++;
   }
-  
+  printf("%lu\n", humidityObserver);
+
 }
 
 

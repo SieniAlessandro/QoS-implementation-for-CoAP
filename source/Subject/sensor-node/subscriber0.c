@@ -9,7 +9,7 @@ extern resource_t res_temperature;
 extern resource_t res_battery;
 
 //#include "dev/humidity.h"
-//extern resource_t res_humidity;
+extern resource_t res_humidity;
 
 //#include "dev/light.h"
 //extern resource_t res_luminosity;
@@ -101,6 +101,7 @@ PROCESS_THREAD(rest_server, ev, data)
   //rest_activate_resource(&res_humidity, "sensors/humidity");
   //SENSORS_ACTIVATE(humidity_sensor);
 
+  //Too much memory is occupied by the array constants used to simulate the resources
   //rest_activate_resource(&res_luminosity, "sensors/luminosity");
   //SENSOR_ACTIVATE(light_sensor);
 

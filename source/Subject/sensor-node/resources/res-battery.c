@@ -66,7 +66,7 @@ static void periodic_handler(){
     REST.notify_subscribers(&res_battery);
   }
   else{ 
-    if(battery > CRITICAL_BATTERY || interval_counter+BATTERY_SENSING_PERIOD >= BATTERY_INTERVAL_MAX){
+    if(battery > CRITICAL_BATTERY && interval_counter+BATTERY_SENSING_PERIOD >= BATTERY_INTERVAL_MAX){
       interval_counter = 0;
       sendedCritical = 0;
       REST.notify_subscribers(&res_battery);

@@ -17,9 +17,10 @@ static uint32_t variable_max_age = RESOURCE_MAX_AGE;
 //Used to know when we are near to the end of the validity of the previous data
 static uint32_t interval_counter = 0;
 
+static uint32_t luminosityObserver = 0;
 //Vectors of luminosity values, used to simulate the luminosity
-#define VALUES 6
-int LUMINOSITY_VALUES[VALUES] = {20,   26,  30, 60, 55, 25};
+#define VALUES 3
+int LUMINOSITY_VALUES[VALUES] = {20, 60, 25};
 
 uint32_t indexLuminosityValues = 1;
 
@@ -95,10 +96,14 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
   //Call the log function - TESTING PHASE
   stampa(luminosity_old, "luminosity", dataLevel);
 
-  if(requestLevel == 0 || requestLevel == CRITICAL){
-    printf("0\n");
-  }
   
+  if(requestLevel == 0 || requestLevel == CRITICAL){
+    luminosityObserver = 0;
+  }else{
+    luminosityObserver++;
+  }
+  printf("%lu\n", luminosityObserver);
+
 }
 
 
