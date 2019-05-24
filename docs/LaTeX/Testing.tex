@@ -1,4 +1,5 @@
 \externaldocument{ProxyObserver.tex}
+\externaldocument{specifiche.tex}
 \chapter{Testing}
   I testing delle modifiche effettuate al Procotollo CoAP sono stati effettuati utilizzando i seguenti dispositivi:
   \begin{itemize}
@@ -36,12 +37,81 @@
     \end{itemize}
     In entrambi è evidente come all'aumentare della priorità il ritardo medio si riduce.
     \begin{figure}
-      \includegraphics[width=\linewidth]{../Immagini/GraficoRitardoLibero.png}
+      \centering
+      \includegraphics[scale = 0.75]{../Immagini/GraficoRitardoLibero.png}
       \caption{Grafico del ritardo al variare della priorità degli Observer con canale libero}
       \label{fig:graficoRitardoLibero}
     \end{figure}
     \begin{figure}
-      \includegraphics[width=\linewidth]{../Immagini/GraficoRitardoDisturbato.png}
+      \centering
+      \includegraphics[scale = 0.75]{../Immagini/GraficoRitardoDisturbato.png}
       \caption{Grafico del ritardo al variare della priorità degli Observer con canale disturbato}
       \label{fig:graficoRitardoDisturbato}
     \end{figure}
+
+    \section{Consumo Batteria in funzione del Numero di Pacchetti}
+
+    saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
+    saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
+    saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
+    saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
+    saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
+    saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
+    saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
+    saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
+    saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
+      \begin{center}
+        \begin{figure}
+          \centering
+          \includegraphics[width=\linewidth]{../Immagini/MergeOn.png}
+          \caption{Grafici Pacchetti Inviati con Algoritmo attivo}
+          \label{fig:mergeOn}
+        \end{figure}
+
+        \begin{figure}
+          \centering
+          \includegraphics[width=\linewidth]{../Immagini/OFF.png}
+          \caption{Grafici Pacchetti Inviati con Algoritmo disattivato}
+          \label{fig:off}
+        \end{figure}
+      \end{center}
+
+      saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
+      saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
+      saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
+      saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
+      saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
+
+
+
+
+
+    \section{Variazione MaxAge}
+      L'algoritmo descritto nel capitolo delle Specifiche \ref{Spec:MaxAge} è stato realizzato apportando delle leggere modifiche ai parametri utilizzati per la modifica del valore del MaxAge. I parametri adottati sono riportarti in tabella \ref{tab:Parametri}
+
+      \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+        \begin{table}%[!h]
+          \renewcommand{\arraystretch}{1.2}
+           \caption{Parametri per la Variazione del MaxAge}
+           \label{tab:Parametri}
+           \centering
+             \begin{tabular}{  P{7cm}  P{7cm}  }
+                 \firsthline
+                 \cline{1-2}
+                 \textbf{Parametro} & \textbf{Valore} \\
+               \hline
+                  RESOURCES\_SENSING\_PERIOD & 5 \\
+                  STEP & 2 \\
+                  MAX\_AGE\_THRESHOLD & 10 \\
+                  RESOURCE\_MIN\_MAX\_AGE & RESOURCES\_SENSING\_PERIOD + MAX\_AGE\_THRESHOLD \\
+                  RESOURCE\_MAX\_AGE & 15*RESOURCES\_SENSING\_PERIOD + MAX\_AGE\_THRESHOLD \\
+                \lasthline
+             \end{tabular}
+        \end{table}
+      Il testing è stato eseguito simulando uno scenario in cui i valori rimangono per la maggior parte del tempo costanti, nel caso specifico ad una temperatura di \ang{28}, con dei picchi a \ang{33} per simulare l'arrivo di un valore critico. Nella figura \ref{fig:graficoMaxAge} si può notare come subito dopo l'arrivo di un valore critico, la frequenza di arrivo delle notifiche dimunisce nel tempo dato che il MaxAge aumenta. Questo accade in quanto per evitare che l'observer cancelli la relazione di osservazione in seguito alla scadenza del MaxAge, il subject invia una nuova notifica prima della scandena, nello specifico RESOURCES\_SENSING\_PERIOD secondi. I parametri utilizzati dovranno essere settati in base alla tipologia della risorsa.
+      \begin{figure}
+        \centering
+        \includegraphics[scale=0.75]{../Immagini/MaxAge.png}
+        \caption{Grafico della variazione del MaxAge quando il valore rimane costante}
+        \label{fig:graficoMaxAge}
+      \end{figure}
