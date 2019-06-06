@@ -80,3 +80,5 @@
 \contentsline {subsection}{\numberline {5.3.3}Parametri}{65}{subsection.5.3.3}% 
 \contentsline {chapter}{\numberline {6}Testing}{66}{chapter.6}% 
 \contentsline {section}{\numberline {6.1}Ritardo Trasmissione}{66}{section.6.1}% 
+\contentsline {section}{\numberline {6.2}Consumo Batteria in funzione del Numero di Pacchetti}{69}{section.6.2}% 
+\contentsline {section}{\numberline {6.3}Variazione MaxAge}{71}{section.6.3}% 
