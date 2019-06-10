@@ -51,15 +51,20 @@
 
     \section{Consumo Batteria in funzione del Numero di Pacchetti}
 
-    saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
-    saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
-    saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
-    saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
-    saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
-    saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
-    saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
-    saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
-    saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
+    In questa fase andiamo a vedere l'impatto che ha l'algoritmo di variazione del tempo di invio dei nuovi valori di una risorsa sul tempo di vita complessivo della Batteria del nodo sensore.\newline
+    Questa simulazione è stata svolta nel seguente scenario:
+    \begin{itemize}
+      \item Proxy e Observer eseguiti in locale sulla stessa macchina, in quanto non siamo interessati al ritardo di trasmissione dei dati
+      \item Un unico Observer registrato alla risorsa \textit{temperatura} con \textit{priorità 1}, necessaria per ricevere tutti i tipi di eventi (\textit{non critici} e \textit{critici})
+      \item La simulazione è durata fino a quando il nodo sensore non si è scaricato
+      \item I dati generati dal sensing del nodo sensore seguivano una segnale periodico uguale per ogni test
+    \end{itemize}
+    In questo scenario sono state svolte 9 simulazioni:
+    \begin{itemize}
+      \item Algoritmo variazione del MaxAge disabilitato, invio di un pacchetto ogni volta che il sensing è eseguito
+      \item Algoritmo variazione del MaxAge abilitato, con variazione di almeno 1 o 0 dei valori rilevati critici, rispetto al valore critico precedente, e con soglia per i valori non critici, per il valore non critico precedente che varia di 1, 2, 3 o 4
+    \end{itemize}
+    Nelle immagini successive possiamo vedere come l'utilizzo dell'algoritmo permetta di risparmiare batteria e di riuscire così ad inviare pacchetti relativi ad una parte del segnale maggiore. Si può anche notare nel caso di algoritmo attivo il fatto che al variare della soglia per i valori non critici si ottiene un segnale più uniforme, e lo stesso vale per i valori critici.
       \begin{center}
         \begin{figure}
           \centering
@@ -75,16 +80,6 @@
           \label{fig:off}
         \end{figure}
       \end{center}
-
-      saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
-      saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
-      saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
-      saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
-      saldgsaljydgsalydvasydgsaydg asldg sauldgsayd gsaduylgs ayludgasu lgaslu dygaslud gasludy gasljd gasljdg auldg alsugd aludgausdgaudgausl
-
-
-
-
 
     \section{Variazione MaxAge}
       L'algoritmo descritto nel capitolo delle Specifiche \ref{Spec:MaxAge} è stato realizzato apportando delle leggere modifiche ai parametri utilizzati per la modifica del valore del MaxAge. I parametri adottati sono riportarti in tabella \ref{tab:Parametri}
