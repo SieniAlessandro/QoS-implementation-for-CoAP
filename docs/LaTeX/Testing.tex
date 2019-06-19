@@ -14,74 +14,7 @@
     \caption{Ambiente di Testing}
     \label{fig:architettura}
   \end{figure}
-  \section{Ritardo Trasmissione}
-    Seguendo il meccanismo di tramissione spiegato in \ref{NotificaPriotita}, il \textit{ProxyObserver} invia le notifiche in modo ordinato agli osservatori, nel seguente ordine:
-    \begin{enumerate}
-      \item \textbf{CoAP.QoSLevel.CRITICAL\_HIGHEST\_PRIORITY}
-      \item \textbf{CoAP.QoSLevel.CRITICAL\_HIGH\_PRIORITY}
-      \item \textbf{CoAP.QoSLevel.NON\_CRITICAL\_MEDIUM\_PRIORITY}
-      \item \textbf{CoAP.QoSLevel.NON\_CRITICAL\_LOW\_PRIORITY}
-    \end{enumerate}
-    Questo si riflette sul tempo necessario ad un osservatore a ricevere la propria notifica, in particolare gli osservatori registrati sulla stessa risorsa dello stesso sensore, riceveranno le notifiche in istanti diversi dipendentemente dal loro livello di priorità.
-    Il testing effettuato permette di evidenziare questa conseguenza del nuovo meccanismo di invio e si basa sull'acquisizione del timestamp in 2 istanti precisi:
-    \begin{enumerate}
-      \item Istante di \textbf{invio} della notifica da parte del \textit{Subject}
-      \item Istante di \textbf{ricezione} della notifica da parte del \textit{Observer}
-    \end{enumerate}
-    Sono stati avviati 16 Observer, in particolare 4 Observer per ogni priorità. Questi hanno richiesto al Proxy le notifiche della temperatura di un sensore, simulando che quest'ultimo sia costantemente in una situazione di criticità, in modo che tutti gli observer ricevino lo stesso numero di notifiche. \newline
-    L'esecuzione è proseguita per un certo intervallo di tempo in cui sono state ricevute circa 40 notifiche, per ognuno delle quali sono stati salvati i timestamp di ricezione in un log relativo ad ogni observer, oltre al log del Subject in cui sono stati salvati i timestamp di invio. A questo punto, è stato possibile analizzare i file creati tramite uno script Python che calcola il ritardo di trasmissione medio dei pacchetti per ogni priorità. \newline
-    I risultati ottenuti variano in base all'ambiente in cui sono stati effettuati i testing, in particolare:
-    \begin{itemize}
-      \item Canale di comunicazione con poche interferenze \ref{fig:graficoRitardoLibero}
-      \item Canale di comunicazione abbastanza disturbato \ref{fig:graficoRitardoDisturbato}
-    \end{itemize}
-    In entrambi è evidente come all'aumentare della priorità il ritardo medio si riduce.
-    \begin{figure}
-      \centering
-      \includegraphics[scale = 0.75]{../Immagini/GraficoRitardoLibero.png}
-      \caption{Grafico del ritardo al variare della priorità degli Observer con canale libero}
-      \label{fig:graficoRitardoLibero}
-    \end{figure}
-    \begin{figure}
-      \centering
-      \includegraphics[scale = 0.75]{../Immagini/GraficoRitardoDisturbato.png}
-      \caption{Grafico del ritardo al variare della priorità degli Observer con canale disturbato}
-      \label{fig:graficoRitardoDisturbato}
-    \end{figure}
-
-    \section{Consumo Batteria in funzione del Numero di Pacchetti}
-
-    In questa fase andiamo a vedere l'impatto che ha l'algoritmo di variazione del tempo di invio dei nuovi valori di una risorsa sul tempo di vita complessivo della Batteria del nodo sensore.\newline
-    Questa simulazione è stata svolta nel seguente scenario:
-    \begin{itemize}
-      \item Proxy e Observer eseguiti in locale sulla stessa macchina, in quanto non siamo interessati al ritardo di trasmissione dei dati
-      \item Un unico Observer registrato alla risorsa \textit{temperatura} con \textit{priorità 1}, necessaria per ricevere tutti i tipi di eventi (\textit{non critici} e \textit{critici})
-      \item La simulazione è durata fino a quando il nodo sensore non si è scaricato
-      \item I dati generati dal sensing del nodo sensore seguivano una segnale periodico uguale per ogni test
-    \end{itemize}
-    In questo scenario sono state svolte 9 simulazioni:
-    \begin{itemize}
-      \item Algoritmo variazione del MaxAge disabilitato, invio di un pacchetto ogni volta che il sensing è eseguito
-      \item Algoritmo variazione del MaxAge abilitato, con variazione di almeno 1 o 0 dei valori rilevati critici, rispetto al valore critico precedente, e con soglia per i valori non critici, per il valore non critico precedente che varia di 1, 2, 3 o 4
-    \end{itemize}
-    Nelle immagini successive possiamo vedere come l'utilizzo dell'algoritmo permetta di risparmiare batteria e di riuscire così ad inviare pacchetti relativi ad una parte del segnale maggiore. Si può anche notare nel caso di algoritmo attivo il fatto che al variare della soglia per i valori non critici si ottiene un segnale più uniforme, e lo stesso vale per i valori critici.
-      \begin{center}
-        \begin{figure}
-          \centering
-          \includegraphics[width=\linewidth]{../Immagini/MergeOn.png}
-          \caption{Grafici Pacchetti Inviati con Algoritmo attivo}
-          \label{fig:mergeOn}
-        \end{figure}
-
-        \begin{figure}
-          \centering
-          \includegraphics[width=\linewidth]{../Immagini/OFF.png}
-          \caption{Grafici Pacchetti Inviati con Algoritmo disattivato}
-          \label{fig:off}
-        \end{figure}
-      \end{center}
-
-    \section{Variazione MaxAge}
+  \section{Variazione MaxAge}
       L'algoritmo descritto nel capitolo delle Specifiche \ref{Spec:MaxAge} è stato realizzato apportando delle leggere modifiche ai parametri utilizzati per la modifica del valore del MaxAge. I parametri adottati sono riportarti in tabella \ref{tab:Parametri}
 
       \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
@@ -110,3 +43,106 @@
         \caption{Grafico della variazione del MaxAge quando il valore rimane costante}
         \label{fig:graficoMaxAge}
       \end{figure}
+  \section{Consumo Batteria in funzione del Numero di Pacchetti}
+    In questa fase si evidenzia l'impatto che ha l'algoritmo di variazione del tempo di invio dei nuovi valori di una risorsa sul tempo di vita complessivo della Batteria del nodo sensore.\newline
+    Questa simulazione è stata svolta nel seguente scenario:
+    \begin{itemize}
+      \item Proxy e Observer eseguiti in locale sulla stessa macchina, in quanto non siamo interessati al ritardo di trasmissione dei dati
+      \item Un unico Observer registrato alla risorsa \textit{temperatura} con \textit{priorità 1}, necessaria per ricevere tutti i tipi di eventi (\textit{non critici} e \textit{critici})
+      \item La simulazione è durata fino a quando il nodo sensore non si è scaricato
+      \item I dati generati dal sensing del nodo sensore seguivano una segnale periodico uguale per ogni test
+    \end{itemize}
+    In questo scenario sono state svolte 9 simulazioni, in cui i valori dei sensori avevano l'andamento rappresentato in figura \ref{fig:off}:
+    \begin{itemize}
+      \item Algoritmo variazione del MaxAge disabilitato, invio di un pacchetto ogni volta che il sensing è eseguito
+      \item Algoritmo variazione del MaxAge abilitato, con variazione di almeno 1 o 0 dei valori rilevati critici, rispetto al valore critico precedente, e con soglia per i valori non critici, per il valore non critico precedente che varia di 1, 2, 3 o 4
+    \end{itemize}
+    \begin{center}
+      \begin{figure}
+        \centering
+        \includegraphics[width=\linewidth]{../Immagini/OFF.png}
+        \caption{Grafici Pacchetti Inviati con Algoritmo disattivato}
+        \label{fig:off}
+      \end{figure}
+
+      \begin{figure}
+        \centering
+        \includegraphics[width=\linewidth]{../Immagini/MergeOn.png}
+        \caption{Grafici Pacchetti Inviati con Algoritmo attivo}
+        \label{fig:mergeOn}
+      \end{figure}
+    \end{center}
+
+    Nel grafico \ref{fig:BatteryLifetimeTime} sono riportate le durate della batterie con i vari scenari descritti. Si può notare un miglioramento notevole rispetto al caso in cui non vi è alcuna ottimizzazione sul rate di invio,
+    nel grafico \ref{fig:BatteryLifetimePercentage} si evidenzia il miglioramento percentuale della durata rispetto al caso \textit{OFF}, le cui percentuali sono riportate in tabella \ref{tab:MiglioramentoPercentuale}. 
+
+    \begin{table}%[!h]
+      \renewcommand{\arraystretch}{1.2}
+       \caption{Miglioramento Percentuale Durata Batteria}
+       \label{tab:MiglioramentoPercentuale}
+       \centering
+         \begin{tabular}{  P{1cm}  P{5cm} P{7cm} }
+            \firsthline
+            \textbf{Delta} & \textbf{CRITICAL ALWAYS SEND } & \textbf{CRITICAL MUST VARIATE FROM PREVIOUS ONE} \\
+          \hline
+            \textbf{1} & 17,02 \% & 31,91 \% \\
+            \textbf{2} & 42,55 \% & 65,95 \% \\
+            \textbf{3} & 52,12 \% & 78,72 \% \\
+            \textbf{4} & 56,38 \% & 80,85 \% \\
+          \lasthline
+         \end{tabular}
+    \end{table}
+    
+    \begin{figure}
+      \centering
+      \includegraphics[width=\linewidth]{../Immagini/GraficoBatteryLifetimeTime.png}
+      \caption{Variazione della durata della batteria al variare della soglia di variazione dei valori}
+      \label{fig:BatteryLifetimeTime}
+    \end{figure}
+
+    \begin{figure}
+      \centering
+      \includegraphics[width=\linewidth]{../Immagini/GraficoBatteryLifetimePercentage.png}
+      \caption{Miglioramento percentuale della durata della batteria}
+      \label{fig:BatteryLifetimePercentage}
+    \end{figure}
+  \section{Ritardo Trasmissione}
+    Seguendo il meccanismo di tramissione spiegato in \ref{NotificaPriotita}, il \textit{ProxyObserver} invia le notifiche in modo ordinato agli osservatori, nel seguente ordine:
+    \begin{enumerate}
+      \item \textbf{CoAP.QoSLevel.CRITICAL\_HIGHEST\_PRIORITY}
+      \item \textbf{CoAP.QoSLevel.CRITICAL\_HIGH\_PRIORITY}
+      \item \textbf{CoAP.QoSLevel.NON\_CRITICAL\_MEDIUM\_PRIORITY}
+      \item \textbf{CoAP.QoSLevel.NON\_CRITICAL\_LOW\_PRIORITY}
+    \end{enumerate}
+    Questo si riflette sul tempo necessario ad un osservatore a ricevere la propria notifica, in particolare gli osservatori registrati sulla stessa risorsa dello stesso sensore, riceveranno le notifiche in istanti diversi dipendentemente dal loro livello di priorità.
+    Il testing effettuato permette di evidenziare questa conseguenza del nuovo meccanismo di invio e si basa sull'acquisizione del timestamp in 2 istanti precisi:
+    \begin{enumerate}
+      \item Istante di \textbf{invio} della notifica da parte del \textit{Subject}
+      \item Istante di \textbf{ricezione} della notifica da parte del \textit{Observer}
+    \end{enumerate}
+    Sono stati avviati 16 Observer, in particolare 4 Observer per ogni priorità. Questi hanno richiesto al Proxy le notifiche della temperatura di un sensore, simulando che quest'ultimo sia costantemente in una situazione di criticità, in modo che tutti gli observer ricevino lo stesso numero di notifiche. \newline
+    L'esecuzione è proseguita per un certo intervallo di tempo in cui sono state ricevute circa 40 notifiche, per ognuno delle quali sono stati salvati i timestamp di ricezione in un log relativo ad ogni observer, oltre al log del Subject in cui sono stati salvati i timestamp di invio. A questo punto, è stato possibile analizzare i file creati tramite uno script Python che calcola il ritardo di trasmissione medio dei pacchetti per ogni priorità. \newline
+    I risultati ottenuti variano in base all'ambiente in cui sono stati effettuati i testing, in particolare:
+    \begin{itemize}
+      \item Test compatto, in cui i dispositivi erano vicini tra loro su un tavolo.\ref{fig:graficoRitardoLibero}
+      \item Test in condizioni peggiori, in cui i dispositivi erano distanti fra loro. \ref{fig:graficoRitardoDisturbato}
+    \end{itemize}
+    In entrambi è evidente come all'aumentare della priorità il ritardo medio si riduce.
+    \begin{figure}
+      \centering
+      \includegraphics[scale = 0.75]{../Immagini/GraficoRitardoLibero.png}
+      \caption{Grafico del ritardo al variare della priorità degli Observer nel Test compatto}
+      \label{fig:graficoRitardoLibero}
+    \end{figure}
+    \begin{figure}
+      \centering
+      \includegraphics[scale = 0.75]{../Immagini/GraficoRitardoDisturbato.png}
+      \caption{Grafico del ritardo al variare della priorità degli Observer con dispositivi distanti}
+      \label{fig:graficoRitardoDisturbato}
+    \end{figure}
+
+    
+
+    
+
+    
