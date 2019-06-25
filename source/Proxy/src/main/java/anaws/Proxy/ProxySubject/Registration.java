@@ -44,8 +44,8 @@ public class Registration{
 		}
 		 String URI = "coap://[" + address + "]:" + port + "/sensors/"+path;
 		 observeRequest.setURI(URI);	
-		 System.out.println("----------------------------------REGISTRAZIONE--------------------------");
-		 System.out.println(observeRequest.toString());
+		 System.out.println("---------------------------REGISTRAZIONE--------------------------");
+//		 System.out.println(observeRequest.toString());
 		 coapRelation = coapClient.observeAndWait(observeRequest, new ResponseHandler(this.cache,this,this.observer));
 		 if(coapRelation.isCanceled() == false) {
 			 //System.out.println("Registrazione con il sensore avvenuta");

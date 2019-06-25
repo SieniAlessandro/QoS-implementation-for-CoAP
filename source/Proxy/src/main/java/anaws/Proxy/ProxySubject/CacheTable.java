@@ -53,7 +53,7 @@ public class CacheTable{
 		SensorData sd;
 		while((sd = searchData(resource,type)) == null) {
 			try {
-				Log.debug("CacheTable", "Waiting for data not null in cache: " +  resource + " " + type );
+//				Log.debug("CacheTable", "Waiting for data not null in cache: " +  resource + " " + type );
 				wait();
 			} catch (InterruptedException e) {
 				e.printStackTrace();

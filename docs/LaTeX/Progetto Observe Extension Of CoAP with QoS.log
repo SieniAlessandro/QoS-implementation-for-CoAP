@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7000 64-bit) (preloaded format=pdflatex 2019.3.28)  19 JUN 2019 12:50
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7000 64-bit) (preloaded format=pdflatex 2019.3.28)  25 JUN 2019 10:59
 entering extended mode
 **"./Progetto Observe Extension Of CoAP with QoS.tex"
 ("Progetto Observe Extension Of CoAP with QoS.tex"
@@ -709,12 +709,6 @@ File: lstlang1.sty 2019/02/27 1.8b listings language file
 
 LaTeX Warning: Label `res-battery' multiply defined.
 
-
-LaTeX Warning: Label `res-battery' multiply defined.
-
-
-LaTeX Warning: Label `res-battery' multiply defined.
-
 ) (Testing.aux))
 \openout1 = `"Progetto Observe Extension Of CoAP with QoS.aux"'.
 
@@ -1188,21 +1182,19 @@ Capitolo 5.
 
 
 
-] (../Codice/C/border-router.c) (../Codice/C/subscriber.c [45] [46])
+] (../Codice/C/border-router.c) (../Codice/C/subscriber.c [45]) [46]
 (../Codice/C/subscriber.c) [47] (../Codice/C/resources/res-battery.c [48]
-[49]) [50] (../Codice/C/resources/res-temperature.c [51] [52] [53] [54]
-[55]) (../Codice/C/resources/res-luminosity.c [56] [57] [58] [59])
-Overfull \hbox (54.41553pt too wide) in paragraph at lines 102--106
+[49]) [50] (../Codice/C/resources/res-temperature.c [51] [52] [53] [54]))
+Overfull \hbox (54.41553pt too wide) in paragraph at lines 100--84
 \T1/lmr/m/n/10.95 (-20) sca dal va-lo-re pre-ce-den-te di un va-lo-re su-pe-rio
 -re a \T1/lmr/bx/n/10.95 HU-MI-DI-TY_NON_CRITICAL_CHANGE\T1/lmr/m/n/10.95 (-20)
  ,
  []
 
-[60] (../Codice/C/resources/res-humidity.c [61] [62] [63] [64])) [65]
+[55]
 \openout2 = `Testing.aux'.
 
-
-(Testing.tex
+ (Testing.tex
 
 Package xr Warning: 
 No file ProxyObserver.tex.aux
@@ -1216,7 +1208,7 @@ LABELS NOT IMPORTED.
  on input line 2.
 
 Capitolo 6.
-<../Immagini/ArchitetturaGenerale.png, id=1981, 735.9495pt x 356.532pt>
+<../Immagini/ArchitetturaGenerale.png, id=1559, 735.9495pt x 356.532pt>
 File: ../Immagini/ArchitetturaGenerale.png Graphic file (type png)
 <use ../Immagini/ArchitetturaGenerale.png>
 Package pdftex.def Info: ../Immagini/ArchitetturaGenerale.png  used on input li
@@ -1227,22 +1219,22 @@ Overfull \hbox (4.08488pt too wide) in paragraph at lines 26--38
  [][] 
  []
 
-<../Immagini/MaxAge.png, id=1986, 462.528pt x 346.896pt>
+<../Immagini/MaxAge.png, id=1564, 462.528pt x 346.896pt>
 File: ../Immagini/MaxAge.png Graphic file (type png)
 <use ../Immagini/MaxAge.png>
 Package pdftex.def Info: ../Immagini/MaxAge.png  used on input line 42.
 (pdftex.def)             Requested size: 346.89514pt x 260.17136pt.
-[66
+[56
 
 
 
-] [67 <../Immagini/ArchitetturaGenerale.png>] [68 <../Immagini/MaxAge.png>]
-<../Immagini/OFF.png, id=2008, 462.528pt x 346.896pt>
+] [57 <../Immagini/ArchitetturaGenerale.png>] [58 <../Immagini/MaxAge.png>]
+<../Immagini/OFF.png, id=1587, 462.528pt x 346.896pt>
 File: ../Immagini/OFF.png Graphic file (type png)
 <use ../Immagini/OFF.png>
 Package pdftex.def Info: ../Immagini/OFF.png  used on input line 63.
 (pdftex.def)             Requested size: 418.25368pt x 313.70677pt.
-<../Immagini/MergeOn.png, id=2009, 749.80125pt x 289.08pt>
+<../Immagini/MergeOn.png, id=1588, 749.80125pt x 289.08pt>
 File: ../Immagini/MergeOn.png Graphic file (type png)
 <use ../Immagini/MergeOn.png>
 Package pdftex.def Info: ../Immagini/MergeOn.png  used on input line 70.
@@ -1252,34 +1244,34 @@ Overfull \hbox (1.73009pt too wide) in paragraph at lines 86--86
  []|\T1/lmr/bx/n/10.95 Delta| 
  []
 
-<../Immagini/GraficoBatteryLifetimeTime.png, id=2013, 587.796pt x 384.2355pt>
+<../Immagini/GraficoBatteryLifetimeTime.png, id=1592, 587.796pt x 384.2355pt>
 File: ../Immagini/GraficoBatteryLifetimeTime.png Graphic file (type png)
 <use ../Immagini/GraficoBatteryLifetimeTime.png>
 Package pdftex.def Info: ../Immagini/GraficoBatteryLifetimeTime.png  used on in
 put line 98.
 (pdftex.def)             Requested size: 418.25368pt x 273.413pt.
-<../Immagini/GraficoBatteryLifetimePercentage.png, id=2014, 587.796pt x 384.235
+<../Immagini/GraficoBatteryLifetimePercentage.png, id=1593, 587.796pt x 384.235
 5pt>
 File: ../Immagini/GraficoBatteryLifetimePercentage.png Graphic file (type png)
 <use ../Immagini/GraficoBatteryLifetimePercentage.png>
 Package pdftex.def Info: ../Immagini/GraficoBatteryLifetimePercentage.png  used
  on input line 105.
 (pdftex.def)             Requested size: 418.25368pt x 273.413pt.
-[69 <../Immagini/OFF.png>] [70 <../Immagini/MergeOn.png>] [71 <../Immagini/Graf
+[59 <../Immagini/OFF.png>] [60 <../Immagini/MergeOn.png>] [61 <../Immagini/Graf
 icoBatteryLifetimeTime.png>]
-<../Immagini/GraficoRitardoLibero.png, id=2041, 462.528pt x 346.896pt>
+<../Immagini/GraficoRitardoLibero.png, id=1619, 462.528pt x 346.896pt>
 File: ../Immagini/GraficoRitardoLibero.png Graphic file (type png)
 <use ../Immagini/GraficoRitardoLibero.png>
 Package pdftex.def Info: ../Immagini/GraficoRitardoLibero.png  used on input li
 ne 133.
 (pdftex.def)             Requested size: 346.89514pt x 260.17136pt.
-<../Immagini/GraficoRitardoDisturbato.png, id=2042, 462.528pt x 346.896pt>
+<../Immagini/GraficoRitardoDisturbato.png, id=1620, 462.528pt x 346.896pt>
 File: ../Immagini/GraficoRitardoDisturbato.png Graphic file (type png)
 <use ../Immagini/GraficoRitardoDisturbato.png>
 Package pdftex.def Info: ../Immagini/GraficoRitardoDisturbato.png  used on inpu
 t line 139.
 (pdftex.def)             Requested size: 346.89514pt x 260.17136pt.
-) [72 <../Immagini/GraficoBatteryLifetimePercentage.png>] [73 <../Immagini/Graf
+) [62 <../Immagini/GraficoBatteryLifetimePercentage.png>] [63 <../Immagini/Graf
 icoRitardoLibero.png> <../Immagini/GraficoRitardoDisturbato.png>]
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 86.
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 86.
@@ -1297,10 +1289,10 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 26297 strings out of 492945
- 493308 string characters out of 3126252
- 917512 words of memory out of 3000000
- 28021 multiletter control sequences out of 15000+200000
+ 25883 strings out of 492945
+ 486092 string characters out of 3126252
+ 908512 words of memory out of 3000000
+ 28003 multiletter control sequences out of 15000+200000
  625953 words of font info for 142 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  45i,10n,63p,1302b,2401s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -1319,10 +1311,10 @@ nts/type1/public/lm/lmri10.pfb><C:/Users/nabow/AppData/Local/Programs/MiKTeX 2.
 X 2.9/fonts/type1/public/lm/lmsy10.pfb><C:/Users/nabow/AppData/Local/Programs/M
 iKTeX 2.9/fonts/type1/public/lm/lmsy8.pfb><C:/Users/nabow/AppData/Local/Program
 s/MiKTeX 2.9/fonts/type1/public/lm/lmsy9.pfb>
-Output written on "Progetto Observe Extension Of CoAP with QoS.pdf" (76 pages, 
-942495 bytes).
+Output written on "Progetto Observe Extension Of CoAP with QoS.pdf" (66 pages, 
+836116 bytes).
 PDF statistics:
- 2422 PDF objects out of 2487 (max. 8388607)
- 1596 named destinations out of 1728 (max. 500000)
+ 1919 PDF objects out of 2073 (max. 8388607)
+ 1206 named destinations out of 1440 (max. 500000)
  32041 words of extra memory for PDF output out of 35830 (max. 10000000)
 
