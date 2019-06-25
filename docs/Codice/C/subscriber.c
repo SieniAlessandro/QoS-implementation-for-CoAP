@@ -1,15 +1,18 @@
 #include "common.h"
 #include "dev/button-sensor.h"
-#include "dev/temperature-sensor.h"
-#include "dev/battery-sensor.h"
-//#include "dev/humidity.h"
-//#include "dev/light.h"
 
-/*DEFINING THE RESOURCE THAT ARE PRESENT IN THE SENSOR NODE*/
+/*DEFINING THE RESOURCE THOSE ARE PRESENT IN THE SENSOR NODE*/
+#include "dev/temperature-sensor.h"
 extern resource_t res_temperature;
+
+#include "dev/battery-sensor.h"
 extern resource_t res_battery;
+
+//#include "dev/humidity.h"
 extern resource_t res_humidity;
-extern resource_t res_luminosity;
+
+//#include "dev/light.h"
+//extern resource_t res_luminosity;
 
 static struct uip_udp_conn *client_conn;
 static uip_ipaddr_t server_ipaddr;
@@ -96,17 +99,13 @@ PROCESS_THREAD(rest_server, ev, data)
   SENSORS_ACTIVATE(temperature_sensor);
 
   rest_activate_resource(&res_humidity, "sensors/humidity");
-  //SENSORS_ACTIVATE(humidity_sensor);
+  SENSORS_ACTIVATE(humidity_sensor);
 
   rest_activate_resource(&res_luminosity, "sensors/luminosity");
-  //SENSOR_ACTIVATE(light_sensor);
+  SENSOR_ACTIVATE(light_sensor);
 
-  //Used only for Testing phase
+  //Used only to log purposes
   printf("Time,IPAddress,Value,Type,Critic,Observe\n");
-
-  //Starting powertrace with a period of 5 minutes
-  //powertrace_start(CLOCK_SECOND*20);
-
 
   SENSORS_ACTIVATE(button_sensor);
   while(1) {
@@ -114,8 +113,6 @@ PROCESS_THREAD(rest_server, ev, data)
     //Used to force the battery to go in the only critic connection accepted phase
     critic_battery();
   }
-
-
 
   PROCESS_END();
 }

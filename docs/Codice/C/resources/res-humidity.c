@@ -21,9 +21,9 @@ static uint32_t variable_max_age = RESOURCE_MAX_AGE;
 static uint32_t interval_counter = 0;
 
 //Vectors of HUMIDITY_NON_CRITICAL_CHANGE values, used to simulate the humidity
-#define VALUES 23
+#define VALUES 3
 
-int HUMIDITY_VALUES[VALUES] = {60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 70, 69, 65, 64, 63, 62, 61};
+int HUMIDITY_VALUES[VALUES] = {60, 74, 61};
 
 uint32_t indexHumidityValues = 1;
 
@@ -32,8 +32,9 @@ static uint32_t dataLevel; //NON_CRITICAL, CRITICAL
 static uint8_t requestedLevel; //NON_CRITICAL all, CRITICAL only criticals
 
 //Used to know if there is at least one subscriber to the resource
-static uint8_t requestedByObserver = 0;
+static uint8_t humidityRequestedByObserver = 0;
 
+static uint32_t humidityObserver = 0;
 //Initialization of the resource humidity as an observable resource, with a periodic handler function
 PERIODIC_RESOURCE(res_humidity,
          "title=\"Humidity\";rt=\"Humidity\";obs",
@@ -58,7 +59,7 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
       requestedLevel = 0;
     }
     //We let the node to sense for the data, because there is at least one observer
-    requestedByObserver = 1;
+    humidityRequestedByObserver = 1;
     //Done to have the actual real value
     indexHumidityValues = (indexHumidityValues+1)%VALUES;
     humidity_old = HUMIDITY_VALUES[indexHumidityValues];
@@ -68,7 +69,7 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
 
   //If we receive a message with the field observer equal to 1, we know that the registration has been canceled
   if(requestLevel == 1){
-      requestedByObserver = 0;
+      humidityRequestedByObserver = 0;
       return;
   }
   unsigned int accept = -1;
@@ -100,9 +101,12 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
   stampa(humidity_old, "humidity", dataLevel);
 
   if(requestLevel == 0 || requestLevel == CRITICAL){
-    printf("0\n");
+    humidityObserver = 0;
+  }else{
+    humidityObserver++;
   }
-  
+  printf("%lu\n", humidityObserver);
+
 }
 
 
@@ -111,7 +115,7 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
  * It will be called by the REST manager process with the defined period.
  */
 static void periodic_handler(){
-  if(!requestedByObserver || battery <= 0)
+  if(!humidityRequestedByObserver || battery <= 0)
     return;
 
   // USED ONLY FOR THE SIMULATIONS ON COOJA //

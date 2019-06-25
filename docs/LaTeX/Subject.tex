@@ -29,7 +29,7 @@
 
       %A seconda di come viene usato e se viene usato o meno alla fine del progetto, inserisci qualche nota relativa a powertrace
 
-      \lstinputlisting[label={RestServer}, language=C, firstnumber=56, firstline=56, caption={Process RestServer},captionpos=b]{../Codice/C/subscriber.c}
+      \lstinputlisting[label={RestServer}, language=C, firstnumber=59, firstline=59, caption={Process RestServer},captionpos=b]{../Codice/C/subscriber.c}
 
     \subsection{Risorse}
       Per avere una maggiore modularità è stato realizzato un file per ogni singola risorsa e risorse sono state definite come variabili di tipo \textbf{extern}
@@ -89,21 +89,15 @@
         soglia critica e viene inviato subito se differisce dal vecchio valore di una quantità maggiore di \textbf{TEMPERATURE\_NON\_CRITICAL\_CHANGE}, altrimenti poco prima
         dello scadere del tempo di validità
 
-        \lstinputlisting[label={res-battery}, language=C, caption={Codice di gestione relativo alla risorsa temperatura},captionpos=b]{../Codice/C/resources/res-temperature.c}
+        \lstinputlisting[label={res-battery}, language=C, firstline=17, firstnumber=17, caption={Codice di gestione relativo alla risorsa temperatura},captionpos=b]{../Codice/C/resources/res-temperature.c}
 
       \subsubsection{Luminosità}
         La luminosità è una risorsa di tipo osservabile, un valore è considerato critico solo nel caso in cui la differenza col valore precedentemente inviato sia di almeno \textbf{LUMINOSITY\_CRITICAL\_CHANGE}, altrimenti viene considerato come valore non critico da inviare se la differenza è minore alla soglia critica, ma maggiore
         di almeno \textbf{LUMINOSITY\_NON\_CRITICAL\_CHANGE}; nel caso di scadenza del tempo di validità il valore è considerato sempre di tipo non critico e inviato
         solo nel caso la registrazione alla risorsa sia per tutti i tipi di messaggio e non solo per i critici
 
-        \lstinputlisting[label={res-battery}, language=C, caption={Codice di gestione relativo alla risorsa luminosità},captionpos=b]{../Codice/C/resources/res-luminosity.c}
-
       \subsubsection{Umidità}
         L'umidità è una risorsa di tipo osservabile, un valore è considerato non critico nel caso in cui questo si trovi all'interno dell'intervallo dei valori non critici,
         i valori compresi tra \textbf{HUMIDITY\_CRITICAL\_MIN\_THRESHOLD} e \textbf{HUMIDITY\_CRITICAL\_MAX\_THRESHOLD}, viene inviato subito nel caso in cui differisca dal
         valore precedente di un valore superiore a \textbf{HUMIDITY\_NON\_CRITICAL\_CHANGE}, altrimenti si attende il termine del tempo di validità della notifica precedente;
         tutti gli altri valori sono considerati critici e inviati subito nel caso in cui la differenza col valore precedente sia superiore a \textbf{HUMIDITY\_CRITICAL\_CHANGE}
-
-        \lstinputlisting[label={res-battery}, language=C, caption={Codice di gestione relativo alla risorsa umidità},captionpos=b]{../Codice/C/resources/res-humidity.c}
-
-    \subsection{Parametri}

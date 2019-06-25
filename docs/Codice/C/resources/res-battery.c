@@ -26,26 +26,20 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
   unsigned int accept = -1;
   coap_get_header_accept(request, &accept);
 
+  battery = reduceBattery(TRANSMITTING_DRAIN);
   //USED A SIMULATED VALUE FOR COOJA
-  battery /= BATTERY_MULTIPLIER;
 
   if(accept == -1 || accept == REST.type.TEXT_PLAIN) {
     REST.set_header_content_type(response, REST.type.TEXT_PLAIN);
     snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "%lu", battery);
 
-
-
     REST.set_response_payload(response, (uint8_t *)buffer, strlen((char *)buffer));
-  } else {
-    REST.set_response_status(response, REST.status.NOT_ACCEPTABLE);
-    const char *msg = "Supporting content-types text/plain and application/json";
-    REST.set_response_payload(response, msg, strlen(msg));
   }
   //We set a prefixed value for the max age
   REST.set_header_max_age(response, BATTERY_MAX_AGE);
 
   //Simulating the transimssion drain of the battery
-  battery = reduceBattery(TRANSMITTING_DRAIN)/BATTERY_MULTIPLIER;
+
 }
 
 static void periodic_handler(){
@@ -66,10 +60,17 @@ static void periodic_handler(){
   }
 
   //Check if the battery must be sent or not
-  if((battery <= CRITICAL_BATTERY) || interval_counter+BATTERY_SENSING_PERIOD >= BATTERY_INTERVAL_MAX) {
-    interval_counter = 0;
+  if(battery <= CRITICAL_BATTERY) {
     sendedCritical = 1;
     /* Notify the registered observers which will trigger the res_get_handler to create the response. */
     REST.notify_subscribers(&res_battery);
   }
+  else{ 
+    if(battery > CRITICAL_BATTERY && interval_counter+BATTERY_SENSING_PERIOD >= BATTERY_INTERVAL_MAX){
+      interval_counter = 0;
+      sendedCritical = 0;
+      REST.notify_subscribers(&res_battery);
+    }
+  }
+
 }

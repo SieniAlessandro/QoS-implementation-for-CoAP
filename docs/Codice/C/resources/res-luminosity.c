@@ -17,9 +17,10 @@ static uint32_t variable_max_age = RESOURCE_MAX_AGE;
 //Used to know when we are near to the end of the validity of the previous data
 static uint32_t interval_counter = 0;
 
+static uint32_t luminosityObserver = 0;
 //Vectors of luminosity values, used to simulate the luminosity
-#define VALUES 6
-int LUMINOSITY_VALUES[VALUES] = {20,   26,  30, 60, 55, 25};
+#define VALUES 3
+int LUMINOSITY_VALUES[VALUES] = {20, 60, 25};
 
 uint32_t indexLuminosityValues = 1;
 
@@ -28,7 +29,7 @@ static uint32_t dataLevel; //NON_CRITICAL, CRITICAL
 static uint8_t requestedLevel; //NON_CRITICAL all, CRITICAL only criticals
 
 //Used to know if there is at least one subscriber to the resource
-static uint8_t requestedByObserver = 0;
+static uint8_t luminosityRequestedByObserver = 0;
 
 //Initialization of the resource luminosity as an observable resource, with a periodic handler function
 PERIODIC_RESOURCE(res_luminosity,
@@ -54,7 +55,7 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
       requestedLevel = 0;
     }
     //We let the node to sense for the data, because there is at least one observer
-    requestedByObserver = 1;
+    luminosityRequestedByObserver = 1;
     //Done to have the actual real value
     indexLuminosityValues = (indexLuminosityValues+1)%VALUES;
     luminosity_old = LUMINOSITY_VALUES[indexLuminosityValues];
@@ -64,7 +65,7 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
 
   //If we receive a message with the field observer equal to 1, we know that the registration has been canceled
   if(requestLevel == 1){
-      requestedByObserver = 0;
+      luminosityRequestedByObserver = 0;
       return;
   }
   unsigned int accept = -1;
@@ -95,10 +96,14 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
   //Call the log function - TESTING PHASE
   stampa(luminosity_old, "luminosity", dataLevel);
 
-  if(requestLevel == 0 || requestLevel == CRITICAL){
-    printf("0\n");
-  }
   
+  if(requestLevel == 0 || requestLevel == CRITICAL){
+    luminosityObserver = 0;
+  }else{
+    luminosityObserver++;
+  }
+  printf("%lu\n", luminosityObserver);
+
 }
 
 
@@ -107,7 +112,7 @@ static void get_handler(void *request, void *response, uint8_t *buffer, uint16_t
  * It will be called by the REST manager process with the defined period.
  */
 static void periodic_handler(){
-  if(!requestedByObserver || battery <= 0)
+  if(!luminosityRequestedByObserver || battery <= 0)
     return;
 
   // USED ONLY FOR THE SIMULATIONS ON COOJA //
